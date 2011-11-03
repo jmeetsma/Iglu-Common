@@ -1,0 +1,13 @@
+Iglu is an atomic framework, written in Java. It's a reference implementation for research focused
+on the configuration of an application in terms of modules, clusters, layers and their relations.
+It helps developers organize high-level separation of concerns and adhere to application design.
+
+Iglu Common contains utilities and components that allows developers to build
+a decent runtime environment with Iglu Configuration.
+
+Iglu is developed and maintained by Jeroen Meetsma, partner at IJsberg.
+E-mail: info@ijsberg.nl
+
+ACKNOWLEDGEMENTS
+
+Special thanks to Noiseplayer, whose picture of a "disegno su costruzione igloo a spirale" inspired the Iglu logo.
