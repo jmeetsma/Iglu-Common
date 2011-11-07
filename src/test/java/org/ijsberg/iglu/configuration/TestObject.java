@@ -12,6 +12,7 @@ public class TestObject implements TestInterface {
 
 	@Override
 	public void setPrefix(String prefix) {
+
 		this.prefix = prefix;
 	}
 

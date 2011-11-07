@@ -52,7 +52,13 @@ public class CommandLineProcessor {
 		String[] commandAndArguments = splitCommandLine(commandLine);
 
 		String[] moduleAndMethodIds = splitCommand(commandAndArguments[0]);
-		String[] arguments = splitArguments(commandAndArguments[1]);
+
+		String[] arguments;
+		if(commandAndArguments.length > 1) {
+			arguments = splitArguments(commandAndArguments[1]);
+		} else {
+			arguments = new String[0];
+		}
 
 		System.out.println(ArraySupport.format("[", arguments, "]") + "]");
 
