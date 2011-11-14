@@ -88,7 +88,7 @@ public class SimpleFileLoggerTest {
 		SimpleFileLogger logger = new SimpleFileLogger(new PrintStream(dummyLogStream));
 
 		logger.log(new LogEntry("test 1"));
-		assertEquals(34, dummyLogStream.getLastOutput().length());
+		assertEquals(32, dummyLogStream.getLastOutput().trim().length());
 
 		logger.setEntryOriginStackTraceDepth(3);
 		logger.log(new LogEntry("test 2"));
@@ -103,11 +103,11 @@ public class SimpleFileLoggerTest {
 		SimpleFileLogger logger = new SimpleFileLogger(new PrintStream(dummyLogStream));
 
 		logger.log(new LogEntry("test 1"));
-		assertEquals(34, dummyLogStream.getLastOutput().length());
+		assertEquals(32, dummyLogStream.getLastOutput().trim().length());
 
 		logger.log(new LogEntry("test 2", "with data..."));
 		System.out.println(dummyLogStream.getLastOutput());
-		assertEquals(48, dummyLogStream.getLastOutput().length());
+		assertEquals(46, dummyLogStream.getLastOutput().trim().length());
 		//TODO rather check lines
 	}
 
@@ -117,7 +117,7 @@ public class SimpleFileLoggerTest {
 		SimpleFileLogger logger = new SimpleFileLogger(new PrintStream(dummyLogStream));
 
 		logger.log(new LogEntry("test 1"));
-		assertEquals(34, dummyLogStream.getLastOutput().length());
+		assertEquals(32, dummyLogStream.getLastOutput().trim().length());
 
 		logger.log(new LogEntry("test 2", new NullPointerException("Test Null Pointer")));
 		System.out.println(dummyLogStream.getLastOutput());
