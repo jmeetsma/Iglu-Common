@@ -20,12 +20,14 @@
 
 package org.ijsberg.iglu.runtime.module;
 
-public class Environment extends Starter implements Runnable {
+import org.ijsberg.iglu.logging.LogEntry;
+
+public class ServerEnvironment extends ModuleStarter implements Runnable {
 
 	private Thread shutdownHook;
 	private boolean isRunning;
 
-	public Environment() {
+	public ServerEnvironment() {
 		super();
 		shutdownHook = new Thread(new ShutdownProcess());
 		Runtime.getRuntime().addShutdownHook(shutdownHook);
@@ -41,8 +43,8 @@ public class Environment extends Starter implements Runnable {
 		 * Invokes shutdown when startup is completed.
 		 */
 		public void run() {
-			System.out.println("starting " + (isRunning ? "forced" : "")
-					+ " application shutdown process...");
+			System.out.println(new LogEntry("starting " + (isRunning ? "forced" : "")
+					+ " application shutdown process..."));
 			if (isStarted) {
 				try {
 					stop();
@@ -51,7 +53,7 @@ public class Environment extends Starter implements Runnable {
 				}
 			}
 			System.out
-					.println("Application shutdown process completed...");
+					.println(new LogEntry("Application shutdown process completed..."));
 		}
 	}
 
@@ -77,8 +79,7 @@ public class Environment extends Starter implements Runnable {
 				Thread.sleep(333);
 			} catch (InterruptedException e) {
 				if (isStarted) {
-					System.out
-							.println("Keep-alive thread interrupted...");
+					System.out.println(new LogEntry("Keep-alive thread interrupted..."));
 					stop();
 				}
 			}

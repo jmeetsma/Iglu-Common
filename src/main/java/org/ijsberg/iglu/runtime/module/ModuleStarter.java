@@ -20,22 +20,20 @@
 
 package org.ijsberg.iglu.runtime.module;
 
+import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.runtime.Startable;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class Starter implements Startable {
+public class ModuleStarter implements Startable {
 
 	protected boolean isStarted = false;
-	//TODO list?
 	protected Set<Startable> registeredStartables = new HashSet<Startable>();
-
-	//TODO Initializable / isReady
 
 	public synchronized void register(Startable startable) {
 
-		System.out.println("registering " + startable + " with " + this);
+		System.out.println(new LogEntry("registering " + startable + " with " + this));
 		if (isStarted && !startable.isStarted()) {
 			startable.start();
 		}
@@ -67,14 +65,13 @@ public class Starter implements Startable {
 		return isStarted;
 	}
 
-	//TODO reverse order
 	public synchronized void stop() {
 		isStarted = false;
 
-
-		for (Startable startable : registeredStartables) {
-			if (startable.isStarted()) {
-				startable.stop();
+		Startable[] startables = registeredStartables.toArray(new Startable[0]);
+		for (int i = startables.length - 1; i >= 0; i--) {
+			if (startables[i].isStarted()) {
+				startables[i].stop();
 			}
 		}
 	}

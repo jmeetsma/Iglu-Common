@@ -67,8 +67,6 @@ public class CommandLineProcessor {
 	 */
 	protected Object processCommandLine(String commandLine) throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
 
-		System.out.println("processing command-line: '" + commandLine + "'");
-
 		String[] commandAndArguments = splitCommandLine(commandLine);
 
 		String[] moduleAndMethodIds = splitCommand(commandAndArguments[0]);
@@ -79,8 +77,6 @@ public class CommandLineProcessor {
 		} else {
 			arguments = new String[0];
 		}
-
-		System.out.println(ArraySupport.format("[", arguments, "]") + "]");
 
 		if (moduleAndMethodIds.length < 2) {
 			throw new IllegalArgumentException("can not process command line: '" + commandLine + "'\nmissing method");

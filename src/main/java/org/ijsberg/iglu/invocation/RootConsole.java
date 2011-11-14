@@ -54,7 +54,7 @@ public class RootConsole extends CommandLineProcessor implements Startable, Runn
 	private String baseDir = ".";
 	private String inputFileLocation = "console/input.txt";
 	private String outputFileLocation = "console/output.txt";
-	private String tempOutputFileLocation = "console/tempoutput.txt";
+	private String tempOutputFileLocation = "console/temp_output.txt";
 
 	public RootConsole(Configuration configuration) {
 		super(configuration);
@@ -75,7 +75,7 @@ public class RootConsole extends CommandLineProcessor implements Startable, Runn
 	 * Starts monitoring the input file.
 	 */
 	public void start() {
-		//thread must have rights to process any request
+		System.out.println(new LogEntry("starting root console"));
 		try {
 			openFileReader();
 		}
@@ -176,7 +176,6 @@ public class RootConsole extends CommandLineProcessor implements Startable, Runn
 	 * @param result
 	 */
 	private void writeResult(Object result) throws IOException {
-		System.out.println("writing result...");
 		File outputFile = new File(outputFileLocation);
 		File tempfile = FileSupport.createFile(tempOutputFileLocation);
 		FileOutputStream fos = null;
@@ -195,9 +194,7 @@ public class RootConsole extends CommandLineProcessor implements Startable, Runn
 		finally {fos.close();}
 
 		if (outputFile.exists()) {
-			System.out.println("writing result...0");
 			boolean success = outputFile.delete();
-			System.out.println("writing result...1 " + success);
 		}
 
 		boolean success = tempfile.renameTo(new File(outputFileLocation));

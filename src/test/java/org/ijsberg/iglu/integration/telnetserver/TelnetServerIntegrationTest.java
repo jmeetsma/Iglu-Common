@@ -37,12 +37,12 @@ public class TelnetServerIntegrationTest implements Configuration {
 		socketServer.start();
 
 		Socket socket = new Socket("localhost", 17623);
-		Thread.sleep(100);
+		Thread.sleep(250);
 		assertTrue(socket.isConnected());
 
 		socket.getOutputStream().write("myCluster.myModule.setPrefix(\"Hello \")\r".getBytes());
 		//give async process time to finish
-		Thread.sleep(100);
+		Thread.sleep(250);
 
 		assertEquals("Hello world!", testObject.getMessage("world!"));
 

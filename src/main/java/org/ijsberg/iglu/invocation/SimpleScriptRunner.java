@@ -53,9 +53,7 @@ public class SimpleScriptRunner extends CommandLineProcessor {
 			BufferedReader reader = new BufferedReader(new StringReader(script));
 			try {
 				List results = runScript(reader);
-				//TODO check if exceptions occurred
 				System.out.println(new LogEntry(Level.CRITICAL, "completed run of script in device '\" + this.deviceId + \"'\""));
-				System.out.println(CollectionSupport.format("-> ", results, "\n"));
 			}
 			catch (Throwable t) {
 				throw new ConfigurationException("failed to complete run of script", t);
