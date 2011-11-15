@@ -1,9 +1,9 @@
 package org.ijsberg.iglu.invocation;
 
 import org.ijsberg.iglu.Cluster;
-import org.ijsberg.iglu.Module;
+import org.ijsberg.iglu.Component;
 import org.ijsberg.iglu.configuration.StandardCluster;
-import org.ijsberg.iglu.configuration.StandardModule;
+import org.ijsberg.iglu.configuration.StandardComponent;
 import org.ijsberg.iglu.configuration.TestConfiguration;
 import org.ijsberg.iglu.configuration.TestObject;
 import org.junit.Test;
@@ -27,7 +27,7 @@ public class CommandLineProcessorTest {
 
 
 
-		Module module = new StandardModule(new TestObject("Hello "));
+		Component module = new StandardComponent(new TestObject("Hello "));
 		cluster.connect("object", module);
 
 		assembly.addCluster("cluster", cluster);

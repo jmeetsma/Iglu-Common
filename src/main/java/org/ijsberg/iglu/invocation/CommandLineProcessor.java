@@ -21,7 +21,6 @@
 package org.ijsberg.iglu.invocation;
 
 import org.ijsberg.iglu.Configuration;
-import org.ijsberg.iglu.util.collection.ArraySupport;
 import org.ijsberg.iglu.util.misc.StringSupport;
 
 import java.lang.reflect.InvocationTargetException;
@@ -85,6 +84,6 @@ public class CommandLineProcessor {
 	}
 
 	protected Object invoke(String clusterId, String moduleId, String methodName, Object... arguments) throws InvocationTargetException, NoSuchMethodException {
-		return configuration.getClusters().get(clusterId).getInternalModules().get(moduleId).invoke(methodName, arguments);
+		return configuration.getClusters().get(clusterId).getInternalComponents().get(moduleId).invoke(methodName, arguments);
 	}
 }

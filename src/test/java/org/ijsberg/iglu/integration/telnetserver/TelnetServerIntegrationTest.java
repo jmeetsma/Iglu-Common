@@ -3,7 +3,7 @@ package org.ijsberg.iglu.integration.telnetserver;
 import org.ijsberg.iglu.Cluster;
 import org.ijsberg.iglu.Configuration;
 import org.ijsberg.iglu.configuration.StandardCluster;
-import org.ijsberg.iglu.configuration.StandardModule;
+import org.ijsberg.iglu.configuration.StandardComponent;
 import org.ijsberg.iglu.configuration.TestObject;
 import org.ijsberg.iglu.server.connection.invocation.ConfigurationInvocationConnectionFactory;
 import org.ijsberg.iglu.server.connection.socket.module.StandardSocketServer;
@@ -55,7 +55,7 @@ public class TelnetServerIntegrationTest implements Configuration {
 	private void initializeAssembly() {
 		Cluster cluster = new StandardCluster();
 		testObject = new TestObject("Hi ");
-		cluster.connect("myModule", new StandardModule(testObject));
+		cluster.connect("myModule", new StandardComponent(testObject));
 		clusterMap.put("myCluster", cluster);
 	}
 
