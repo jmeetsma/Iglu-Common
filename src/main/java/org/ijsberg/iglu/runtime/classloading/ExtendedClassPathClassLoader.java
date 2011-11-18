@@ -100,7 +100,7 @@ import java.util.zip.ZipFile;
  * The Iglu application class loader inherits from URLClassLoader.
  * It gives components, such as a JSP-engine, the opportunity to expand the classpath.
  */
-public class FlexibleClassLoader extends URLClassLoader {
+public class ExtendedClassPathClassLoader extends URLClassLoader {
 
 	//contains either a filename pointing to a JAR containing the resource or an actual file
 	private TreeMap classResourceLocations = new TreeMap();
@@ -118,7 +118,7 @@ public class FlexibleClassLoader extends URLClassLoader {
 	/**
 	 * @param classpath a dedicated classpath; both colons and semicolons are valid separators
 	 */
-	public FlexibleClassLoader(String classpath) {
+	public ExtendedClassPathClassLoader(String classpath) {
 		super(new URL[]{});
 		this.classpath = classpath;
 		init();
