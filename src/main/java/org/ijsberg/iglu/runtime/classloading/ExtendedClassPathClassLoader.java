@@ -21,14 +21,14 @@
 package org.ijsberg.iglu.runtime.classloading;
 
 import org.ijsberg.iglu.Cluster;
+import org.ijsberg.iglu.exception.ResourceException;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.io.StreamSupport;
 import org.ijsberg.iglu.util.misc.StringSupport;
 
 import java.io.*;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.net.*;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -133,7 +133,7 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 
 		Iterator i = paths.iterator();
 		while (i.hasNext()) {
-			String location = (String) i.next();
+			String location = FileSupport.convertToUnixStylePath((String) i.next());
 			if (location.endsWith(".zip") || location.endsWith(".jar")) {
 				mapFilesInZip(location);
 			}
@@ -263,13 +263,21 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 //TODO			if (!className.startsWith(enterpriseInterfacePackageName) && !className.equals("org.ijsberg.iglu.RuntimeEnvironment")) {
 				try {
 					retval = findClass(className);
-					if (resolve) {
-						resolveClass(retval);
+					if(retval == ResourceBundle.class) {
+						throw new ClassNotFoundException("found properties instead of class with name " + className);
 					}
-					return retval;
+					else {
+						if (resolve) {
+							resolveClass(retval);
+						}
+						return retval;
+					}
 				}
 				catch (ClassNotFoundException e) {
-					retval = super.loadClass(className, true);
+					if(retval == ResourceBundle.class) {
+						throw e;
+					}
+					retval = super.loadClass(className, resolve);
 				}
 /*			}
 			else {
@@ -366,6 +374,31 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 		return data;
 	}
 
+
+	/**
+	 * Retrieves resource as input stream from a directory or jar in the filesystem.
+	 *
+	 * @param fileName
+	 * @return
+	 */
+	public URL findResource(String fileName) {
+		Object location = this.mixedResourceLocations.get(fileName);
+		if (location == null) {
+			return super.findResource(fileName);
+		}
+		String url;
+		if(location instanceof File) {
+			url = "file:/" + FileSupport.convertToUnixStylePath(((File)location).getAbsolutePath());
+		}
+		else {
+			url = "jar:file:" + FileSupport.convertToUnixStylePath((String)location) + "!/" + fileName;
+		}
+		try {
+			return new URL(url);
+		} catch (MalformedURLException e) {
+			throw new ResourceException(e);
+		}
+	}
 
 	/**
 	 * Retrieves resource as input stream from a directory or jar in the filesystem.

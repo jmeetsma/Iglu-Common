@@ -33,8 +33,8 @@ public class RootConsoleTest extends CommandLineProcessorTest {
 
 	@After
 	public void tearDown() throws Exception {
-//		console.stop();
-//		tmpDir.delete();
+		console.stop();
+		tmpDir.delete();
 	}
 
 	@Test
