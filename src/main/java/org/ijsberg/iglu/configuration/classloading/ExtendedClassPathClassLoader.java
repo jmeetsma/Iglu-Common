@@ -309,6 +309,7 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 	 * @throws ClassNotFoundException
 	 */
 	public Class findClass(String className) throws ClassNotFoundException {
+
 		Object location = classResourceLocations.get(className);
 		if (location == null && this.propertiesResourceLocations.containsKey(className)) {
 			String fileName = (String) propertiesResourceLocations.get(className);
@@ -320,6 +321,9 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 				throw new ClassNotFoundException("resource '" + fileName + "' for class '" + className + "' has incompatible format");
 			}
 		}
+        if(className.startsWith("java.")) {
+            return super.findClass(className);
+        }
 		if (location == null) {
 			throw new ClassNotFoundException("class '" + className + "' not found in " + classpath);
 		}
