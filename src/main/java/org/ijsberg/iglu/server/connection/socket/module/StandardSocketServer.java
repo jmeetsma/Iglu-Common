@@ -19,10 +19,10 @@
  */
 package org.ijsberg.iglu.server.connection.socket.module;
 
-import org.ijsberg.iglu.ConfigurationException;
+import org.ijsberg.iglu.configuration.ConfigurationException;
+import org.ijsberg.iglu.configuration.Startable;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
-import org.ijsberg.iglu.runtime.Startable;
 import org.ijsberg.iglu.server.connection.Connection;
 import org.ijsberg.iglu.server.connection.ConnectionFactory;
 import org.ijsberg.iglu.server.connection.socket.SocketServer;

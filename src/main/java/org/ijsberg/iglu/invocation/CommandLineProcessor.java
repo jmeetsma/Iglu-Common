@@ -20,7 +20,7 @@
 
 package org.ijsberg.iglu.invocation;
 
-import org.ijsberg.iglu.Configuration;
+import org.ijsberg.iglu.configuration.Assembly;
 import org.ijsberg.iglu.util.misc.StringSupport;
 
 import java.lang.reflect.InvocationTargetException;
@@ -28,10 +28,10 @@ import java.lang.reflect.InvocationTargetException;
 /**
  */
 public class CommandLineProcessor {
-	private Configuration configuration;
+	private Assembly assembly;
 
-	public CommandLineProcessor(Configuration configuration) {
-		this.configuration = configuration;
+	public CommandLineProcessor(Assembly assembly) {
+		this.assembly = assembly;
 	}
 
 	/**
@@ -84,6 +84,6 @@ public class CommandLineProcessor {
 	}
 
 	protected Object invoke(String clusterId, String moduleId, String methodName, Object... arguments) throws InvocationTargetException, NoSuchMethodException {
-		return configuration.getClusters().get(clusterId).getInternalComponents().get(moduleId).invoke(methodName, arguments);
+		return assembly.getClusters().get(clusterId).getInternalComponents().get(moduleId).invoke(methodName, arguments);
 	}
 }

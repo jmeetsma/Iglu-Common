@@ -98,4 +98,26 @@ public class PropertiesSupport {
 	public static Map<String, Properties> getSubsections(Properties properties, String sectionkey) {
 		return getSubsections(getSubsection(properties, sectionkey));
 	}
+
+	/**
+	 * Collects command line properties of the following form: 
+	 * java Command -key value
+	 * 
+	 * @param args
+	 * @return
+	 */
+	public static Properties getCommandLineProperties(String ... args) {
+		Properties retval = new Properties();
+		for(int i = 0; i < args.length; i++) {
+			if(args[i].startsWith("-") && args[i].length() > 1) {
+				String key = args[i].substring(1);
+				String value = "";
+				if(i + 1 < args.length && !args[i + 1].startsWith("-")) {
+					value = args[++i];
+				}
+				retval.setProperty(key, value);
+			}
+		}
+		return retval;
+	}
 }

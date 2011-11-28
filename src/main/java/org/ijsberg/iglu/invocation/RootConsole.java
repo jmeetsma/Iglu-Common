@@ -20,11 +20,11 @@
 
 package org.ijsberg.iglu.invocation;
 
-import org.ijsberg.iglu.Configuration;
+import org.ijsberg.iglu.configuration.Assembly;
+import org.ijsberg.iglu.configuration.Startable;
 import org.ijsberg.iglu.exception.ResourceException;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
-import org.ijsberg.iglu.runtime.Startable;
 import org.ijsberg.iglu.util.io.FileSupport;
 
 import java.io.*;
@@ -56,8 +56,8 @@ public class RootConsole extends CommandLineProcessor implements Startable, Runn
 	private String outputFileLocation = "console/output.txt";
 	private String tempOutputFileLocation = "console/temp_output.txt";
 
-	public RootConsole(Configuration configuration) {
-		super(configuration);
+	public RootConsole(Assembly assembly) {
+		super(assembly);
 	}
 
 

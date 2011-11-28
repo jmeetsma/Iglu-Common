@@ -20,6 +20,12 @@
 
 package org.ijsberg.iglu.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+import java.util.Properties;
+
+import org.ijsberg.iglu.util.properties.PropertiesSupport;
 import org.junit.Test;
 
 /**
@@ -43,6 +49,39 @@ public class PropertiesSupportTest {
 	@Test
 	public void testGetSubsectionsForSectionKey() throws Exception {
 		//Properties properties, String sectionkey
+	}
+	
+	@Test
+	public void testGetCommandLineProperties() {
+		
+		Properties properties = PropertiesSupport.getCommandLineProperties("-test", "true");
+		assertEquals(1, properties.size());
+		assertEquals("true", properties.getProperty("test"));
+
+		properties = PropertiesSupport.getCommandLineProperties("-test", "true", "-key", "value");
+		assertEquals(2, properties.size());
+		assertEquals("true", properties.getProperty("test"));
+		assertEquals("value", properties.getProperty("key"));
+
+		properties = PropertiesSupport.getCommandLineProperties("-test", "true", "-key");
+		assertEquals(2, properties.size());
+		assertEquals("true", properties.getProperty("test"));
+		assertEquals("", properties.getProperty("key"));
+
+		properties = PropertiesSupport.getCommandLineProperties("-test", "-key", "value");
+		assertEquals(2, properties.size());
+		assertEquals("", properties.getProperty("test"));
+		assertEquals("value", properties.getProperty("key"));
+
+		properties = PropertiesSupport.getCommandLineProperties("-test", "true", "-key", "value", "dummy");
+		assertEquals(2, properties.size());
+		assertEquals("true", properties.getProperty("test"));
+		assertEquals("value", properties.getProperty("key"));
+
+		properties = PropertiesSupport.getCommandLineProperties("dummy1", "-test", "true", "-key", "value", "dummy2");
+		assertEquals(2, properties.size());
+		assertEquals("true", properties.getProperty("test"));
+		assertEquals("value", properties.getProperty("key"));
 	}
 
 

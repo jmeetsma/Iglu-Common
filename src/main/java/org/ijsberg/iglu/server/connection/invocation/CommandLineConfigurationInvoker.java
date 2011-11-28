@@ -21,7 +21,7 @@
 package org.ijsberg.iglu.server.connection.invocation;
 
 
-import org.ijsberg.iglu.Configuration;
+import org.ijsberg.iglu.configuration.Assembly;
 import org.ijsberg.iglu.invocation.CommandLineProcessor;
 import org.ijsberg.iglu.server.connection.CommandLineClientAdapter;
 import org.ijsberg.iglu.server.connection.CommandLineInterpreter;
@@ -57,8 +57,8 @@ public class CommandLineConfigurationInvoker extends CommandLineProcessor implem
 	/**
 	 *
 	 */
-	public CommandLineConfigurationInvoker(Configuration configuration) {
-		super(configuration);
+	public CommandLineConfigurationInvoker(Assembly assembly) {
+		super(assembly);
 	}
 
 

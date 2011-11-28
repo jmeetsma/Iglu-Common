@@ -20,8 +20,8 @@
 
 package org.ijsberg.iglu.invocation;
 
-import org.ijsberg.iglu.ConfigurationException;
-import org.ijsberg.iglu.Configuration;
+import org.ijsberg.iglu.configuration.Assembly;
+import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.util.collection.CollectionSupport;
@@ -40,8 +40,8 @@ public class SimpleScriptRunner extends CommandLineProcessor {
 	private int pageIntervalInMinutes = 0;
 	private int pageOffsetInMinutes = 0;
 
-	public SimpleScriptRunner(Configuration configuration) {
-		super(configuration);
+	public SimpleScriptRunner(Assembly assembly) {
+		super(assembly);
 	}
 
 

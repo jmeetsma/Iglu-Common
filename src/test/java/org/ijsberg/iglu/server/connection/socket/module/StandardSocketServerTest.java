@@ -1,8 +1,8 @@
 package org.ijsberg.iglu.server.connection.socket.module;
 
-import org.ijsberg.iglu.Cluster;
-import org.ijsberg.iglu.ConfigurationException;
-import org.ijsberg.iglu.configuration.StandardCluster;
+import org.ijsberg.iglu.configuration.Cluster;
+import org.ijsberg.iglu.configuration.ConfigurationException;
+import org.ijsberg.iglu.configuration.module.StandardCluster;
 import org.ijsberg.iglu.integration.telnetserver.DummyConnectionFactory;
 import org.ijsberg.iglu.server.connection.socket.module.dummy.ConnectionFactoryDummy;
 import org.junit.After;

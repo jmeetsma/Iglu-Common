@@ -1,11 +1,11 @@
 package org.ijsberg.iglu.invocation;
 
-import org.ijsberg.iglu.Cluster;
-import org.ijsberg.iglu.Component;
-import org.ijsberg.iglu.configuration.StandardCluster;
-import org.ijsberg.iglu.configuration.StandardComponent;
-import org.ijsberg.iglu.configuration.TestConfiguration;
-import org.ijsberg.iglu.configuration.TestObject;
+import org.ijsberg.iglu.configuration.Cluster;
+import org.ijsberg.iglu.configuration.Component;
+import org.ijsberg.iglu.configuration.module.StandardCluster;
+import org.ijsberg.iglu.configuration.module.StandardComponent;
+import org.ijsberg.iglu.sample.configuration.TestAssembly;
+import org.ijsberg.iglu.sample.configuration.TestObject;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -15,14 +15,14 @@ import static junit.framework.Assert.fail;
  */
 public class CommandLineProcessorTest {
 
-	protected TestConfiguration assembly;
+	protected TestAssembly assembly;
 
 
 
 
 	protected void setUpAssembly() {
 
-		assembly = new TestConfiguration();
+		assembly = new TestAssembly();
 		Cluster cluster = new StandardCluster();
 
 

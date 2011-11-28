@@ -20,7 +20,7 @@
 
 package org.ijsberg.iglu.server.connection.invocation;
 
-import org.ijsberg.iglu.Configuration;
+import org.ijsberg.iglu.configuration.Assembly;
 import org.ijsberg.iglu.server.connection.Connection;
 import org.ijsberg.iglu.server.connection.ConnectionFactory;
 import org.ijsberg.iglu.server.connection.socket.*;
@@ -33,13 +33,13 @@ import java.net.Socket;
  */
 public class ConfigurationInvocationConnectionFactory implements ConnectionFactory
 {
-	private Configuration configuration;
+	private Assembly assembly;
 
-	public ConfigurationInvocationConnectionFactory(Configuration configuration) {
-		this.configuration = configuration;
+	public ConfigurationInvocationConnectionFactory(Assembly assembly) {
+		this.assembly = assembly;
 	}
 
 	public Connection createConnection(Socket socket) throws IOException {
-		return new ByteStreamReadingConnection(socket, new TelnetAdapter(), new CommandLineConfigurationInvoker(configuration), 900);
+		return new ByteStreamReadingConnection(socket, new TelnetAdapter(), new CommandLineConfigurationInvoker(assembly), 900);
 	}
 }

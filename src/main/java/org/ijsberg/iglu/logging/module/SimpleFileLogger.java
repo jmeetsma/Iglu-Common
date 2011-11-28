@@ -20,11 +20,11 @@
 
 package org.ijsberg.iglu.logging.module;
 
+import org.ijsberg.iglu.configuration.Startable;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.logging.LogPrintStream;
 import org.ijsberg.iglu.logging.Logger;
-import org.ijsberg.iglu.runtime.Startable;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

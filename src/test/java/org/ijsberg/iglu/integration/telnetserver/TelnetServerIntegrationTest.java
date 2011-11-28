@@ -1,10 +1,10 @@
 package org.ijsberg.iglu.integration.telnetserver;
 
-import org.ijsberg.iglu.Cluster;
-import org.ijsberg.iglu.Configuration;
-import org.ijsberg.iglu.configuration.StandardCluster;
-import org.ijsberg.iglu.configuration.StandardComponent;
-import org.ijsberg.iglu.configuration.TestObject;
+import org.ijsberg.iglu.configuration.Assembly;
+import org.ijsberg.iglu.configuration.Cluster;
+import org.ijsberg.iglu.configuration.module.StandardCluster;
+import org.ijsberg.iglu.configuration.module.StandardComponent;
+import org.ijsberg.iglu.sample.configuration.TestObject;
 import org.ijsberg.iglu.server.connection.invocation.ConfigurationInvocationConnectionFactory;
 import org.ijsberg.iglu.server.connection.socket.module.StandardSocketServer;
 import org.junit.Test;
@@ -20,7 +20,7 @@ import static junit.framework.Assert.fail;
 
 /**
  */
-public class TelnetServerIntegrationTest implements Configuration {
+public class TelnetServerIntegrationTest implements Assembly {
 
 	private HashMap<String, Cluster> clusterMap = new HashMap<String, Cluster>();
 	private TestObject testObject;
@@ -62,5 +62,17 @@ public class TelnetServerIntegrationTest implements Configuration {
 	@Override
 	public Map<String, Cluster> getClusters() {
 		return clusterMap;
+	}
+
+	@Override
+	public Cluster getCoreCluster() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void initialize(String[] args) {
+		// TODO Auto-generated method stub
+		
 	}
 }
