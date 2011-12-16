@@ -20,11 +20,11 @@
 
 package org.ijsberg.iglu.configuration.module;
 
-import org.ijsberg.iglu.configuration.Startable;
-import org.ijsberg.iglu.logging.LogEntry;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import org.ijsberg.iglu.configuration.Startable;
+import org.ijsberg.iglu.logging.LogEntry;
 
 /**
  * If ComponentStarter is added to a cluster, it will register Startable components.

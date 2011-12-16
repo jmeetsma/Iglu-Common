@@ -20,15 +20,20 @@
 
 package org.ijsberg.iglu.invocation;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Properties;
+
 import org.ijsberg.iglu.configuration.Assembly;
 import org.ijsberg.iglu.configuration.Startable;
 import org.ijsberg.iglu.exception.ResourceException;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.util.io.FileSupport;
-
-import java.io.*;
-import java.util.Properties;
 
 /**
  * Processes command-line instructions that are read from an input file.

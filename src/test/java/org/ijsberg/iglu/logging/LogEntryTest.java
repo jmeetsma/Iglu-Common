@@ -20,12 +20,12 @@
 
 package org.ijsberg.iglu.logging;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 /**
  */

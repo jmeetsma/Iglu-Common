@@ -1,5 +1,12 @@
 package org.ijsberg.iglu.server.connection.socket.module;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+
+import java.net.ConnectException;
+import java.net.Socket;
+
 import org.ijsberg.iglu.configuration.Cluster;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.module.StandardCluster;
@@ -8,13 +15,6 @@ import org.ijsberg.iglu.server.connection.socket.module.dummy.ConnectionFactoryD
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.net.ConnectException;
-import java.net.Socket;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
 
 /**
  */

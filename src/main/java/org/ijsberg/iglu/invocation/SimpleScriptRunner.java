@@ -20,18 +20,17 @@
 
 package org.ijsberg.iglu.invocation;
 
-import org.ijsberg.iglu.configuration.Assembly;
-import org.ijsberg.iglu.configuration.ConfigurationException;
-import org.ijsberg.iglu.logging.Level;
-import org.ijsberg.iglu.logging.LogEntry;
-import org.ijsberg.iglu.util.collection.CollectionSupport;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import org.ijsberg.iglu.configuration.Assembly;
+import org.ijsberg.iglu.configuration.ConfigurationException;
+import org.ijsberg.iglu.logging.Level;
+import org.ijsberg.iglu.logging.LogEntry;
 
 /**
  */

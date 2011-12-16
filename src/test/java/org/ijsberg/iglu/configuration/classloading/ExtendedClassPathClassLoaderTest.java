@@ -20,19 +20,21 @@
 
 package org.ijsberg.iglu.configuration.classloading;
 
-import org.ijsberg.iglu.configuration.classloading.ExtendedClassPathClassLoader;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertSame;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+
+import java.io.File;
+import java.net.URL;
+
 import org.ijsberg.iglu.util.io.FileSupport;
-import org.ijsberg.iglu.util.io.StreamSupport;
 import org.ijsberg.iglu.util.misc.StringSupport;
 import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.File;
-import java.net.URL;
-
-import static junit.framework.Assert.*;
 
 /**
  */

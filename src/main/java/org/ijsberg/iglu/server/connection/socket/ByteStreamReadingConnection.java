@@ -20,16 +20,16 @@
 package org.ijsberg.iglu.server.connection.socket;
 
 
-import org.ijsberg.iglu.logging.Level;
-import org.ijsberg.iglu.logging.LogEntry;
-import org.ijsberg.iglu.server.connection.Connection;
-import org.ijsberg.iglu.server.connection.CommandLineClientAdapter;
-import org.ijsberg.iglu.server.connection.CommandLineInterpreter;
-
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+
+import org.ijsberg.iglu.logging.Level;
+import org.ijsberg.iglu.logging.LogEntry;
+import org.ijsberg.iglu.server.connection.CommandLineClientAdapter;
+import org.ijsberg.iglu.server.connection.CommandLineInterpreter;
+import org.ijsberg.iglu.server.connection.Connection;
 
 /**
  * This class embeds the socket that is connected to a client.

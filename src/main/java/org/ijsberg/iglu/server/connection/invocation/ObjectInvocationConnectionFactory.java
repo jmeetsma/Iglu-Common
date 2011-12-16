@@ -20,12 +20,12 @@
 
 package org.ijsberg.iglu.server.connection.invocation;
 
+import java.io.IOException;
+import java.net.Socket;
+
 import org.ijsberg.iglu.server.connection.ConnectionFactory;
 import org.ijsberg.iglu.server.connection.socket.ByteStreamReadingConnection;
 import org.ijsberg.iglu.server.telnet.TelnetAdapter;
-
-import java.io.IOException;
-import java.net.Socket;
 
 /**
  */

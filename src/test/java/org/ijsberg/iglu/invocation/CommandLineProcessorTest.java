@@ -1,5 +1,8 @@
 package org.ijsberg.iglu.invocation;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.fail;
+
 import org.ijsberg.iglu.configuration.Cluster;
 import org.ijsberg.iglu.configuration.Component;
 import org.ijsberg.iglu.configuration.module.StandardCluster;
@@ -7,9 +10,6 @@ import org.ijsberg.iglu.configuration.module.StandardComponent;
 import org.ijsberg.iglu.sample.configuration.TestAssembly;
 import org.ijsberg.iglu.sample.configuration.TestObject;
 import org.junit.Test;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.fail;
 
 /**
  */

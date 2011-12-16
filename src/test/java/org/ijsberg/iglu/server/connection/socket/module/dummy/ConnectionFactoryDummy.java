@@ -1,10 +1,10 @@
 package org.ijsberg.iglu.server.connection.socket.module.dummy;
 
-import org.ijsberg.iglu.server.connection.ConnectionFactory;
-import org.ijsberg.iglu.server.connection.socket.ByteStreamReadingConnection;
-
 import java.io.IOException;
 import java.net.Socket;
+
+import org.ijsberg.iglu.server.connection.ConnectionFactory;
+import org.ijsberg.iglu.server.connection.socket.ByteStreamReadingConnection;
 
 /**
  */

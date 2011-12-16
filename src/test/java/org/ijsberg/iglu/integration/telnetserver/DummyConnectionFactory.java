@@ -1,12 +1,12 @@
 package org.ijsberg.iglu.integration.telnetserver;
 
-import org.ijsberg.iglu.server.connection.Connection;
-import org.ijsberg.iglu.server.connection.ConnectionFactory;
-
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.ijsberg.iglu.server.connection.Connection;
+import org.ijsberg.iglu.server.connection.ConnectionFactory;
 
 /**
  */

@@ -20,13 +20,16 @@
 
 package org.ijsberg.iglu.configuration.module;
 
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.ijsberg.iglu.configuration.Assembly;
 import org.ijsberg.iglu.configuration.Component;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.classloading.ExtendedClassPathClassLoader;
-import org.ijsberg.iglu.configuration.module.StandardComponent;
+import org.ijsberg.iglu.invocation.RootConsole;
+import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.util.properties.PropertiesSupport;
 import org.ijsberg.iglu.util.reflection.ReflectionSupport;
@@ -91,8 +94,10 @@ public class ServerEnvironment extends ComponentStarter implements Runnable {
 		super();
 		String className = args[0];
 		Properties settings = PropertiesSupport.getCommandLineProperties(args);
-		assembly = instantiateConfiguration(className, settings);
+		assembly = instantiateAssembly(className, settings);
 		assembly.initialize(args);
+		Component rootConsole = new StandardComponent(new RootConsole(assembly));
+		assembly.getCoreCluster().connect("RootConsole", rootConsole);
 		Component serverComponent = new StandardComponent(this);
 		assembly.getCoreCluster().connect("ServerEnvironment", serverComponent);
 
@@ -152,14 +157,20 @@ public class ServerEnvironment extends ComponentStarter implements Runnable {
 		}
 	}	
 
-	private Assembly instantiateConfiguration(String className, Properties settings)
+	private Assembly instantiateAssembly(String className, Properties settings)
 			throws InstantiationException {
 		if(settings.containsKey("xcl")) {
 			String extendedPath = settings.getProperty("xcl");
 			if("".equals(extendedPath)) {
 				throw new ConfigurationException("-xcp : extended class path is missing");
 			}
-			extClassLoader = new ExtendedClassPathClassLoader(extendedPath, Assembly.class.getPackage().getName());
+			extClassLoader = new ExtendedClassPathClassLoader(extendedPath, Assembly.class.getPackage());
+			Map<String, Set<Object>> multipleResourceLocations = extClassLoader.getMultipleLocationsForResources();
+			if(multipleResourceLocations.size() > 0) {
+				System.out.print(new LogEntry(Level.CRITICAL, "extended class loader reports multiple locations for " + multipleResourceLocations.size() + " resources"));
+				//System.out.println(new LogEntry("", (Serializable) multipleResourceLocations));
+			}
+			Thread.currentThread().setContextClassLoader(extClassLoader);
 			return (Assembly)ReflectionSupport.instantiateClass(extClassLoader, className);
 		}
 		else {
@@ -209,8 +220,11 @@ public class ServerEnvironment extends ComponentStarter implements Runnable {
 		if(args.length == 0) {
 			printUsage();
 		} else {
+			System.out.println("Creating server environment for assembly " + args[0]);
 			ServerEnvironment server = new ServerEnvironment(args);
+			System.out.println("Starting server ...");
 			server.start();
+			System.out.println("... Server started");
 		}
 	}
 }

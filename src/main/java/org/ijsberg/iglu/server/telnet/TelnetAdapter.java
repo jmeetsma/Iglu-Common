@@ -20,17 +20,17 @@
 
 package org.ijsberg.iglu.server.telnet;
 
-import org.ijsberg.iglu.logging.Level;
-import org.ijsberg.iglu.logging.LogEntry;
-import org.ijsberg.iglu.server.connection.CommandLineClientAdapter;
-import org.ijsberg.iglu.server.connection.CommandLineInterpreter;
-import org.ijsberg.iglu.server.connection.Connection;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+
+import org.ijsberg.iglu.logging.Level;
+import org.ijsberg.iglu.logging.LogEntry;
+import org.ijsberg.iglu.server.connection.CommandLineClientAdapter;
+import org.ijsberg.iglu.server.connection.CommandLineInterpreter;
+import org.ijsberg.iglu.server.connection.Connection;
 
 /**
  * This class translates communication between a telnet client and an interpreter.
@@ -59,7 +59,6 @@ public class TelnetAdapter implements CommandLineClientAdapter {
 	private boolean echoEnabled = true;
 
 	private CommandLineInterpreter interpreter;
-	private boolean adapterTerminating = false;
 
 	/*
 	List of ASCII characters
@@ -251,7 +250,7 @@ public class TelnetAdapter implements CommandLineClientAdapter {
 	private boolean controlCharCaptureMode;
 	private String promptStr = "";
 	private int historyIndex;
-	private ArrayList history = new ArrayList(10);
+	private ArrayList<String> history = new ArrayList<String>();
 	private int curPos;
 	private Connection connection;
 
@@ -289,7 +288,6 @@ public class TelnetAdapter implements CommandLineClientAdapter {
 	public void receive(byte[] byteArray) throws IOException {
 		//register the current application for this thread
 		// in case a subsystem logs to the environment
-		String result;
 		if (interpreter.isInSubProcessMode()) {
 			if (!abortSubprocessModeIfNecessary(byteArray)) {
 				/*			case CTRLC:
@@ -325,7 +323,6 @@ public class TelnetAdapter implements CommandLineClientAdapter {
 
 	private void processInput(byte[] byteArray)
 			throws IOException {
-		String result;
 		for (int i = 0; i < byteArray.length; i++) {
 			byte b2 = byteArray[i];
 			if (!controlCharCaptureMode) {

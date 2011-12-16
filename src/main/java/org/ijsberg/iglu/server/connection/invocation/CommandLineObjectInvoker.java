@@ -20,16 +20,15 @@
 
 package org.ijsberg.iglu.server.connection.invocation;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import org.ijsberg.iglu.invocation.CommandLineProcessor;
 import org.ijsberg.iglu.server.connection.ClientSessionAware;
 import org.ijsberg.iglu.server.connection.CommandLineClientAdapter;
 import org.ijsberg.iglu.server.connection.CommandLineInterpreter;
-import org.ijsberg.iglu.util.collection.ArraySupport;
 import org.ijsberg.iglu.util.misc.StringSupport;
 import org.ijsberg.iglu.util.reflection.ReflectionSupport;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  * Provides a basic command-line interface.

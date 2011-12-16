@@ -1,11 +1,11 @@
 package org.ijsberg.iglu.integration.telnetserver;
 
+import java.io.IOException;
+import java.net.Socket;
+
 import org.ijsberg.iglu.exception.ResourceException;
 import org.ijsberg.iglu.server.connection.Connection;
 import org.ijsberg.iglu.util.misc.StringSupport;
-
-import java.io.IOException;
-import java.net.Socket;
 
 /**
  */

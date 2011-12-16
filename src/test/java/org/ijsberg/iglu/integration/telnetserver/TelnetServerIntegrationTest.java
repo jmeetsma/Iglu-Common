@@ -1,5 +1,12 @@
 package org.ijsberg.iglu.integration.telnetserver;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.ijsberg.iglu.configuration.Assembly;
 import org.ijsberg.iglu.configuration.Cluster;
 import org.ijsberg.iglu.configuration.module.StandardCluster;
@@ -8,14 +15,6 @@ import org.ijsberg.iglu.sample.configuration.TestObject;
 import org.ijsberg.iglu.server.connection.invocation.ConfigurationInvocationConnectionFactory;
 import org.ijsberg.iglu.server.connection.socket.module.StandardSocketServer;
 import org.junit.Test;
-
-import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
 
 
 /**

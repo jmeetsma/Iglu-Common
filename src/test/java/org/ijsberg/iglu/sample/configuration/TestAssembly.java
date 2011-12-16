@@ -1,11 +1,11 @@
 package org.ijsberg.iglu.sample.configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.ijsberg.iglu.configuration.Assembly;
 import org.ijsberg.iglu.configuration.Cluster;
 import org.ijsberg.iglu.configuration.module.StandardCluster;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  */

@@ -20,10 +20,10 @@
 
 package org.ijsberg.iglu.invocation;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.ijsberg.iglu.configuration.Assembly;
 import org.ijsberg.iglu.util.misc.StringSupport;
-
-import java.lang.reflect.InvocationTargetException;
 
 /**
  */

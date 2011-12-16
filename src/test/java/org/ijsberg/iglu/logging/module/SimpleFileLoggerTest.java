@@ -20,14 +20,16 @@
 
 package org.ijsberg.iglu.logging.module;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.PrintStream;
+
 import org.ijsberg.iglu.logging.DummyOutputStream;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.junit.Test;
-
-import java.io.PrintStream;
-
-import static org.junit.Assert.*;
 
 
 /**

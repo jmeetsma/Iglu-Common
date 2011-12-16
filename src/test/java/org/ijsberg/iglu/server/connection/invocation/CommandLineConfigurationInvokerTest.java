@@ -3,9 +3,6 @@ package org.ijsberg.iglu.server.connection.invocation;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-
 /**
  */
 public class CommandLineConfigurationInvokerTest

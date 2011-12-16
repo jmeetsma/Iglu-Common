@@ -8,7 +8,6 @@ import static org.junit.Assert.fail;
 import java.io.PrintStream;
 
 import org.ijsberg.iglu.configuration.ConfigurationException;
-import org.ijsberg.iglu.configuration.module.ServerEnvironment;
 import org.ijsberg.iglu.logging.DummyOutputStream;
 import org.junit.Test;
 

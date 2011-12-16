@@ -1,14 +1,18 @@
 package org.ijsberg.iglu.invocation;
 
+import static junit.framework.Assert.assertEquals;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Properties;
+
 import org.ijsberg.iglu.util.io.FileSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.*;
-import java.util.Properties;
-
-import static junit.framework.Assert.assertEquals;
 
 /**
  */
