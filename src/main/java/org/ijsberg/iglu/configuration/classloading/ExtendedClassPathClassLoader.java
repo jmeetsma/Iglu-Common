@@ -344,7 +344,7 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 
 
 	/**
-	 * Tries to locate a class in the specific classpath.
+	 * Tries to locate a class in the specific class path.
 	 *
 	 * @param className
 	 * @return
@@ -362,6 +362,9 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 				throw new ClassNotFoundException("resource '" + fileName + "' for class '" + className + "' has incompatible format");
 			}
 		}
+        if(className.startsWith("java.")) {
+            return super.findClass(className);
+        }
 		if (location == null) {
 			throw new ClassNotFoundException("class '" + className + "' not found in " + classpath);
 		}

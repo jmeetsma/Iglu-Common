@@ -52,8 +52,8 @@ public class ExtendedClassPathClassLoaderTest {
 
 		Thread.sleep(100);
 
-		FileSupport.copyClassLoadableResourceToFileSystem(pathToResources + "/jars/iglu-telnet-server-1.0.jar", tmpDir.getAbsolutePath() + "/jars/");
 		FileSupport.copyClassLoadableResourceToFileSystem(pathToResources + "/resources/test.properties", tmpDir.getAbsolutePath() + "/resources/");
+        FileSupport.copyClassLoadableResourceToFileSystem(pathToResources + "/jars/iglu-telnet-server-1.0.jar", tmpDir.getAbsolutePath() + "/jars/");
 		FileSupport.copyClassLoadableResourceToFileSystem(pathToResources + "/ExtendedClassPathClassLoaderTestHelper.class", tmpDir.getAbsolutePath() + "/classes/" + pathToResources);
 	}
 
