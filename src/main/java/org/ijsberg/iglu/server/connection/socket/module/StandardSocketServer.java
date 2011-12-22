@@ -97,6 +97,7 @@ public class StandardSocketServer implements Runnable, SocketServer, Startable {
 			System.out.println(new LogEntry(e.getMessage(), e));
 			throw new ConfigurationException("Cannot start server at port " + port, e);
 		}
+		System.out.println(new LogEntry("starting socket server at port " + port));
 		serverThread = new Thread(this);
 		serverThread.start();
 	}
