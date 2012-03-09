@@ -84,6 +84,7 @@ public class CommandLineProcessor {
 	}
 
 	protected Object invoke(String clusterId, String moduleId, String methodName, Object... arguments) throws InvocationTargetException, NoSuchMethodException {
+		//TODO provide more precise exception than NullPointers if statement fails 
 		return assembly.getClusters().get(clusterId).getInternalComponents().get(moduleId).invoke(methodName, arguments);
 	}
 }
