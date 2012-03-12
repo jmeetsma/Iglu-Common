@@ -43,11 +43,11 @@ public class CommandLineProcessor {
 	 * @return String list, #0 is the command, the rest are arguments
 	 */
 	public static String[] splitCommandLine(String line) {
-		return (String[]) StringSupport.split(line, "()", "").toArray(new String[0]);
+		return StringSupport.split(line, "()", "").toArray(new String[0]);
 	}
 
 	public static String[] splitArguments(String line) {
-		return (String[]) StringSupport.split(line, ", ", "\"").toArray(new String[0]);
+		return StringSupport.split(line, ", ", "\"").toArray(new String[0]);
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class CommandLineProcessor {
 	 * @return
 	 */
 	public static String[] splitCommand(String line) {
-		return (String[]) StringSupport.split(line, ".", "\"").toArray(new String[0]);
+		return StringSupport.split(line, ".", "\"").toArray(new String[0]);
 	}
 
 	/**
@@ -67,7 +67,6 @@ public class CommandLineProcessor {
 	protected Object processCommandLine(String commandLine) throws IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
 
 		String[] commandAndArguments = splitCommandLine(commandLine);
-
 		String[] moduleAndMethodIds = splitCommand(commandAndArguments[0]);
 
 		String[] arguments;
@@ -84,6 +83,7 @@ public class CommandLineProcessor {
 	}
 
 	protected Object invoke(String clusterId, String moduleId, String methodName, Object... arguments) throws InvocationTargetException, NoSuchMethodException {
+		//TODO decent exceptions
 		return assembly.getClusters().get(clusterId).getInternalComponents().get(moduleId).invoke(methodName, arguments);
 	}
 }

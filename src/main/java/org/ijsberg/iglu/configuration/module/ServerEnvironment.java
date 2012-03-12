@@ -64,9 +64,6 @@ public class ServerEnvironment extends ComponentStarter implements Runnable {
 
 	/**
 	 * 
-	 * @param args
-	 * @throws InstantiationException
-	 * @throws ConfigurationException
 	 */
 	public ServerEnvironment(Assembly assembly) {
 		
