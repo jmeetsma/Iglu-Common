@@ -6,8 +6,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.PrintStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
 import org.ijsberg.iglu.configuration.ConfigurationException;
+import org.ijsberg.iglu.configuration.classloading.ExtendedClassPathClassLoader;
 import org.ijsberg.iglu.logging.DummyOutputStream;
 import org.junit.Test;
 
@@ -25,10 +28,10 @@ public class ServerEnvironmentTest {
 			env = new ServerEnvironment("org.iglu.BogusClass");
 			fail("InstantiationException expected");
 		} catch (InstantiationException expected) {}
-		
+
 		env = new ServerEnvironment("org.ijsberg.iglu.sample.configuration.TestAssembly");
 		assertNotNull(env.getAssembly());
-		
+
 		try {
 			env = new ServerEnvironment("org.ijsberg.iglu.sample.configuration.TestAssembly", "-xcl");
 			fail("ConfigurationException expected");
@@ -38,10 +41,10 @@ public class ServerEnvironmentTest {
 		assertNotNull(env.getAssembly());
 
 		assertEquals("org.ijsberg.iglu.configuration.classloading.ExtendedClassPathClassLoader", env.getAssembly().getClass().getClassLoader().getClass().getName());
-		
+
 
 	}
-	
+
 	@Test
 	public void testMain() throws Exception {
 		DummyOutputStream dummyStream = new DummyOutputStream();
@@ -49,5 +52,4 @@ public class ServerEnvironmentTest {
 		ServerEnvironment.main(new String[0]);
 		assertTrue(dummyStream.getLastOutput().startsWith("Usage:"));
 	}
-
 }
