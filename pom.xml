@@ -26,12 +26,12 @@
         <dependency>
           <groupId>org.ijsberg</groupId>
           <artifactId>iglu</artifactId>
-          <version>1.0.3</version>
+          <version>1.0.4</version>
         </dependency>
         <dependency>
           <groupId>org.ijsberg</groupId>
           <artifactId>iglu-util</artifactId>
-          <version>0.9.1</version>
+          <version>0.9.2</version>
         </dependency>
     </dependencies>
 
