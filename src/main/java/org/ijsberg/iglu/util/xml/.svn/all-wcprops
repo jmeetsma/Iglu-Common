@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/iglu/!svn/ver/298/src/main/java/org/ijsberg/iglu/server/content/xml
+END
+ParseException.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/iglu/!svn/ver/298/src/main/java/org/ijsberg/iglu/server/content/xml/ParseException.java
+END
+Document.java
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/iglu/!svn/ver/298/src/main/java/org/ijsberg/iglu/server/content/xml/Document.java
+END
+ElementList.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/iglu/!svn/ver/298/src/main/java/org/ijsberg/iglu/server/content/xml/ElementList.java
+END
+Node.java
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/iglu/!svn/ver/298/src/main/java/org/ijsberg/iglu/server/content/xml/Node.java
+END
