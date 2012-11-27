@@ -19,7 +19,6 @@ public interface Session
 	 * Performs authentication and stores the user if authentication was successful.
 	 * Implementations may define their own credential types.
 	 *
-	 * @param realmId ID of the realm the user belongs to
 	 * @param credentials user credentials such as an object containing username and password
 	 * @return a successfully authenticated user
 	 */
@@ -28,12 +27,10 @@ public interface Session
 	/**
 	 * Removes a user who was previously logged in.
 	 *
-	 * @param realmId id of the realm the user belongs to
 	 */
 	void logout(/*String realmId*/);
 
 	/**
-	 * @param realmId ID of the realm the user belongs to
 	 * @return the currently logged in user
 	 */
 	User getUser(/*String realmId*/);
@@ -78,4 +75,5 @@ public interface Session
 	 */
 //	void putForm(Object formId, Form form);
 
+	<T> T getAgent(Class<T> agentType);
 }

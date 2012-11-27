@@ -11,8 +11,6 @@ import java.util.Properties;
  * Implementations are responsible of binding and releasing the
  * user request to their threads of execution.
  *
- * @see Application#bindRequest(EntryPoint)
- * @see Application#releaseRequest()
  */
 public interface EntryPoint
 {

@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.ijsberg.iglu.configuration.Startable;
+import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 
 /**
@@ -58,15 +59,17 @@ public class ComponentStarter implements Startable {
 	public synchronized void start() {
 		if (!isStarted) {
 			isStarted = true;
-			try {
-				for (Startable startable : registeredStartables) {
-					if (!startable.isStarted()) {
+			for (Startable startable : registeredStartables) {
+				if (!startable.isStarted()) {
+					try {
 						startable.start();
+					} catch (Exception e) {
+						System.out.println(new LogEntry(Level.CRITICAL, "unable to start component " + startable +
+								" with message: " + e.getMessage(), e));
+						isStarted = false;
+						return;
 					}
 				}
-			}
-			catch (Exception e) {
-				isStarted = false;
 			}
 		}
 	}
