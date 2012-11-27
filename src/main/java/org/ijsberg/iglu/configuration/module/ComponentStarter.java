@@ -43,6 +43,7 @@ public class ComponentStarter implements Startable {
 	public synchronized void register(Startable startable) {
 
 		System.out.println(new LogEntry("registering " + startable + " with " + this));
+		System.out.flush();
 		if (isStarted && !startable.isStarted()) {
 			startable.start();
 		}
