@@ -18,21 +18,13 @@
  * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.ijsberg.iglu.logging;
+package org.ijsberg.iglu.access.component;
+
+import org.ijsberg.iglu.access.Request;
 
 /**
- *
  */
-public enum Level {DEBUG, VERBOSE, CRITICAL;
-	public static String[] LEVEL_DESC_ABBR = {"DBG", "VBS", "CRT"};
-	public static String[] LEVEL_DESC = {"debug", "verbose", "critical"};
-	public static String[] LEVEL_CONFIG_TERM = {"DEBUG", "VERBOSE", "CRITICAL"};
+public interface RequestKeeper {
 
-	public String getShortDescription() {
-		return LEVEL_DESC_ABBR[ordinal()];
-	}
-
-	public String getDescription() {
-		return LEVEL_DESC[ordinal()];
-	}
+	Request getCurrentRequest();
 }

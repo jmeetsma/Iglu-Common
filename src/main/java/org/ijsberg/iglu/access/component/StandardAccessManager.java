@@ -20,9 +20,11 @@ import java.util.TreeMap;
 import org.ijsberg.iglu.access.*;
 import org.ijsberg.iglu.configuration.Cluster;
 import org.ijsberg.iglu.configuration.Component;
+import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.module.StandardComponent;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.scheduling.Pageable;
+
 
 
 /**
@@ -34,7 +36,7 @@ import org.ijsberg.iglu.scheduling.Pageable;
  * integers for distinct objects.
  */
 
-public class StandardAccessManager implements AccessManager, Pageable
+public class StandardAccessManager implements AccessManager, Pageable, RequestKeeper
 {
 	//session storage
 	private final HashMap sessionsMirror = new HashMap(10);//mirror is used for cleanup
@@ -55,6 +57,10 @@ public class StandardAccessManager implements AccessManager, Pageable
 	private Authenticator authenticator;
 
 	private Cluster serviceCluster;
+
+
+
+	private HashMap<String, AgentFactory> agentFactoriesByAgentId = new HashMap();
 
 	/**
 	 *
@@ -323,12 +329,17 @@ public class StandardAccessManager implements AccessManager, Pageable
 		//this won't work in a remote component
 		synchronized (requestsByThreadId)
 		{
-			return (Request) requestsByThreadId.get(Thread.currentThread().hashCode());
+			return requestsByThreadId.get(Thread.currentThread().hashCode());
 		}
 	}
 
 	@Override
-	public Component createAgent(Object implementation) {
+	public Component createAgent(String id) {
+		AgentFactory agentFactory = agentFactoriesByAgentId.get(id);
+		if(agentFactory == null) {
+			throw new ConfigurationException("no AgentFactory for agents with id " + id + " present, register one in cluster");
+		}
+		Object implementation = agentFactory.createAgentImpl();
 		Component component = new StandardComponent(implementation);
 		//connect component anonymously
 		serviceCluster.getFacade().connect(component);
@@ -469,7 +480,7 @@ public class StandardAccessManager implements AccessManager, Pageable
 	}
 
 	@Override
-	public boolean isActive() {
+	public boolean isStarted() {
 		return true;
 	}
 
@@ -483,4 +494,10 @@ public class StandardAccessManager implements AccessManager, Pageable
 	public User authenticate(Credentials expiredCredentials, Credentials newCredentials) throws AuthenticationException {
 		return authenticator.authenticate(expiredCredentials, newCredentials);
 	}
+
+
+	public <T> void register(AgentFactory<T> agentFactory) {
+		agentFactoriesByAgentId.put(agentFactory.getAgentId(), agentFactory);
+	}
+
 }

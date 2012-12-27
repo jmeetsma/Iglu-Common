@@ -9,10 +9,9 @@
 package org.ijsberg.iglu.access;
 
 import org.ijsberg.iglu.configuration.Component;
-import org.ijsberg.iglu.configuration.ConfigurationException;
+import org.ijsberg.iglu.exception.ResourceException;
 import org.ijsberg.iglu.util.io.ReceiverQueue;
 import org.ijsberg.iglu.util.misc.KeyGenerator;
-import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -41,8 +40,7 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	//whenever a session is created, the StandardRequestManager adds its default settings to the created session
 	private Properties userSettings;
 	//collection of session objects for each realm
-	private HashMap<Class<?>, Object> agentImpls = new HashMap();
-	private HashMap<Class<?>, Component> agentComponents = new HashMap();
+	private HashMap<String, Component> agentComponents = new HashMap();
 	//tme last accessed, needed for timeout determination
 	private long lastAccessedTime = System.currentTimeMillis();
 	//expiration timeout in milliseconds
@@ -140,23 +138,21 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	}*/
 
 
-	public <T> T getAgent(Class<T> agentType) {
+	@Override
+	public <T> Component getAgent(String id) {
 
-		if(agentImpls.containsKey(agentType)) {
-			return (T) agentImpls.get(agentType);
+		if(agentComponents.containsKey(id)) {
+			return agentComponents.get(id);
 		}
-		T agentImpl;
-		try {
-			agentImpl = (T)ReflectionSupport.instantiateClass(agentType);
-		} catch (InstantiationException e) {
-			throw new ConfigurationException("unable to create agent of type " + agentType, e);
-		}
-		Component agent = accessManager.createAgent(agentImpl);
-		agentComponents.put(agentType, agent);
-		agentImpls.put(agentType, agentImpl);
-
-		return agentImpl;
+		return createAgent(id);
 	}
+
+	private <T> Component createAgent(String id) {
+		Component agent = accessManager.createAgent(id);
+		agentComponents.put(id, agent);
+		return agent;
+	}
+
 
 
 	/**

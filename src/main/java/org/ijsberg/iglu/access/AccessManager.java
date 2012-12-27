@@ -121,7 +121,7 @@ public interface AccessManager extends Authenticator
 	Request getCurrentRequest();
 
 
-	Component createAgent(Object implementation);
+	Component createAgent(String id);
 
 	void removeAgent(Component agent);
 

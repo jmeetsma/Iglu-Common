@@ -18,21 +18,27 @@
  * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.ijsberg.iglu.logging;
+package org.ijsberg.iglu.server.connection.invocation;
 
 /**
- *
  */
-public enum Level {DEBUG, VERBOSE, CRITICAL;
-	public static String[] LEVEL_DESC_ABBR = {"DBG", "VBS", "CRT"};
-	public static String[] LEVEL_DESC = {"debug", "verbose", "critical"};
-	public static String[] LEVEL_CONFIG_TERM = {"DEBUG", "VERBOSE", "CRITICAL"};
+public class AssemblyCommandLine extends CommandLine {
 
-	public String getShortDescription() {
-		return LEVEL_DESC_ABBR[ordinal()];
+
+	public AssemblyCommandLine(String commandLine) {
+		super(commandLine);
 	}
 
-	public String getDescription() {
-		return LEVEL_DESC[ordinal()];
+	public String getClusterId() {
+		return getUnitIdentifierSequence()[0];
 	}
+
+	public String getComponentId() {
+		return getUnitIdentifierSequence()[1];
+	}
+
+	public String getMethodName() {
+		return getUnitIdentifierSequence()[2];
+	}
+
 }

@@ -9,6 +9,7 @@ import org.ijsberg.iglu.configuration.module.StandardCluster;
 import org.ijsberg.iglu.configuration.module.StandardComponent;
 import org.ijsberg.iglu.sample.configuration.TestAssembly;
 import org.ijsberg.iglu.sample.configuration.TestObject;
+import org.ijsberg.iglu.server.connection.invocation.AssemblyCommandLine;
 import org.junit.Test;
 
 /**
@@ -36,11 +37,11 @@ public class CommandLineProcessorTest {
 	@Test
 	public void testSplitCommandLine() throws Exception {
 
-		String[] command = CommandLineProcessor.splitCommandLine("service.agent.process(14)");
+		String[] command = AssemblyCommandLine.splitCommandLine("service.agent.process(14)");
 		assertEquals("service.agent.process", command[0]);
 		assertEquals("14", command[1]);
 
-		command = CommandLineProcessor.splitCommandLine("service.agent.process(14, 12, \"hello world\") ");
+		command = AssemblyCommandLine.splitCommandLine("service.agent.process(14, 12, \"hello world\") ");
 		assertEquals("service.agent.process", command[0]);
 		assertEquals("14, 12, \"hello world\"", command[1]);
 	}
@@ -48,7 +49,7 @@ public class CommandLineProcessorTest {
 	@Test
 	public void testSplitArguments() throws Exception {
 
-		String[] arguments = CommandLineProcessor.splitArguments("14, \"some kind of string\", 20");
+		String[] arguments = AssemblyCommandLine.splitArguments("14, \"some kind of string\", 20");
 		assertEquals("14", arguments[0]);
 		assertEquals("some kind of string", arguments[1]);
 		assertEquals("20", arguments[2]);
@@ -57,7 +58,7 @@ public class CommandLineProcessorTest {
 
 	@Test
 	public void testSplitCommand() throws Exception {
-		String[] command = CommandLineProcessor.splitCommand("service.agent.process");
+		String[] command = AssemblyCommandLine.splitCommand("service.agent.process");
 		assertEquals("service", command[0]);
 		assertEquals("agent", command[1]);
 		assertEquals("process", command[2]);

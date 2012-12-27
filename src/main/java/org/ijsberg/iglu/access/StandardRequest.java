@@ -366,16 +366,6 @@ public class StandardRequest implements Request//, PropertyListener
 	}
 
 
-	/**
-	 * Returns an agent for the given type.
-	 *
-	 * @param agentType
-	 * @return
-	 */
-	public <T> T getAgent(Class<T> agentType)
-	{
-		return getSession(false).getAgent(agentType);
-	}
 
 
 	/**

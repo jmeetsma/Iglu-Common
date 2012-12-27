@@ -20,17 +20,22 @@
 
 package org.ijsberg.iglu.logging.module;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Properties;
 
 import org.ijsberg.iglu.configuration.Startable;
+import org.ijsberg.iglu.exception.ResourceException;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.logging.LogPrintStream;
 import org.ijsberg.iglu.logging.Logger;
+import org.ijsberg.iglu.util.io.FileSupport;
 
 /**
  */
@@ -43,15 +48,29 @@ public class SimpleFileLogger implements Logger, Startable {
 
 	private PrintStream originalSystemOut;
 	private PrintStream filteredSystemOut;
-	private PrintStream logFilePrintStream;
+	protected PrintStream logFilePrintStream;
 
-	public SimpleFileLogger(String fileName) throws IOException{
+	protected String fileName;
+	protected Object lock = new Object();
+
+	public SimpleFileLogger(String fileName) {
+		this.fileName = fileName;
 		originalSystemOut = System.out;
 		filteredSystemOut = new LogPrintStream(originalSystemOut, this);
-		logFilePrintStream = new PrintStream(new FileOutputStream(fileName));
+		openLogStream();
 	}
 
-	public SimpleFileLogger(PrintStream logFilePrintStream) throws IOException{
+	protected void openLogStream() {
+		try {
+			logFilePrintStream = new PrintStream(new FileOutputStream(FileSupport.createFile(fileName + ".log")));
+		}
+		catch (IOException e) {
+			throw new ResourceException("unable to open new logfile '" + fileName + ".log'", e);
+
+		}
+	}
+
+	public SimpleFileLogger(PrintStream logFilePrintStream) {
 		originalSystemOut = System.out;
 		filteredSystemOut = new LogPrintStream(originalSystemOut, this);
 		this.logFilePrintStream = logFilePrintStream;
@@ -61,7 +80,9 @@ public class SimpleFileLogger implements Logger, Startable {
 	public void log(LogEntry entry) {
 		//System.out.println(entry.getLevel().ordinal() + ">=" + logLevelOrdinal);
 		if(entry.getLevel().ordinal() >= logLevelOrdinal) {
-			writeEntry(entry);
+			synchronized (lock) {
+				writeEntry(entry);
+			}
 		}
 	}
 
@@ -78,7 +99,7 @@ public class SimpleFileLogger implements Logger, Startable {
 		}
 
 		if(entryOriginStackTraceDepth > 0) {
-			printStackTrace(getStackTracePart(3, entryOriginStackTraceDepth));
+			printStackTrace(getStackTracePart(4, entryOriginStackTraceDepth));
 		}
 	}
 
@@ -133,8 +154,10 @@ public class SimpleFileLogger implements Logger, Startable {
 
 
 	public synchronized void start() {
-		System.setOut(filteredSystemOut);
-		isStarted = true;
+		synchronized (lock) {
+			System.setOut(filteredSystemOut);
+			isStarted = true;
+		}
 	}
 
 	public void setDateFormat(String dateFormat)
@@ -147,14 +170,26 @@ public class SimpleFileLogger implements Logger, Startable {
 		this.entryOriginStackTraceDepth = entryOriginStackTraceDepth;
 	}
 
-	public synchronized void stop() {
-		isStarted = false;
-		System.setOut(originalSystemOut);
+	public void stop() {
+		synchronized (lock) {
+			isStarted = false;
+			System.setOut(originalSystemOut);
+			logFilePrintStream.close();
+		}
 	}
 
 	public synchronized boolean isStarted() {
 		return isStarted;
 	}
+
+
+	public void setProperties(Properties properties) {
+
+		logLevelOrdinal = Arrays.asList(Level.LEVEL_CONFIG_TERM).indexOf(properties.getProperty("log_level", Level.LEVEL_CONFIG_TERM[logLevelOrdinal]));
+		entryOriginStackTraceDepth = Integer.parseInt(properties.getProperty("entry_stack_trace_depth", "" + entryOriginStackTraceDepth));
+		System.out.println(new LogEntry("log level set to " + Level.LEVEL_CONFIG_TERM[logLevelOrdinal]));
+	}
+
 
 
 }

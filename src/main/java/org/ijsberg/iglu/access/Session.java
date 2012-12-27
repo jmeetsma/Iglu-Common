@@ -1,5 +1,7 @@
 package org.ijsberg.iglu.access;
 
+import org.ijsberg.iglu.configuration.Component;
+
 import java.util.Properties;
 
 /**
@@ -75,5 +77,6 @@ public interface Session
 	 */
 //	void putForm(Object formId, Form form);
 
-	<T> T getAgent(Class<T> agentType);
+	<T> Component getAgent(String id);
+
 }

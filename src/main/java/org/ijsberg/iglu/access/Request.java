@@ -244,6 +244,5 @@ public interface Request
 	 */
 	Session resolveSession(String sessionToken, String userId);
 
-	<T> T getAgent(Class<T> agentType);
 
 }

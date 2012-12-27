@@ -58,5 +58,5 @@ public interface Pageable
 	/**
 	 * @return true if the implementation should be paged
 	 */
-	boolean isActive();
+	boolean isStarted();
 }

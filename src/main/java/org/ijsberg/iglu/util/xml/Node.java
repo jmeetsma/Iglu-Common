@@ -310,6 +310,9 @@ public class Node extends ElementList
 		if (nodeAttributes != null)
 		{
 			node.nodeAttributes = new Properties(nodeAttributes);
+			for(Object key : nodeAttributes.keySet()) {
+				node.nodeAttributes.put(key, nodeAttributes.get(key));
+			}
 		}
 		Iterator i = contents.iterator();
 		while (i.hasNext())
