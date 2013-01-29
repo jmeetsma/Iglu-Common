@@ -28,7 +28,7 @@ import org.ijsberg.iglu.logging.LogEntry;
 
 /**
  * If ComponentStarter is added to a cluster, it will register Startable components.
- * Registered Startables can be controlled by Compentstarter instead of having
+ * Registered Startables can be controlled by ComponentStarter instead of having
  * to start and stop them separately.
  * 
  * @see Startable
