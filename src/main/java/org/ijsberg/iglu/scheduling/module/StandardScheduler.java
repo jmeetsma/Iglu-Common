@@ -159,15 +159,18 @@ public class StandardScheduler implements Runnable, Startable, Scheduler
 //		Environment.setCurrentApplication(application);
 		currentState = SCHEDULER_WAIT;
 
+		long currentTime = System.currentTimeMillis();
+		long officialTime = TimeSupport.roundToMinute(currentTime);// + totalOffsetInMillis;
+
 		while (currentState == SCHEDULER_WAIT)
 		{
 			try
 			{
 				long interval2 = SchedulingSupport.getTimeTillIntervalStart(System.currentTimeMillis(), interval);
 				//prevent having two runs in one heartbeat
-				if (interval2 < 100)
+				if (interval2 < TimeSupport.SECOND_IN_MS)
 				{
-					interval2 += interval;
+					interval2 += interval * TimeSupport.MINUTE_IN_MS;
 				}
 				Thread.sleep(interval2);
 			}
@@ -180,8 +183,8 @@ public class StandardScheduler implements Runnable, Startable, Scheduler
 			{
 				currentState = SCHEDULER_BUSY;
 				//do work (async in future)
-				long currentTime = System.currentTimeMillis();
-				long officialTime = TimeSupport.roundToMinute(currentTime);// + totalOffsetInMillis;
+				currentTime = System.currentTimeMillis();
+				officialTime = TimeSupport.roundToMinute(currentTime);// + totalOffsetInMillis;
 
 				synchronized (pagedSystems)
 				{
@@ -194,7 +197,7 @@ public class StandardScheduler implements Runnable, Startable, Scheduler
 						{
 							//log("scheduler can not page " + StringSupport.trim(pageable.toString() + "'", 50, "...") + ": interval in minutes (" + pageable.getPageIntervalInMinutes() + ") is not valid");
 						}
-						else if (SchedulingSupport.isWithinMinuteOfIntervalStart(officialTime, pageable.getPageIntervalInMinutes(), pageable.getPageOffsetInMinutes()) && pageable.isActive())
+						else if (SchedulingSupport.isWithinMinuteOfIntervalStart(officialTime, pageable.getPageIntervalInMinutes(), pageable.getPageOffsetInMinutes()) && pageable.isStarted())
 						{
 							try
 							{

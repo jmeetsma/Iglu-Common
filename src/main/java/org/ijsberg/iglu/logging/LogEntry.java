@@ -20,6 +20,8 @@
 
 package org.ijsberg.iglu.logging;
 
+import org.ijsberg.iglu.util.misc.StringSupport;
+
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -76,7 +78,9 @@ public class LogEntry implements Serializable {
 	public String toString() {
 		return level.getShortDescription() + " " +
 				new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date(timeInMillis)) +
-				(message != null ? " " + message : "") + (data != null ? "\n" + data + "\n" : "");
+				(message != null ? " " + message : "") + (data != null ? "\n" +
+				(data instanceof Throwable ? StringSupport.getStackTrace((Throwable)data, 20) : data) + "\n" : "");
+		//TODO make stacktracedepth configurable
 	}
 
 

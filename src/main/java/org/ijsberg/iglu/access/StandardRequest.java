@@ -9,9 +9,7 @@
 package org.ijsberg.iglu.access;
 
 import org.ijsberg.iglu.configuration.ConfigurationException;
-import org.ijsberg.iglu.util.collection.CollectionSupport;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -50,7 +48,7 @@ public class StandardRequest implements Request//, PropertyListener
 	//private int timesRepresentingInternalRequest;
 
 	//reference to request manager (which created this request)
-	private RequestManager requestManager;
+	private AccessManager accessManager;
 	//request stack
 	//private ArrayList componentStack = new ArrayList(3);
 	//user settings (that may affect response)
@@ -110,12 +108,8 @@ public class StandardRequest implements Request//, PropertyListener
 	/**
 	 * Creates request for request manager.
 	 *
-	 * @param entryPoint
-	 * @param requestManager
-	 * @param isAdminRequest
-	 * @param internalRequests
 	 */
-	public StandardRequest(/*int threadId, EntryPoint entryPoint,*/ RequestManager requestManager/*, boolean isAdminRequest, HashMap internalRequests*/)
+	public StandardRequest(/*int threadId, */EntryPoint entryPoint, AccessManager accessManager/*, boolean isAdminRequest, HashMap internalRequests*/)
 	{
 	/*	if (entryPoint == null)
 		{
@@ -127,10 +121,10 @@ public class StandardRequest implements Request//, PropertyListener
 		this.application = realm.getApplication();
 		this.isAdminRequest = isAdminRequest;
 //		this.sessionToken = sessionToken;*/
-		this.requestManager = requestManager;
-	/*	this.entryPoint = entryPoint;
+		this.accessManager = accessManager;
+		this.entryPoint = entryPoint;
 		//store entrylayer as first in stack
-		componentStack.add(0, realm.getEntryLayer());*/
+	/*	componentStack.add(0, realm.getEntryLayer());*/
 	}
 
 	/**
@@ -153,11 +147,11 @@ public class StandardRequest implements Request//, PropertyListener
 	{
 		if (create && session == null)
 		{
-			if(requestManager == null)
+			if(accessManager == null)
 			{
 				throw new ConfigurationException("request " + toString() + " has no reference to a request manager that can create a session");
 			}
-			session = requestManager.createSession(getUserSettings());
+			session = accessManager.createSession(getUserSettings());
 			this.sessionToken = session.getToken();
 			if (entryPoint != null)
 			{
@@ -191,9 +185,9 @@ public class StandardRequest implements Request//, PropertyListener
 		{
 			entryPoint.onSessionDestruction(this, session);
 		}
-		if (requestManager != null)
+		if (accessManager != null)
 		{
-			requestManager.destroyCurrentSession();
+			accessManager.destroyCurrentSession();
 		}
 		session = null;
 	}
@@ -372,17 +366,7 @@ public class StandardRequest implements Request//, PropertyListener
 	}
 
 
-	/**
-	 * Returns an agent for the given ID.
-	 *
-	 * @param agentId
-	 * @return
-	 */
-/*	public Agent getAgent(String agentId)
-	{
-		return getSession(false).getAgent(agentId);
-	}
-*/
+
 
 	/**
 	 * Returns an existing and possibly filled out form obtained from a session
@@ -492,9 +476,9 @@ public class StandardRequest implements Request//, PropertyListener
 	{
 		this.sessionToken = sessionToken;
 		this.userId = userId;
-		if(requestManager != null)
+		if(accessManager != null)
 		{
-			this.session = requestManager.getSessionByToken(sessionToken);
+			this.session = accessManager.getSessionByToken(sessionToken);
 		}
 		return session;
 	}

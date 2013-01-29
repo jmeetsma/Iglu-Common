@@ -11,7 +11,6 @@ package org.ijsberg.iglu.util.caching.module;
 //TODO move up out of util
 
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -122,13 +121,6 @@ public class StandardCache<K, V> implements Cache<K, V>, Startable, Pageable
 	}
 
 	/**
-	 */
-	public boolean isStarted()
-	{
-		return isStarted;
-	}
-	
-	/**
 	 * Clears storage. Resets statistics.
 	 * Is invoked by superclass.
 	 */
@@ -178,7 +170,7 @@ public class StandardCache<K, V> implements Cache<K, V>, Startable, Pageable
 
 	private boolean isCachingEnabled()
 	{
-		return ttlInSeconds > 0 && isActive();
+		return ttlInSeconds > 0 && isStarted();
 	}
 
 	private boolean isCachingPermanent()
@@ -566,8 +558,6 @@ public class StandardCache<K, V> implements Cache<K, V>, Startable, Pageable
 	 * @param cacheName cache service ID
 	 * @param ttl time to live in seconds
 	 * @param cleanupInterval cleanup interval in seconds
-	 * @param application
-	 * @param layer
 	 * @return
 	 */
 	public static <K, V> Cache<K, V> createCache(String cacheName, int ttl, long cleanupInterval/*, Application application, Layer layer*/)
@@ -622,7 +612,7 @@ public class StandardCache<K, V> implements Cache<K, V>, Startable, Pageable
 	}
 
 	@Override
-	public boolean isActive() {
+	public boolean isStarted() {
 		// TODO Auto-generated method stub
 		return isStarted;
 	}

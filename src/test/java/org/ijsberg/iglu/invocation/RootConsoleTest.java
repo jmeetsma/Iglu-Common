@@ -31,8 +31,8 @@ public class RootConsoleTest extends CommandLineProcessorTest {
 		consoleProperties.setProperty("base_dir", tmpDir.getPath());
 		console.setProperties(consoleProperties);
 		console.start();
-		//wait for async process to start
-		Thread.sleep(10);
+		//wait for async process to start (FIXME this has caused an error once)
+		Thread.sleep(100);
 	}
 
 	@After

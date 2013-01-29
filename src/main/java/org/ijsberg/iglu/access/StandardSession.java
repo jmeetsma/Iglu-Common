@@ -8,6 +8,8 @@
  */
 package org.ijsberg.iglu.access;
 
+import org.ijsberg.iglu.configuration.Component;
+import org.ijsberg.iglu.exception.ResourceException;
 import org.ijsberg.iglu.util.io.ReceiverQueue;
 import org.ijsberg.iglu.util.misc.KeyGenerator;
 
@@ -26,7 +28,7 @@ import java.util.TreeMap;
  * A session may contain receivers and transceivers which can be used to
  * communicate messages (asynchronously), such as dedicated log messages.
  *
- * @see RequestManager
+ * @see AccessManager
  */
 public final class StandardSession implements Serializable, Session//, PropertyListener
 {
@@ -38,7 +40,7 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	//whenever a session is created, the StandardRequestManager adds its default settings to the created session
 	private Properties userSettings;
 	//collection of session objects for each realm
-	private HashMap agents = new HashMap();
+	private HashMap<String, Component> agentComponents = new HashMap();
 	//tme last accessed, needed for timeout determination
 	private long lastAccessedTime = System.currentTimeMillis();
 	//expiration timeout in milliseconds
@@ -52,20 +54,21 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 
 	private HashMap forms;
 
-	private Authenticator authenticator;
+	private AccessManager accessManager;
 
 	/**
 	 * Constructs a normal user session.
 	 *
 	 * @param expirationTimeout expiration timeout in seconds, 0 or less means that session will not expire
 	 */
-	public StandardSession(/*Application application,*/ long expirationTimeout, Properties defaultUserSettings)
+	public StandardSession(AccessManager accessManager, long expirationTimeout, Properties defaultUserSettings)
 	{
-		//create an id thats unique and difficult to guess
+		//create an id that's unique and difficult to guess
 		token = KeyGenerator.generateKey();
 //		this.application = application;
 		//store as millis
 		this.expirationTimeout = expirationTimeout * 1000;
+		this.accessManager = accessManager;
 		//copy settings
 //		userSettings = new GenericPropertyBundle("user settings");
 //		userSettings.merge(defaultUserSettings);
@@ -128,12 +131,29 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	/**
 	 * Merges settings with the existing settings.
 	 *
-	 * @param settings
 	 */
 /*	public void addSettings(GenericPropertyBundle settings)
 	{
 		this.userSettings.merge(settings);
 	}*/
+
+
+	@Override
+	public <T> Component getAgent(String id) {
+
+		if(agentComponents.containsKey(id)) {
+			return agentComponents.get(id);
+		}
+		return createAgent(id);
+	}
+
+	private <T> Component createAgent(String id) {
+		Component agent = accessManager.createAgent(id);
+		agentComponents.put(id, agent);
+		return agent;
+	}
+
+
 
 	/**
 	 * @return An agent providing stateful access to the application.
@@ -183,7 +203,6 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	}*/
 
 	/**
-	 * @param realmId id of the realm the user belongs to
 	 * @return a user logged in to the current realm
 	 */
 	public User getUser(/*String realmId*/)
@@ -194,7 +213,6 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	/**
 	 * Authenticates a user for a certain realm based on credentials.
 	 *
-	 * @param realmId id of the realm the user belongs to
 	 * @param credentials
 	 * @return transient user if authentication succeeded or null if it didn't
 	 * @throws SecurityException if user already logged in
@@ -212,7 +230,7 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 			//throw new SecurityException("user already logged in as '" + loggedInUser.getId() + "'");
 		}
 
-		User user = authenticator.authenticate(credentials);
+		User user = accessManager.authenticate(credentials);
 		if(user != null)
 		{
 			this.user = user;
@@ -228,13 +246,11 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	 */
 	public void onDestruction()
 	{
-/*		Iterator i = new ArrayList(agents.values()).iterator();
+		//Iterator i = new ArrayList(agents.values()).iterator();
 
-		while (i.hasNext())
-		{
-			BasicAgent agent = (BasicAgent) i.next();
-			agent.shutdown();
-		}*/
+		for (Component component : agentComponents.values()) {
+			accessManager.removeAgent(component);
+		}
 		//close receivers
 	/*	Iterator receiverIterator = getReceivers().iterator();
 		while (receiverIterator.hasNext())
@@ -248,7 +264,6 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	/**
 	 * Performs logout of user in the current realm.
 	 *
-	 * @param realmId id of the realm the user belongs to
 	 */
 	public void logout(/*String realmId*/)
 	{
@@ -257,7 +272,7 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	}
 
 	/**
-	 * Renews the last-accessed-time and prolongues the life of this session.
+	 * Renews the last-accessed-time and prolongs the life of this session.
 	 */
 	public void updateLastAccessedTime()
 	{

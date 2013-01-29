@@ -25,7 +25,6 @@ import java.util.Properties;
  * A user request may represent an internal request (if known by a subsystem), thus gaining
  * unlimited access to secured components.
  *
- * @see Application#getCurrentRequest()
  * @see EntryPoint
  */
 public interface Request
@@ -80,7 +79,6 @@ public interface Request
 	 *
 	 * @param credentials user credentials
 	 * @return the authenticated user
-	 * @see Realm
 	 */
 	User login(Credentials credentials);
 
@@ -245,4 +243,6 @@ public interface Request
 	 * @return session resolved by the given token or null
 	 */
 	Session resolveSession(String sessionToken, String userId);
+
+
 }
