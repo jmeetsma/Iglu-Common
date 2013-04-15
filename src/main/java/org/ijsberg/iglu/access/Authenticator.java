@@ -12,7 +12,7 @@ package org.ijsberg.iglu.access;
 /**
  * Service that acts as authenticator for realms.
  *
- * @see Realm
+
  */
 public interface Authenticator
 {
@@ -29,7 +29,6 @@ public interface Authenticator
 	/**
 	 * To be invoked if a user can't login because his credentials are expired.
 	 *
-	 * @param realm
 	 * @param expiredCredentials
 	 * @param newCredentials
 	 * @return user if authentication is successful

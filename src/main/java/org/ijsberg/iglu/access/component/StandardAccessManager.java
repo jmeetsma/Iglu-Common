@@ -487,6 +487,10 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestKe
 	//TODO deal with null
 	@Override
 	public User authenticate(Credentials credentials) throws AuthenticationException {
+
+        // TODO provide simple admin access
+        // TODO if(authenticator == null)
+
 		return authenticator.authenticate(credentials);
 	}
 

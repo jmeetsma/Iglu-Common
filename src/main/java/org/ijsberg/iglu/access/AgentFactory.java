@@ -21,6 +21,9 @@
 package org.ijsberg.iglu.access;
 
 /**
+ * Used by access manager to create agents which are session-bound components meant for stateful access.
+ *
+ * @see AccessManager
  */
 public interface AgentFactory<T> {
 

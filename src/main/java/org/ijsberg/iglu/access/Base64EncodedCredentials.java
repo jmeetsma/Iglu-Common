@@ -16,7 +16,6 @@ import org.ijsberg.iglu.util.misc.EncodingSupport;
  * Base 64 encoded encodedCredentials are passed by a browser
  * when BASIC authentication is performed.
  *
- * @see Realm#authenticate(Credentials)
  */
 public class Base64EncodedCredentials extends SimpleCredentials
 {

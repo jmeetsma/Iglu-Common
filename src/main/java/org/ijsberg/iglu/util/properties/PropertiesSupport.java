@@ -20,6 +20,12 @@
 
 package org.ijsberg.iglu.util.properties;
 
+import org.ijsberg.iglu.exception.ResourceException;
+import org.ijsberg.iglu.util.io.FileSupport;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -124,4 +130,19 @@ public class PropertiesSupport {
 		}
 		return retval;
 	}
+
+    public static Properties loadProperties(String fileName) {
+        Properties retval = new Properties();
+        try {
+            File file = new File(fileName);
+            if(file.exists()) {
+                retval.load(new FileInputStream(file));
+            } else {
+                retval.load(FileSupport.getInputStreamFromClassLoader(fileName));
+            }
+        } catch (IOException ioe) {
+            throw new ResourceException("can not load properties from file '" + fileName + "'", ioe);
+        }
+        return retval;
+    }
 }
