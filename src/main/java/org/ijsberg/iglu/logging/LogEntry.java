@@ -79,7 +79,7 @@ public class LogEntry implements Serializable {
 		return level.getShortDescription() + " " +
 				new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date(timeInMillis)) +
 				(message != null ? " " + message : "") + (data != null ? "\n" +
-				(data instanceof Throwable ? StringSupport.getStackTrace((Throwable)data, 20) : data) + "\n" : "");
+				(data instanceof Throwable ? StringSupport.getRootStackTrace((Throwable)data, 20) : data) + "\n" : "");
 		//TODO make stacktracedepth configurable
 	}
 

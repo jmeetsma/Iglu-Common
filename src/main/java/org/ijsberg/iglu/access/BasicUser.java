@@ -28,7 +28,7 @@ import java.util.Properties;
  * When a user logs in to a realm, this object is created and stored
  * in a session.
  *
- * @see Account
+
  * @see StandardSession
  */
 public class BasicUser implements User

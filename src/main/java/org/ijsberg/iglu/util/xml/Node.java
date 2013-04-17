@@ -284,7 +284,43 @@ public class Node extends ElementList
 		return result.toString();
 	}
 
-	//TODO do not format comment! <!--
+    /**
+     * @return the XML node as a formatted text
+     */
+    public String toHtmlString(String lineFeed, int minimumLineSize)
+    {
+        if (tagname == null)
+        {
+            return "";
+        }
+
+        StringBuffer result = new StringBuffer();
+/*		for (int x = 0; x < depth; x++)
+		{
+			result.append("x\t");
+		}*/
+        result.append("<" + tagname);
+
+        result.append(contextToNodeAttributes(nodeAttributes));
+
+        if (!contents.isEmpty() || (interpreteAsXHTML && !isSingleTag))
+        {
+            result.append('>');
+            result.append(contentsToMaintainableHtml(lineFeed, minimumLineSize));
+            if (( !(/*containsMarkupText ||*/ isPartOfText())) && result.length() > 0 && result.charAt(result.length() - 1) == TAB)
+            {
+                result.deleteCharAt(result.length() - 1);
+            }
+
+            result.append("</" + tagname + '>');
+        }
+        else
+        {
+            result.append(" />");
+        }
+        return result.toString();
+    }
+    //TODO do not format comment! <!--
 
 
 	/**

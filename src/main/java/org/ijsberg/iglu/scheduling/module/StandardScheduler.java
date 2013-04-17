@@ -17,6 +17,7 @@ import org.ijsberg.iglu.util.misc.StringSupport;
 import org.ijsberg.iglu.util.time.SchedulingSupport;
 import org.ijsberg.iglu.util.time.TimeSupport;
 
+import java.lang.reflect.UndeclaredThrowableException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -201,15 +202,19 @@ public class StandardScheduler implements Runnable, Startable, Scheduler
 						{
 							try
 							{
-								System.out.println(new LogEntry("scheduler about to page " + StringSupport.trim(pageable.toString() + "'", 50, "...")));
+								System.out.println(new LogEntry("scheduler about to page " + StringSupport.trim(pageable.toString() + "'", 80, "...")));
 								//the page method is invoked by a system session
 								//  so a developer may try to use it to outflank the security system
 								//another risk is that the invoked method consumes too much time
 								pageable.onPageEvent(officialTime);
 							}
+							catch (UndeclaredThrowableException e)//pageable is not per se a trusted component
+							{
+								System.out.println(new LogEntry(Level.CRITICAL, "undeclared exception while paging pageable '" + StringSupport.trim(pageable.toString() + "'", 80, "..."), e.getCause()));
+							}
 							catch (Exception e)//pageable is not per se a trusted component
 							{
-								System.out.println(new LogEntry(Level.CRITICAL, "error while paging pageable '" + StringSupport.trim(pageable.toString() + "'", 50, "..."), e));
+								System.out.println(new LogEntry(Level.CRITICAL, "exception while paging pageable '" + StringSupport.trim(pageable.toString() + "'", 80, "..."), e));
 							}
 						}
 					}
@@ -220,6 +225,5 @@ public class StandardScheduler implements Runnable, Startable, Scheduler
 		}
 		currentState = SCHEDULER_HALT;
 	}
-
 
 }

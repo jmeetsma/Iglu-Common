@@ -30,12 +30,12 @@ public interface Session
 	 * Removes a user who was previously logged in.
 	 *
 	 */
-	void logout(/*String realmId*/);
+	void logout();
 
 	/**
 	 * @return the currently logged in user
 	 */
-	User getUser(/*String realmId*/);
+	User getUser();
 
 	/**
 	 * Creates an agent if none exists.
@@ -72,8 +72,6 @@ public interface Session
 	/**
 	 * Stores a form on the session.
 	 *
-	 * @param formId form ID
-	 * @param form form to be completed
 	 */
 //	void putForm(Object formId, Form form);
 

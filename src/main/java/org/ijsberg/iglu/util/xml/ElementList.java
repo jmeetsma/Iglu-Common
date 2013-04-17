@@ -41,6 +41,7 @@ public abstract class ElementList implements Serializable
 	public static final byte CONDENSE = 1;
 	public static final byte STRETCH = 2;
 
+    //contains (HTML) elements that are used to mark up texts such as <b>
 	protected boolean containsMarkupText;
 	protected boolean containsSingleString;
 
@@ -83,7 +84,7 @@ public abstract class ElementList implements Serializable
 						{
 							contents.add(newNode);
 //							if (interpreteAsXHTML && isHTMLMarkupTag(subtag.tagname))
-							if (interpreteAsXHTML && isHTMLMarkupTag(getName()))//TODO
+							if (interpreteAsXHTML && isHTMLMarkupTag(getName()))
 							{
 								containsMarkupText = true;
 							}
@@ -1155,8 +1156,9 @@ public abstract class ElementList implements Serializable
 	public static final String[] htmlMarkupTags = {"ABBR", "ACRONYM", "B", "BASEFONT", "BIG", "BLINK", "CITE", "CODE", "DEL", "DFN", "EM", "FONT", "I", "INS", "KBD", "NOBR", "Q", "S", "SAMP", "SMALL", "STRIKE", "STRONG", "SUB", "SUP", "TT", "U", "VAR", "SPAN"};
 	//structure tags that encapsulates text
 	public static final String[] htmlStructureTags = {"TABLE", "TR", "TD", "DIV", "FORM"};
+    public static final String[] htmlLineBreakSuitable = {"DIV", "BR", "P", "LI", "H1", "H2", "H3", "H4", "H5", "H6"};
 
-	/**
+    /**
 	 * @param tagName
 	 * @return true if this node stands for text markup in an HTML context
 	 */
@@ -1224,10 +1226,6 @@ public abstract class ElementList implements Serializable
 	 */
 	public String contentsToString(String lineFeed, byte formattingStyle, int minimumLineSize)
 	{
-/*		if (tagname == null/* && !(this instanceof Document))
-		{
-			return "";
-		}*/
 		StringBuffer result = new StringBuffer();
 		if (!contents.isEmpty() && (!contentsIsWhiteSpace() || formattingStyle == LEAVE_AS_IS))
 		{
@@ -1354,4 +1352,115 @@ public abstract class ElementList implements Serializable
 		}
 		return result.toString();
 	}
+
+
+    /**
+     * @return the contents of the XML node as a formatted text
+     */
+    public String contentsToMaintainableHtml() {
+        return contentsToMaintainableHtml(EOL, -1);
+    }
+
+    /**
+     * @return the contents of the XML node as a formatted text
+     */
+    public String contentsToMaintainableHtml(String lineFeed, int minimumLineSize)
+    {
+        StringBuffer result = new StringBuffer();
+        if (!contents.isEmpty() && !contentsIsWhiteSpace())
+        {
+            if (!(containsSingleString || (containsMarkupText || isPartOfText())))
+            {
+                //start output on a new, indented line if elements are not (part of) text or formattingstyle is STRETCHED
+                result.append(lineFeed);
+            }
+            Iterator i = contents.iterator();
+
+            int currentLineLength = 0;
+            Object o;
+            LOOP:
+            while (i.hasNext())
+            {
+                o = i.next();
+                if (o instanceof String)
+                {
+                    String text = o.toString();
+                    if (text.trim().length() == 0)
+                    {
+                        continue LOOP;
+                    }
+                    text = StringSupport.condenseWhitespace(text);
+                    if (containsSingleString)
+                    {
+                        //avoid unnecessary empty lines
+                        //text = text.trim();
+                    }
+                    currentLineLength += text.length();
+                    //split long lines here if desired
+                    if (minimumLineSize >= 0 && currentLineLength > minimumLineSize)
+                    {
+                        text = StringSupport.replaceAll(text, " ", lineFeed, minimumLineSize);
+                        currentLineLength = text.length() - text.lastIndexOf(lineFeed);
+                    }
+                    result.append(text);
+                }
+                else if (o instanceof Node)
+                {
+                    Node node = (Node)o;
+                    String text = null;
+                    if(wantsHtmlLineBreak(node)) {
+                        text = ((Node) o).toHtmlString(lineFeed, minimumLineSize);
+                        text += lineFeed;
+                    }
+                    else if (containsMarkupText || isPartOfText())
+                    {
+                        text = ((Node) o).toHtmlString(lineFeed, minimumLineSize);
+                        if (minimumLineSize >= 0 && currentLineLength > minimumLineSize)
+                        {
+                            text += lineFeed;
+                        }
+                        currentLineLength = text.length() - text.lastIndexOf(lineFeed);
+                        if (minimumLineSize >= 0 && currentLineLength > minimumLineSize)
+                        {
+                            text += lineFeed;
+                            currentLineLength = 0;
+                        }
+                    }
+                    else
+                    {
+                        text = ((Node) o).toHtmlString(lineFeed + TAB, minimumLineSize);
+                    }
+                    result.append(text);
+                } else if(o instanceof Tag) {
+
+                }
+                else
+                {
+                    throw new IllegalStateException("node " + getName() + " contains invalid element " + o.getClass().getName() + " -> " + o);
+                }
+                if ( ( !(containsSingleString || (containsMarkupText || isPartOfText()))))
+//                    if (formattingStyle == STRETCH || !(containsSingleString || (containsMarkupText || isPartOfText()))/* && !(interpreteAsXHTML && this.isHTMLMarkupTag())*/)
+                {
+                    result.append(lineFeed);
+/*                    result.append(EOL);
+                    for (int x = 0; x < depth; x++)
+                    {
+                        result.append(TAB);
+                    }*/
+                }
+            }
+        }
+        return result.toString();
+    }
+
+    private static boolean wantsHtmlLineBreak(Node node) {
+        for(String htmlTagName : htmlLineBreakSuitable)  {
+            if(node.getName().equalsIgnoreCase(htmlTagName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }

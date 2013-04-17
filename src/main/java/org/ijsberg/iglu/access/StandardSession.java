@@ -156,56 +156,9 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 
 
 	/**
-	 * @return An agent providing stateful access to the application.
-	 */
-/*	public Agent getAgent(String moduleId)
-	{
-		String moduleId1 = moduleId;
-		String layerId;
-		Layer layer;
-		if (StandardApplication.isGlobalId(moduleId1))
-		{
-			layerId = StandardApplication.getLayerIdFromGlobalId(moduleId1);
-			moduleId1 = StandardApplication.getModuleIdFromGlobalId(moduleId1);
-			layer = application.getLayer(layerId);
-		}
-		else
-		{
-			Request request = application.getCurrentRequest();
-			layer = request.getRealm().getEntryLayer();
-		}
-
-		Agent retval = (Agent) agents.get(layer.getGlobalId() + Application.ID_SEPARATOR + moduleId1);
-		if (retval == null)
-		{
-			//next statement throws if BasicAgent can not be created
-			//the layer (being entry layer for a realm) may decide if it supports agents by the given id
-			retval = layer.createAgent(moduleId1);
-			agents.put(layer.getGlobalId() + Application.ID_SEPARATOR + moduleId1, retval);
-		}
-		return retval;
-	}*/
-
-	/**
-	 *
-	 * @param agentId
-	 * @return
-	 */
-/*	public Agent destroyAgent(String agentId)
-	{
-		Agent agent = (Agent)agents.remove(agentId);
-//		System.out.println("AGENT " + agent + " removed...");
-		if(agent != null)
-		{
-			agent.shutdown();
-		}
-		return agent;
-	}*/
-
-	/**
 	 * @return a user logged in to the current realm
 	 */
-	public User getUser(/*String realmId*/)
+	public User getUser()
 	{
 		return user;
 	}
@@ -218,10 +171,8 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	 * @throws SecurityException if user already logged in
 	 * @throws AuthenticationException if some user action is required
 	 */
-	public User login(/*String realmId, */Credentials credentials) throws SecurityException
+	public User login(Credentials credentials) throws SecurityException
 	{
-//		Realm realm = application.getRealm(realmId);
-
 		//check if user is logged in already
 		User loggedInUser = getUser();
 		if (loggedInUser != null)
@@ -265,7 +216,7 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	 * Performs logout of user in the current realm.
 	 *
 	 */
-	public void logout(/*String realmId*/)
+	public void logout()
 	{
 		user = null;
 		//Object removed = usersByRealmId.remove(realmId);
@@ -304,21 +255,6 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 		return result.toString();
 	}
 
-	/**
-	 * To be invoked when user setting changes.
-	 *
-	 * @param bundle
-	 * @param property
-	 * @param status
-	 */
-/*	public void onPropertyChange(PropertyBundle bundle, Property property, int status)
-	{
-		if (bundle == userSettings)
-		{
-			Request request = application.getCurrentRequest();
-			request.exportUserSettings();
-		}
-	}*/
 
 
 	/**
