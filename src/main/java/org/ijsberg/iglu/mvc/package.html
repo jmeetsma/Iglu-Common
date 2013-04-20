@@ -1,0 +1,53 @@
+<html>
+<head></head>
+<body>
+<p>
+	MVC: mapping and dispatching of client requests.
+</p>
+
+<p>
+	The Iglu model-view-control package offers a mechanism to map requests to module methods in the application.
+</p>
+
+<p>
+	Somehow, especially from a web environment (that was intended to contain documents instead
+	of applications) it has always been difficult to interact with server-side applications.
+	<br>
+	The essence of a good system that facilitates the interaction of user interface
+	and server-side application, is to keep the structure as compact as possible.
+	Iglu MVC defines a minimal number of parts that need maintenance:
+	<ul>
+		<li>A user interface part, typically a JSP that accesses
+			the application via service components and agents and that has access to
+			empty or (partially) filled out forms.
+		</li>
+		<li>A mapping part, a readable plain text file, that defines incoming requests,
+			the module methods they access
+			and the user interface part they get directed to depending on the outcome of the methods invoked.
+		</li>
+		<li>A controller part, being an agent or service component, that processes request data and returns clues to
+			what to next.
+		</li>
+	</ul>
+	In case of a web application, requests are collected and dispatched
+	by a servlet that implements RequestDispatcher. The DispatcherServlet
+	delegates requests to a web-independent RequestMapper,
+	which is configured as an Iglu component. The RequestMapper
+	manages one or more mapping structures that are based on a map configuration.
+	These structures may invoke methods on modules. After a process is finished
+	they delegate dispatching to the RequestDispatcher again.
+	In terms of the classical model-view-control principle:
+	<ul>
+		<li>The model is (represented by) the service layer of the application in the form
+			of services and stateful agents.
+		</li>
+		<li>The view is represented by JSP-files.</li>
+		<li>The controller is the request mapper - possibly in combination with modules
+			in the presentation layer - that decides, which business logic to invoke
+			and which view to dispatch to.
+		</li>
+	</ul>
+</p>
+
+</body>
+</html>
