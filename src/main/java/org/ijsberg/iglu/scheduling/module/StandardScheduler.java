@@ -41,6 +41,8 @@ public class StandardScheduler implements Runnable, Startable, Scheduler
 	protected long lastCall;
 
 	protected ArrayList pagedSystems = new ArrayList();
+	//proxies will get registered, the toString() method reflects the actual component
+	protected ArrayList<String> pagedSystemObjectNames = new ArrayList();
 
 //	private Request initialRequest;
 
@@ -135,17 +137,22 @@ public class StandardScheduler implements Runnable, Startable, Scheduler
 	 */
 	public void register(Pageable pageable)
 	{
-		if(pageable.getPageIntervalInMinutes() <= 0)
-		{
-			System.out.println(new LogEntry("scheduler will not page " + StringSupport.trim(pageable.toString() + "'", 50, "...") + ": interval in minutes (" + pageable.getPageIntervalInMinutes() + ") is not valid"));
-		}
-		else
-		{
-			System.out.println(new LogEntry("scheduler will page " + StringSupport.trim(pageable.toString() + "'", 50, "...") + " every " + pageable.getPageIntervalInMinutes() + " minute(s)"));
-		}
-		synchronized (pagedSystems)
-		{
-			pagedSystems.add(pageable);
+		if(!pagedSystemObjectNames.contains(pageable.toString())) {
+			if(pageable.getPageIntervalInMinutes() <= 0)
+			{
+				System.out.println(new LogEntry("scheduler will not page " + StringSupport.trim(pageable.toString() + "'", 80, "...") + ": interval in minutes (" + pageable.getPageIntervalInMinutes() + ") is not valid"));
+			}
+			else
+			{
+				System.out.println(new LogEntry("scheduler will page " + StringSupport.trim(pageable.toString() + "'", 80, "...") + " every " + pageable.getPageIntervalInMinutes() + " minute(s)"));
+			}
+			synchronized (pagedSystems)
+			{
+				pagedSystems.add(pageable);
+				pagedSystemObjectNames.add(pageable.toString());
+			}
+		} else {
+			System.out.println(new LogEntry("pageable " + pageable + " already registered in scheduler"));
 		}
 	}
 

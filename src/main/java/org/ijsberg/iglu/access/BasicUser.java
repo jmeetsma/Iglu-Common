@@ -7,12 +7,6 @@
  * =======================================================================
  */
 package org.ijsberg.iglu.access;
-/*
-import org.ijsberg.enterprise.system.PropertyBundle;
-import org.ijsberg.enterprise.system.Role;
-import org.ijsberg.enterprise.system.User;
-import org.ijsberg.iglu.core.security.Account;
-*/
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -59,6 +53,12 @@ public class BasicUser implements User
 			roleId = role.getId();
 			this.roles.put(roleId, role);
 		}
+	}
+
+	public BasicUser(String userId, Properties settings)
+	{
+		this.userId = userId;
+		this.settings = settings;
 	}
 
 	/**

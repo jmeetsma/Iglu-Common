@@ -167,14 +167,26 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestKe
         return boundRequest;
     }
 
-
+	/**
+	 * Used to register any first available authenticator within cluster.
+	 * @param authenticator
+	 */
     public void register(Authenticator authenticator) {
-        this.authenticator = authenticator;
-        System.out.println(new LogEntry("authenticator registered with request manager"));
+		if(this.authenticator == null) {
+        	this.authenticator = authenticator;
+        	System.out.println(new LogEntry("authenticator registered with request manager"));
+		}
     }
 
+	/**
+	 * Sets authenticator explicitly.
+	 * @param authenticator
+	 */
+	public void setAuthenticator(Authenticator authenticator) {
+		this.authenticator = authenticator;
+	}
 
-    /**
+	/**
      * Removes a specific bound thread from the list so that it no longer points to a specific request.
      * This method should be invoked at the point where a (stateless) request leaves the application
      * If the thread was not released, a following request with an unbound thread would still be bound
@@ -241,14 +253,16 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestKe
 
     @Override
     public Component createAgent(String id) {
-        AgentFactory agentFactory = agentFactoriesByAgentId.get(id);
+		if(serviceCluster == null) {
+			throw new ConfigurationException("access manager has no 'ServiceCluster' to connect agent to, please provide one");
+		}
+		AgentFactory agentFactory = agentFactoriesByAgentId.get(id);
         if (agentFactory == null) {
             throw new ConfigurationException("no AgentFactory for agents with id " + id + " present, register one in cluster");
         }
         Object implementation = agentFactory.createAgentImpl();
         Component component = new StandardComponent(implementation);
         //connect component anonymously
-        //TODO serviceCluster may be null
         serviceCluster.getFacade().connect(component);
         return component;
     }

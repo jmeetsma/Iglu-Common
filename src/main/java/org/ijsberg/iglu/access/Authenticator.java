@@ -24,7 +24,7 @@ public interface Authenticator
 	 * an exception must be thrown rather than returning null
 	 * @throws AuthenticationException if authentication fails for any reason
 	 */
-	User authenticate(/*Realm realm, */Credentials credentials) throws AuthenticationException;
+	User authenticate(Credentials credentials) throws AuthenticationException;
 
 	/**
 	 * To be invoked if a user can't login because his credentials are expired.
@@ -34,5 +34,6 @@ public interface Authenticator
 	 * @return user if authentication is successful
 	 * @throws AuthenticationException
 	 */
-	User authenticate(/*Realm realm, */Credentials expiredCredentials, Credentials newCredentials) throws AuthenticationException;
+	User authenticate(Credentials expiredCredentials, Credentials newCredentials) throws AuthenticationException;
+
 }

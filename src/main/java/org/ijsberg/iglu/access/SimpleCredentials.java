@@ -63,4 +63,8 @@ public class SimpleCredentials implements Credentials, Serializable
 	{
 		return userId;
 	}
+
+	public String getPassword() {
+		return password;
+	}
 }

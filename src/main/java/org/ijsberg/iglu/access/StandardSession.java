@@ -125,6 +125,9 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	 */
 	public Properties getUserSettings()
 	{
+		if(userSettings == null) {
+			userSettings = new Properties();
+		}
 		return userSettings;
 	}
 

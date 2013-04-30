@@ -95,7 +95,7 @@ public class StandardRequestMapper implements RequestMapper, Startable {
             String fileName = mappingFilesMap.getProperty(mappingName);
             System.out.println(new LogEntry("loading mapping '" + mappingName + "' from '" + fileName + '\''));
             //TODO filename sometimes null
-            IndentedConfigReaderMapping mapping = new IndentedConfigReaderMapping(mappingName, /*Application.getRoot()+"/"+*/fileName, assembly);
+            IndentedConfigReaderMapping mapping = new IndentedConfigReaderMapping(mappingName, fileName, assembly);
             succeeded = succeeded && mapping.isLoaded();
             mappingMap.put(mappingName, mapping);
         }
@@ -158,11 +158,6 @@ public class StandardRequestMapper implements RequestMapper, Startable {
         Environment.System.out.println("checking mapping strictly: " + strict);*/
 
         mappingFilesMap = PropertiesSupport.getSubsection(properties, "mapping");
-/*		if (mappingFilesMap.isEmpty())
-		{
-			section.setProperty("mapping." + defaultMappingName, application.getWorkingDirectory() + "conf/" + defaultMappingName + ".map", "mappings, specified like 'mapping.mapid=path_to_mapping_file'");
-		}
-*/
     }
 
 
@@ -242,7 +237,7 @@ public class StandardRequestMapper implements RequestMapper, Startable {
 
         Mapping mapping = mappingMap.get(mappingName);
         if (mapping == null) {
-            System.out.println(new LogEntry("can not find mapping '" + mappingName + ": turning to default mapping '" + defaultMappingName));
+            System.out.println(new LogEntry("can not find mapping '" + mappingName + "': turning to default mapping '" + defaultMappingName + "'"));
             mapping = mappingMap.get(defaultMappingName);
             if (mapping == null || !mapping.isLoaded()) {
                 throw new ConfigurationException("can not find mapping '" + mappingName + "',\n" +
