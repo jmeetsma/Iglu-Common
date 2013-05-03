@@ -76,10 +76,21 @@ public class LogEntry implements Serializable {
 	 * @return
 	 */
 	public String toString() {
-		return level.getShortDescription() + " " +
+		StringBuffer retval = new StringBuffer(level.getShortDescription() + " " +
 				new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(new Date(timeInMillis)) +
 				(message != null ? " " + message : "") + (data != null ? "\n" +
-				(data instanceof Throwable ? StringSupport.getRootStackTrace((Throwable)data, 20) : data) + "\n" : "");
+				(data instanceof Throwable ? "" : data) + "\n" : ""));
+
+		if(data instanceof Throwable) {
+			Throwable cause = (Throwable)data;
+			while(cause != null) {
+				retval.append("\n" + StringSupport.getRootStackTrace(cause, 20) + "\n");
+				cause = cause.getCause();
+			}
+		}
+
+
+		return retval.toString();
 		//TODO make stacktracedepth configurable
 	}
 

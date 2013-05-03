@@ -37,8 +37,14 @@ public class ExceptionHandler extends InvocationResultExpression
 	 * @param t
 	 * @return true if the throwable encountered is listed
 	 */
-	public boolean doesCatch(Throwable t)
+	public Throwable doesCatch(Throwable t)
 	{
-		return caughtExceptions.contains(t.getClass().getName());
+		while(t != null) {
+			if(caughtExceptions.contains(t.getClass().getName()) || caughtExceptions.contains(t.getClass().getSimpleName())) {
+				return t;
+			}
+			t = t.getCause();
+		}
+		return null;
 	}
 }

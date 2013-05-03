@@ -20,6 +20,8 @@
 
 package org.ijsberg.iglu.access;
 
+import java.util.Properties;
+
 /**
  * Used by access manager to create agents which are session-bound components meant for stateful access.
  *
@@ -30,4 +32,6 @@ public interface AgentFactory<T> {
 	String getAgentId();
 
 	T createAgentImpl();
+
+	Properties getAgentProperties();
 }

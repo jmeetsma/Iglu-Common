@@ -20,8 +20,7 @@
 
 package org.ijsberg.iglu.configuration.module;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.ijsberg.iglu.configuration.Startable;
 import org.ijsberg.iglu.logging.Level;
@@ -39,7 +38,7 @@ import org.ijsberg.iglu.logging.LogEntry;
 public class ComponentStarter implements Startable {
 
 	protected boolean isStarted = false;
-	protected Set<Startable> registeredStartables = new HashSet<Startable>();
+	protected Map<Integer, Startable> registeredStartables = new LinkedHashMap<Integer, Startable>();
 
 	public synchronized void register(Startable startable) {
 
@@ -48,18 +47,18 @@ public class ComponentStarter implements Startable {
 		if (isStarted && !startable.isStarted()) {
 			startable.start();
 		}
-		registeredStartables.add(startable);
+		registeredStartables.put(startable.toString().hashCode(), startable);
 	}
 
 	public synchronized void unregister(Startable startable) {
-		registeredStartables.remove(startable);
+		registeredStartables.remove(startable.toString().hashCode());
 	}
 
 
 	public synchronized void start() {
 		if (!isStarted) {
 			isStarted = true;
-			for (Startable startable : registeredStartables) {
+			for (Startable startable : registeredStartables.values()) {
 				if (!startable.isStarted()) {
 					try {
 						startable.start();
@@ -81,7 +80,7 @@ public class ComponentStarter implements Startable {
 	public synchronized void stop() {
 		isStarted = false;
 
-		Startable[] startables = registeredStartables.toArray(new Startable[0]);
+		Startable[] startables = registeredStartables.values().toArray(new Startable[0]);
 		for (int i = startables.length - 1; i >= 0; i--) {
 			if (startables[i].isStarted()) {
 				startables[i].stop();

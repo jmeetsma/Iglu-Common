@@ -24,7 +24,7 @@ import org.ijsberg.iglu.access.Request;
 
 /**
  */
-public interface RequestKeeper {
+public interface RequestRegistry {
 
 	Request getCurrentRequest();
 }

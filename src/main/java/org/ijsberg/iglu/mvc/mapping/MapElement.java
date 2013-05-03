@@ -9,6 +9,7 @@
 package org.ijsberg.iglu.mvc.mapping;
 
 
+import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.mvc.RequestDispatcher;
 
 import java.util.Properties;
@@ -130,10 +131,22 @@ public abstract class MapElement
 	* @return true if processing leads to a successful redirect
 	 * @throws Throwable
 	 */
-	public abstract boolean processRequest(String[] processArray, Properties requestPropertie, RequestDispatcher dispatcher);
+	public abstract boolean processRequest(String[] processArray, Properties requestPropertie, RequestDispatcher dispatcher) throws Exception;
 
 	/**
 	 * @return a (mandatory) brief description of the MVCc element
 	 */
 	public abstract String toString();
+
+	protected boolean handleException(String[] processArray, Properties requestProperties, RequestDispatcher dispatcher, Exception e) throws Exception {
+		Throwable caught = null;
+		if (exceptionHandler != null && (caught = exceptionHandler.doesCatch(e)) != null)
+		{
+			requestProperties.put("exception", caught);
+			System.out.println("X " + requestProperties);
+			System.out.println(new LogEntry("exception occurred that will be handled by mvc exception handler", e));
+			return exceptionHandler.processRequest(processArray, requestProperties, dispatcher);
+		}
+		throw e;
+	}
 }

@@ -36,6 +36,7 @@ import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.logging.LogPrintStream;
 import org.ijsberg.iglu.logging.Logger;
 import org.ijsberg.iglu.util.io.FileSupport;
+import org.ijsberg.iglu.util.misc.StringSupport;
 
 /**
  */

@@ -34,7 +34,7 @@ import org.ijsberg.iglu.scheduling.Pageable;
  * integers for distinct objects.
  */
 
-public class StandardAccessManager implements AccessManager, Pageable, RequestKeeper {
+public class StandardAccessManager implements AccessManager, Pageable, RequestRegistry {
     //session storage
     private final HashMap sessionsMirror = new HashMap(10);//mirror is used for cleanup
     private final HashMap sessions = new HashMap(10);
@@ -262,6 +262,7 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestKe
         }
         Object implementation = agentFactory.createAgentImpl();
         Component component = new StandardComponent(implementation);
+		component.setProperties(agentFactory.getAgentProperties());
         //connect component anonymously
         serviceCluster.getFacade().connect(component);
         return component;

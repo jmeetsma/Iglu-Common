@@ -112,7 +112,12 @@ public class Invocation extends MapElement
 	 */
 	public boolean addFlowElement(MapElement fe)
 	{
-		if (fe instanceof InvocationResultExpression)
+		if (fe instanceof ExceptionHandler)
+		{
+			exceptionHandler = (ExceptionHandler) fe;
+			return true;
+		}
+		else if (fe instanceof InvocationResultExpression)
 		{
 			if (results == null)
 			{
@@ -120,10 +125,6 @@ public class Invocation extends MapElement
 			}
 			results.add(fe);
 			return true;
-		}
-		else if (fe instanceof ExceptionHandler)
-		{
-			exceptionHandler = (ExceptionHandler) fe;
 		}
 		return false;
 	}
@@ -137,7 +138,7 @@ public class Invocation extends MapElement
 	 * @throws ConfigurationException
 	 */
 	public boolean processRequest(String[] processArray, Properties requestProperties, RequestDispatcher dispatcher)
-			throws ConfigurationException
+			throws Exception
 	{
 		timesProcessed++;
 
@@ -147,14 +148,16 @@ public class Invocation extends MapElement
 		try
 		{
 			result = dispatcher.handleInvocation(command, requestProperties);
+			if(result != null) {
+				requestProperties.put("result", result);
+			}
+		}
+		catch (Exception e)
+		{
+			return handleException(processArray, requestProperties, dispatcher, e);
 		}
 		catch (Throwable t)
 		{
-			if (exceptionHandler != null && exceptionHandler.doesCatch(t))
-			{
-				System.out.println(new LogEntry("exception occurred that will be handled by mvc exception handler", t));
-				return exceptionHandler.processRequest(processArray, requestProperties, dispatcher);
-			}
 			System.out.println(new LogEntry("exception occurred in mvc invocation", t));
 			throw new RuntimeException("unable to invoke assembly", t);
 			//TODO provide string explaining invocationType

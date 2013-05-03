@@ -21,9 +21,9 @@ import org.ijsberg.iglu.util.collection.CollectionSupport;
 import org.ijsberg.iglu.util.misc.StringSupport;
 import org.ijsberg.iglu.util.properties.PropertiesSupport;
 
+import java.io.Serializable;
 import java.util.*;
 
-//TODO reset does not seem to reload changed flow files
 
 /**
  * This component contains the mapping and the wiring to handle MVC requests.
@@ -93,11 +93,14 @@ public class StandardRequestMapper implements RequestMapper, Startable {
         while (i.hasNext()) {
             String mappingName = (String) i.next();
             String fileName = mappingFilesMap.getProperty(mappingName);
-            System.out.println(new LogEntry("loading mapping '" + mappingName + "' from '" + fileName + '\''));
+			System.out.println(new LogEntry("loading mapping '" + mappingName + "' from '" + fileName + '\''));
             //TODO filename sometimes null
             IndentedConfigReaderMapping mapping = new IndentedConfigReaderMapping(mappingName, fileName, assembly);
             succeeded = succeeded && mapping.isLoaded();
-            mappingMap.put(mappingName, mapping);
+			if(!mapping.isLoaded()) {
+				System.out.println(new LogEntry("loading NOT succeeded", (Serializable)mapping.getLoadMessages()));
+			}
+			mappingMap.put(mappingName, mapping);
         }
         loadSucceeded = succeeded;
         isStarted = true;

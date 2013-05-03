@@ -91,7 +91,7 @@ public class InvocationResultExpression extends MapElement
 	 * @return
 	 * @throws Throwable
 	 */
-	public boolean processRequest(String[] processArray, Properties requestProperties, RequestDispatcher dispatcher)
+	public boolean processRequest(String[] processArray, Properties requestProperties, RequestDispatcher dispatcher) throws Exception
 	{
 		timesProcessed++;
 

@@ -365,6 +365,7 @@ public class IndentedConfigReaderMapping implements Mapping
 				if (equaloffset == -1 || equaloffset > colon)
 				{
 					UnparsableLine unparsableLine = new UnparsableLine("Syntax error", depth, lineNr);
+					loadMessages.add(unparsableLine.toString());
 					mapElements.add(unparsableLine);
 					return false;
 				}

@@ -17,7 +17,7 @@ public class ResponseWritingInvocation extends Invocation implements ResponseWri
 		super(assembly, command, depth, lineNr, false);
 	}
 
-	public boolean processRequest(String[] processArray, Properties requestProperties, RequestDispatcher dispatcher)// throws Throwable
+	public boolean processRequest(String[] processArray, Properties requestProperties, RequestDispatcher dispatcher) throws Exception
 	{
         timesProcessed++;
 
@@ -27,14 +27,14 @@ public class ResponseWritingInvocation extends Invocation implements ResponseWri
         try
         {
             result = dispatcher.respond(command, requestProperties);
+			requestProperties.put("result", result);
         }
-        catch (Throwable t)
+		catch (Exception e)
+		{
+			return handleException(processArray, requestProperties, dispatcher, e);
+		}
+		catch (Throwable t)
         {
-            if (exceptionHandler != null && exceptionHandler.doesCatch(t))
-            {
-                System.out.println(new LogEntry("exception occurred that will be handled by mvc exception handler", t));
-                return exceptionHandler.processRequest(processArray, requestProperties, dispatcher);
-            }
             System.out.println(new LogEntry("exception occurred in mvc invocation", t));
             throw new RuntimeException("unable to invoke assembly", t);
             //TODO provide string explaining invocationType

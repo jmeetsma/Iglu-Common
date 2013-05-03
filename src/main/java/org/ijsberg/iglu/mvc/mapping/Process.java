@@ -70,7 +70,13 @@ public class Process extends MapElement
 			return false;
 		}
 
-		if ((fe instanceof Invocation) ||
+		if (fe instanceof ExceptionHandler)
+		{
+			//TODO only 1 allowed
+			exceptionHandler = (ExceptionHandler) fe;
+			return true;
+		}
+		else if ((fe instanceof Invocation) ||
 				(fe instanceof Process) ||
 				(fe instanceof ResponseWriter))
 		{
@@ -80,10 +86,6 @@ public class Process extends MapElement
 			}
 			elements.add(fe);
 			return true;
-		}
-		else if (fe instanceof ExceptionHandler)
-		{
-			exceptionHandler = (ExceptionHandler) fe;
 		}
 		return false;
 	}
@@ -96,7 +98,7 @@ public class Process extends MapElement
 	 * @return
 	 * @throws Throwable
 	 */
-	public boolean processRequest(String[] processArray, Properties requestProperties, RequestDispatcher frh)// throws Throwable
+	public boolean processRequest(String[] processArray, Properties requestProperties, RequestDispatcher frh) throws Exception
 	{
 		timesProcessed++;
 		//success is defined by a successful redirect
@@ -106,7 +108,7 @@ public class Process extends MapElement
 		{
 			MapElement fe = (MapElement) i.next();
 			//we can't process events here
-//			try
+			try
 			{
 				if (!(fe instanceof Process))
 				{
@@ -129,6 +131,8 @@ public class Process extends MapElement
 						}
 					}
 				}
+			} catch (Exception e) {
+				return handleException(processArray, requestProperties, frh, e);
 			}
 		}
 		return false;
