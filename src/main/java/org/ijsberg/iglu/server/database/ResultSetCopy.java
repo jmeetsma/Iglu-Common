@@ -337,9 +337,13 @@ public class ResultSetCopy implements Serializable
 		return Integer.parseInt(getObject(getColumnIndexByName(colName)).toString());
 	}
 
-	public long getLong(String colName)
+	public Long getLong(String colName)
 	{
-		return Long.parseLong(getObject(getColumnIndexByName(colName)).toString());
+		Object o = getObject(getColumnIndexByName(colName));
+		if(o != null) {
+			return Long.parseLong(getObject(getColumnIndexByName(colName)).toString());
+		}
+		return null;
 	}
 
 	public String getString(String colName)
@@ -362,26 +366,6 @@ public class ResultSetCopy implements Serializable
 	}
 
 
-	/**
-	 * @param colName name of the column to obtain an Object from
-	 * @return A value in the indicated column at the present row
-	 */
-/*	public Value getValue(String colName)
-	{
-		return getValue(getColumnIndexByName(colName));
-	}*/
-
-
-	/**
-	 * @param columnIndex name of the column to obtain an Object from
-	 * @return A value in the indicated column at the present row
-	 */
-/*	public Value getValue(int columnIndex)
-	{
-		//TODO this produces a npe if next() not invoked
-		checkCurrentRowBeforeRetrieval();
-		return new GenericValue(currentRow[columnIndex - 1]);
-	}*/
 
 	private void checkCurrentRowBeforeRetrieval()
 	{
