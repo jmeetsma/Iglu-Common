@@ -19,7 +19,7 @@ public interface RequestDispatcher
 	 * @return
 	 * @throws IOException
 	 */
-	boolean redirect(String target, String[] parameters/*, boolean switchSecure, boolean switchInsecure, boolean copyParameter*/);
+	boolean redirect(String target, String[] parameters/*boolean copyParameter*/);
 
 	/**
 	 * Tests if a redirect to specified target will be successful
