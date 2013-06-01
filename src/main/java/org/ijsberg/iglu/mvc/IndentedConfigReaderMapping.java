@@ -432,14 +432,14 @@ public class IndentedConfigReaderMapping implements Mapping
 				//load file from classpath
 				input = getClass().getClassLoader().getResourceAsStream(fileName);
 			}
-			if(input == null)
+/*			if(input == null)
 			{
-				file = new File(/*Environment.currentApplication().getWorkingDirectory() +*/ fileName);
+				file = new File(/ *Environment.currentApplication().getWorkingDirectory() +* / fileName);
 				if(file.exists())
 				{
 					input = new FileInputStream(file);
 				}
-			}
+			}    */
 			if(input == null)
 			{
 				throw new ConfigurationException("can not load flow: file '" + fileName + "' can not be found at exact location or classpath");

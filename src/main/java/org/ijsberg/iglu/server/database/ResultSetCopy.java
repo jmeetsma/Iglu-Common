@@ -173,7 +173,12 @@ public class ResultSetCopy implements Serializable
 			Object[] row = new Object[colCount];
 			for (int i = 0; i < colCount; i++)
 			{
-				row[i] = rs.getObject(i + 1);
+				try {
+					row[i] = rs.getObject(i + 1);
+				} catch (SQLException e) {
+					//TODO log
+					row[i] = null;
+				}
 				if (resolveLOBs)
 				{
 					if (row[i] instanceof Clob)
@@ -332,9 +337,13 @@ public class ResultSetCopy implements Serializable
 		return getObject(getColumnIndexByName(colName));
 	}
 
-	public int getInt(String colName)
+	public Integer getInt(String colName)
 	{
-		return Integer.parseInt(getObject(getColumnIndexByName(colName)).toString());
+		Object o = getObject(getColumnIndexByName(colName));
+		if(o != null) {
+			return Integer.parseInt(getObject(getColumnIndexByName(colName)).toString());
+		}
+		return null;
 	}
 
 	public Long getLong(String colName)
