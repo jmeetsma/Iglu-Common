@@ -37,7 +37,7 @@ public class ResultSetCopy implements Serializable
 	private Object[] currentRow;
 	private String[][] colTypeNames;
 	private String[] colName;
-	private HashMap colNames;
+	private HashMap<String, Integer> colNames;
 	private boolean resolveLOBs;
 	private IOException lobReadException;
 
@@ -156,7 +156,7 @@ public class ResultSetCopy implements Serializable
 
 		int[] colType = new int[colCount];
 		colTypeNames = new String[colCount][2];
-		colNames = new HashMap(colCount);
+		colNames = new HashMap<String, Integer>(colCount);
 		colName = new String[colCount];
 
 		for (int i = 0; i < colCount; i++)
@@ -530,6 +530,11 @@ public class ResultSetCopy implements Serializable
 			sb.append("max nr of rows to log exceeded...\n");
 		}
 		return sb.toString();
+	}
+
+
+	public String[] getColumnNames() {
+		return colName;
 	}
 
 	//TODO convert a row to PropertyBundle when reading

@@ -51,7 +51,7 @@ public class PropertiesSupport {
 			String key = (String) keyObj;
 			if (key.startsWith(sectionKey + KEY_SEPARATOR)) {
 				String subkey = key.substring(sectionKey.length() + 1);
-				retval.setProperty(subkey, properties.getProperty(key));
+				retval.put(subkey, properties.get(key));
 			}
 		}
 		return retval;
@@ -145,4 +145,7 @@ public class PropertiesSupport {
         }
         return retval;
     }
+
+
+
 }
