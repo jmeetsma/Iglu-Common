@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
+import java.util.Properties;
 
 /**
  */
@@ -164,5 +165,10 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 		} catch (IOException e) {
 			throw new ConfigurationException("unable to save account data to '" + storageFileName + "'", e);
 		}
+	}
+
+
+	public void setProperties(Properties properties) {
+		storageFileName = properties.getProperty("storage_file_name", storageFileName);
 	}
 }

@@ -8,6 +8,7 @@
  */
 package org.ijsberg.iglu.server.database.component;
 
+import org.ijsberg.iglu.exception.ResourceException;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.server.database.*;
