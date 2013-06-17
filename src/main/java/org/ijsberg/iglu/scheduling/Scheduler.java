@@ -23,4 +23,6 @@ public interface Scheduler
 	 * @param pageable
 	 */
 	void register(Pageable pageable);
+
+	String getReport();
 }

@@ -57,6 +57,7 @@ public class StandardScheduler implements Runnable, Startable, Scheduler
 	/**
 	 * @return an overview of registered pageables
 	 */
+	@Override
 	public String getReport()
 	{
 		StringBuffer sb = new StringBuffer("Registered clients:\n");
@@ -140,11 +141,11 @@ public class StandardScheduler implements Runnable, Startable, Scheduler
 		if(!pagedSystemObjectNames.contains(pageable.toString())) {
 			if(pageable.getPageIntervalInMinutes() <= 0)
 			{
-				System.out.println(new LogEntry("scheduler will not page " + StringSupport.trim(pageable.toString() + "'", 80, "...") + ": interval in minutes (" + pageable.getPageIntervalInMinutes() + ") is not valid"));
+				System.out.println(new LogEntry(Level.VERBOSE, "scheduler will not page " + StringSupport.trim(pageable.toString() + "'", 80, "...") + ": interval in minutes (" + pageable.getPageIntervalInMinutes() + ") is not valid"));
 			}
 			else
 			{
-				System.out.println(new LogEntry("scheduler will page " + StringSupport.trim(pageable.toString() + "'", 80, "...") + " every " + pageable.getPageIntervalInMinutes() + " minute(s)"));
+				System.out.println(new LogEntry(Level.VERBOSE, "scheduler will page " + StringSupport.trim(pageable.toString() + "'", 80, "...") + " every " + pageable.getPageIntervalInMinutes() + " minute(s)"));
 			}
 			synchronized (pagedSystems)
 			{
@@ -184,7 +185,7 @@ public class StandardScheduler implements Runnable, Startable, Scheduler
 			}
 			catch (InterruptedException ie)
 			{
-				System.out.println(new LogEntry(("scheduler interrupted...")));
+				System.out.println(new LogEntry(Level.CRITICAL, ("scheduler interrupted...")));
 				currentState = SCHEDULER_HALT;
 			}
 			if (currentState == SCHEDULER_WAIT)

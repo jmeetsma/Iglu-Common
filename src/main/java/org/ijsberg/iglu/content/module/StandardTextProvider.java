@@ -23,7 +23,7 @@ public class StandardTextProvider implements TextProvider {
 	private HashMap<String, Properties> textsByCategory = new HashMap<String, Properties>();
 	protected Properties defaultTexts;
 	private String substitutionString = "[*]";
-	private String defaultText = null;
+	protected String defaultText = null;
 
 	protected StandardTextProvider() {
 		this.defaultTexts = new Properties();

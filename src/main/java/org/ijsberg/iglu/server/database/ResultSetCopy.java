@@ -14,9 +14,7 @@ import org.ijsberg.iglu.util.io.StreamSupport;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 
 /**
@@ -265,7 +263,7 @@ public class ResultSetCopy implements Serializable
 
 
 	/**
-	 * Resets the iteration index so that ResultSetCopy mey be iteratied again using the next() method
+	 * Resets the iteration index so that ResultSetCopy may be iterated again using the next() method
 	 */
 	public void reset()
 	{
@@ -299,34 +297,61 @@ public class ResultSetCopy implements Serializable
 	}
 
 
-	/**
-	 * Sets the index to the next row in the result set
-	 *
-	 * @return the next row wrapped in a context
-	 */
-/*	public GenericPropertyBundle nextAsContext()
-	{
-		if (index == -1)
-		{
-			if (result == null || result.isEmpty())
-			{
-				return null;
-			}
-			index = 0;
-		}
-
-		if (index < result.size())
-		{
-			currentRow = (Object[]) result.get(index++);
-			GenericPropertyBundle retval = new GenericPropertyBundle("1 row of result of database query");
-			for (int i = 0; i < colName.length; i++)
-			{
-				retval.setProperty(colName[i], getObject(i));
-			}
-			return retval;
-		}
-		return null;
+	public Properties rowToProperties() {
+		return rowToProperties(null);
 	}
+
+
+	public Properties rowToProperties(String defaultVal) {
+		Properties properties = new Properties();
+		for(String columnName : colNames.keySet()) {
+			Object value = currentRow[colNames.get(columnName) - 1];
+			if(value != null) {
+				properties.put(columnName, value);
+			} else {
+				properties.put(columnName, defaultVal);
+			}
+		}
+		return properties;
+	}
+
+
+	public Properties nextRow() {
+		boolean hasNext = next();
+		if(!hasNext) {
+			return null;
+		}
+		Properties properties = new Properties();
+		for(String columnName : colNames.keySet()) {
+			Object value = currentRow[colNames.get(columnName) - 1];
+			if(value != null) {
+				properties.put(columnName, value);
+			}
+		}
+		return properties;
+	}
+
+
+	public Properties nextRow(Map mapping) {
+		boolean hasNext = next();
+		if(!hasNext) {
+			return null;
+		}
+		Properties properties = new Properties();
+		for(Object fieldName : mapping.keySet()) {
+			String columnName = (String)mapping.get(fieldName);
+		//	System.out.println("-->" + columnName + " in " + colNames);
+			Integer index = colNames.get(columnName.toLowerCase());
+			if(index != null) {
+				Object value = currentRow[index - 1];
+				if(value != null) {
+					properties.put(fieldName, value);
+				}
+			}
+		}
+		return properties;
+	}
+
 
 	/**
 	 * @param colName name of the column to obtain an Object from
@@ -546,6 +571,4 @@ public class ResultSetCopy implements Serializable
 		return colName;
 	}
 
-	//TODO convert a row to PropertyBundle when reading
-	//an Entity now only has to implement setFromContext and getAsContext
 }

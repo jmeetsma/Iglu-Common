@@ -69,17 +69,4 @@ public class StatementInput
 		this.returnsVoid = returnsVoid;
 	}
 
-	/**
-	 * Executes a prepared statement on a relational database
-	 *
-	 * @param statement		declaration of the prepared statement
-	 * @param outParamType	 expected result type e.g. the code for VARCHAR
-	 * @param inParams		 an array of parameters to feed the stored procedure
-	 * @param specificSqlTypes an array of SQL-types to specify the params parameters
-	 * @param hasReturnVal	 a flag indicated if a return value is expected
-	 * @param resolveLOBs	  a flag indicating that LOBs should be read into a String or byte array
-	 * @param readOnly		 a flag indicating that a read-only connection should be used
-	 * @param isCallable	   must be true if the statement should be regerded as a stored procedure instead of an SQL statment
-	 * @return the outcome of the execution of the stored procedure, this may be null, any kind of object, or a ResultSetCopy
-	 */
 }

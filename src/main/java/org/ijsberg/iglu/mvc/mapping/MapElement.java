@@ -143,7 +143,6 @@ public abstract class MapElement
 		if (exceptionHandler != null && (caught = exceptionHandler.doesCatch(e)) != null)
 		{
 			requestProperties.put("exception", caught);
-			System.out.println("X " + requestProperties);
 			System.out.println(new LogEntry("exception occurred that will be handled by mvc exception handler", e));
 			return exceptionHandler.processRequest(processArray, requestProperties, dispatcher);
 		}
