@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -18,7 +17,7 @@
  * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.ijsberg.iglu.server.connection.invocation;
+package org.ijsberg.iglu.server.invocation;
 
 
 import org.ijsberg.iglu.configuration.Assembly;
@@ -41,7 +40,6 @@ public class CommandLineConfigurationInvoker extends CommandLineProcessor implem
 	private CommandLineClientAdapter adapter;
 
 	/**
-	 *
 	 * @param line
 	 * @return
 	 */
@@ -99,7 +97,7 @@ public class CommandLineConfigurationInvoker extends CommandLineProcessor implem
 	public String processCommandLine(String commandLine) {
 		StringBuffer response = new StringBuffer();
 		try {
-				response.append(super.processCommandLine(commandLine));
+			response.append(super.processCommandLine(commandLine));
 		} catch (Throwable t) {
 			response.append(StringSupport.getStackTrace(t, 5) + "\n");
 		}

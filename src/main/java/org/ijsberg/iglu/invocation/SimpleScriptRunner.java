@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -20,17 +19,17 @@
 
 package org.ijsberg.iglu.invocation;
 
+import org.ijsberg.iglu.configuration.Assembly;
+import org.ijsberg.iglu.configuration.ConfigurationException;
+import org.ijsberg.iglu.logging.Level;
+import org.ijsberg.iglu.logging.LogEntry;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
-import org.ijsberg.iglu.configuration.Assembly;
-import org.ijsberg.iglu.configuration.ConfigurationException;
-import org.ijsberg.iglu.logging.Level;
-import org.ijsberg.iglu.logging.LogEntry;
 
 /**
  */
@@ -53,8 +52,7 @@ public class SimpleScriptRunner extends CommandLineProcessor {
 			try {
 				List results = runScript(reader);
 				System.out.println(new LogEntry(Level.CRITICAL, "completed run of script in device '\" + this.deviceId + \"'\""));
-			}
-			catch (Throwable t) {
+			} catch (Throwable t) {
 				throw new ConfigurationException("failed to complete run of script", t);
 			}
 		}
@@ -82,8 +80,7 @@ public class SimpleScriptRunner extends CommandLineProcessor {
 	private String readLine(BufferedReader reader) {
 		try {
 			return reader.readLine();
-		}
-		catch (IOException ioe) {
+		} catch (IOException ioe) {
 			//should be impossible
 			throw new ConfigurationException("unable to read line from buffer");
 		}

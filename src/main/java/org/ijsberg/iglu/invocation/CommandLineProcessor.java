@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -20,10 +19,10 @@
 
 package org.ijsberg.iglu.invocation;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.ijsberg.iglu.configuration.Assembly;
-import org.ijsberg.iglu.server.connection.invocation.AssemblyCommandLine;
+import org.ijsberg.iglu.server.invocation.AssemblyCommandLine;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  */

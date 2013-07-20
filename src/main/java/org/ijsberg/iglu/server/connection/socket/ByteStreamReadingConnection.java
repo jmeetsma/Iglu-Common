@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -20,16 +19,16 @@
 package org.ijsberg.iglu.server.connection.socket;
 
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.Socket;
-
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.server.connection.CommandLineClientAdapter;
 import org.ijsberg.iglu.server.connection.CommandLineInterpreter;
 import org.ijsberg.iglu.server.connection.Connection;
+
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.Socket;
 
 /**
  * This class embeds the socket that is connected to a client.
@@ -55,10 +54,10 @@ public class ByteStreamReadingConnection implements Connection, Runnable {
 	/**
 	 * Invoked by connection factory to spawn a client connection for a server.
 	 *
-	 * @param socket client socket which is connected to a tcp client
-	 * @param adapter command-line adapter
+	 * @param socket      client socket which is connected to a tcp client
+	 * @param adapter     command-line adapter
 	 * @param interpreter command-line interpreter
-	 * @param timeout time out in seconds when idle
+	 * @param timeout     time out in seconds when idle
 	 * @see org.ijsberg.iglu.server.connection.ConnectionFactory
 	 */
 	public ByteStreamReadingConnection(Socket socket, CommandLineClientAdapter adapter, CommandLineInterpreter interpreter, int timeout) throws IOException {
@@ -86,21 +85,16 @@ public class ByteStreamReadingConnection implements Connection, Runnable {
 
 			while (processingIncomingBytes()) {
 			}
-		}
-		catch (InterruptedException ie) {
+		} catch (InterruptedException ie) {
 			adapter.onConnectionClose(closeMessage);
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			System.out.println(new LogEntry("", ioe));
-		}
-		finally {
+		} finally {
 			try {
 				if (!socket.isClosed()) {
 					socket.close();
 				}
-			}
-			catch (IOException ioe) {
+			} catch (IOException ioe) {
 				System.out.println(new LogEntry(Level.CRITICAL, "unable to close connection", ioe));
 			}
 		}
@@ -113,8 +107,7 @@ public class ByteStreamReadingConnection implements Connection, Runnable {
 			byte[] bytes = new byte[avail];
 			is.read(bytes, 0, avail);
 			adapter.receive(bytes);
-		}
-		else {
+		} else {
 			Thread.sleep(25);
 		}
 		if ((timeout > 0) && ((System.currentTimeMillis() - lastUpdate) > (timeout * 1000))) {
@@ -133,8 +126,7 @@ public class ByteStreamReadingConnection implements Connection, Runnable {
 	public void send(byte[] message) {
 		try {
 			os.write(message);
-		}
-		catch (IOException ioe) {
+		} catch (IOException ioe) {
 			System.out.println(new LogEntry("closing connection to " + socket.getInetAddress() + " due to IO exception " + ioe.getMessage(), ioe));
 			close("closing connection to due to IO exception");
 		}
@@ -162,8 +154,7 @@ public class ByteStreamReadingConnection implements Connection, Runnable {
 			if (!socket.isClosed()) {
 				socket.close();
 			}
-		}
-		catch (IOException ioe) {
+		} catch (IOException ioe) {
 			System.out.println(new LogEntry(Level.CRITICAL, "IOException occurred while closing connection to " + socket.getInetAddress() + " with message: " + ioe.getMessage(), ioe));
 		}
 	}

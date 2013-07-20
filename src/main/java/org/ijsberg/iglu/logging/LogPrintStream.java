@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -25,26 +24,25 @@ import java.io.PrintStream;
 
 /**
  */
-public class LogPrintStream extends PrintStream
-{
+public class LogPrintStream extends PrintStream {
 	Logger logger;
 
-	public LogPrintStream(OutputStream standardStream, Logger logger){
+	public LogPrintStream(OutputStream standardStream, Logger logger) {
 		super(standardStream, true);
 		this.logger = logger;
 	}
 
-    public void println(Object message) {
-		if(message instanceof LogEntry) {
-			logger.log((LogEntry)message);
+	public void println(Object message) {
+		if (message instanceof LogEntry) {
+			logger.log((LogEntry) message);
 		} else {
 			super.println(message);
 		}
-    }
+	}
 
 	public void print(Object message) {
-		if(message instanceof LogEntry) {
-			logger.log((LogEntry)message);
+		if (message instanceof LogEntry) {
+			logger.log((LogEntry) message);
 		} else {
 			super.print(message);
 		}

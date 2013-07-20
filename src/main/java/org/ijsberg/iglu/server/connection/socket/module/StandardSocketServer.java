@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -19,13 +18,6 @@
  */
 package org.ijsberg.iglu.server.connection.socket.module;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Properties;
-
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.Startable;
 import org.ijsberg.iglu.logging.Level;
@@ -35,6 +27,13 @@ import org.ijsberg.iglu.server.connection.ConnectionFactory;
 import org.ijsberg.iglu.server.connection.socket.SocketServer;
 import org.ijsberg.iglu.util.collection.CollectionSupport;
 import org.ijsberg.iglu.util.types.Converter;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Properties;
 
 /**
  * This service allows clients to start a connection to the application (server).
@@ -58,7 +57,6 @@ public class StandardSocketServer implements Runnable, SocketServer, Startable {
 
 
 	/**
-	 *
 	 * @param connectionFactory
 	 */
 	public void setConnectionFactory(ConnectionFactory connectionFactory) {
@@ -73,13 +71,11 @@ public class StandardSocketServer implements Runnable, SocketServer, Startable {
 		StringBuffer sb = new StringBuffer("Connected clients:\n");
 		if (connectedClients.isEmpty()) {
 			sb.append("none...");
-		}
-		else {
+		} else {
 			sb.append(CollectionSupport.format(new ArrayList<Connection>(connectedClients), "\n"));
 		}
 		return sb.toString();
 	}
-
 
 
 	/**
@@ -87,13 +83,12 @@ public class StandardSocketServer implements Runnable, SocketServer, Startable {
 	 * handles incoming client connections.
 	 */
 	public void start() throws ConfigurationException {
-		if(connectionFactory == null) {
+		if (connectionFactory == null) {
 			throw new ConfigurationException("can not start without client socket factory");
 		}
 		try {
 			server = new ServerSocket(port);
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			System.out.println(new LogEntry(e.getMessage(), e));
 			throw new ConfigurationException("Cannot start server at port " + port, e);
 		}
@@ -113,25 +108,23 @@ public class StandardSocketServer implements Runnable, SocketServer, Startable {
 				//server thread blocks until a client connects
 				Socket socket = server.accept();
 
-				System.out.println(new LogEntry("client ("  + socket.getInetAddress().getHostAddress() + ") attempts to connect..."));
+				System.out.println(new LogEntry("client (" + socket.getInetAddress().getHostAddress() + ") attempts to connect..."));
 				Connection c = establishConnection(socket);
 				updateConnectedClients(c);
 			}
-		}
-		catch (IOException ioe) {
+		} catch (IOException ioe) {
 			System.out.println(new LogEntry("server forced to stop with message " + ioe.getClass().getName() + ' ' + ioe.getMessage()));
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			System.out.println(new LogEntry(Level.CRITICAL, "server forced to stop with message " + t.getClass().getName() + ' ' + t.getMessage(), t));
 		}
 	}
 
 	private void updateConnectedClients(Connection c) {
-		synchronized(connectedClients) {
+		synchronized (connectedClients) {
 			connectedClients.add(c);
 			//a little housekeeping
 			for (Connection client : new HashSet<Connection>(connectedClients)) {
-				if(client.isClosed()) {
+				if (client.isClosed()) {
 					connectedClients.remove(client);
 				}
 			}
@@ -166,15 +159,14 @@ public class StandardSocketServer implements Runnable, SocketServer, Startable {
 				//close and force IOException in server process
 				server.close();
 				//server thread will end as well
-			}
-			catch (IOException ioe) {
+			} catch (IOException ioe) {
 				System.out.println(new LogEntry(Level.CRITICAL, ioe.getMessage(), ioe));
 			}
 		}
 
 		//close client connections as well
 		for (Connection client : new HashSet<Connection>(connectedClients)) {
-			if(!client.isClosed()) {
+			if (!client.isClosed()) {
 				client.close("server shut down...");
 			}
 		}

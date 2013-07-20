@@ -1,31 +1,38 @@
-/* =======================================================================
- * Copyright (c) 2003-2010 IJsberg Automatisering BV. All rights reserved.
- * Redistribution and use of this code are permitted provided that the
- * conditions of the Iglu License are met.
- * The license can be found in org.ijsberg.iglu.StandardApplication.java
- * and is also published on http://iglu.ijsberg.org/LICENSE.
- * =======================================================================
+/*
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
+ *
+ * This file is part of Iglu.
+ *
+ * Iglu is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Iglu is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.ijsberg.iglu.util.caching;
 
 import java.util.Collection;
 import java.util.Set;
 
-import org.ijsberg.iglu.configuration.Startable;
-
 /**
  * Interface for a cache service that stores objects for a certain amount of time.
  */
-public interface Cache<K, V>
-{
+public interface Cache<K, V> {
 	/**
 	 * Stores an object in the cache.
 	 * Nulls should be stored as well to indicate
 	 * that a value can not be retrieved at all.
-	 * @see this#containsStoredNull(Object)
 	 *
-	 * @param key the key to retrieve the object by
+	 * @param key    the key to retrieve the object by
 	 * @param object the object to be cached
+	 * @see this#containsStoredNull(Object)
 	 */
 	void store(K key, V object);
 
@@ -41,7 +48,7 @@ public interface Cache<K, V>
 	/**
 	 * Retrieves an object from cache.
 	 *
-	 * @param key the key to retrieve the object by
+	 * @param key     the key to retrieve the object by
 	 * @param timeout time to wait for the first thread to retrieve an object from the original location
 	 * @return the cached object or null if it's not found
 	 */

@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -20,10 +19,6 @@
 
 package org.ijsberg.iglu.configuration.module;
 
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 import org.ijsberg.iglu.configuration.Assembly;
 import org.ijsberg.iglu.configuration.Component;
 import org.ijsberg.iglu.configuration.ConfigurationException;
@@ -34,11 +29,15 @@ import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.util.properties.PropertiesSupport;
 import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
 /**
  * Provides a number of functions that enables an assembly of clusters
  * and components to behave as stand-alone server that can be controlled
  * by shell scripts.
- * 
+ * <p/>
  * ServerEnvironment does a number of things:
  * <ul>
  * <li>It loads a specific assembly</li>
@@ -46,27 +45,26 @@ import org.ijsberg.iglu.util.reflection.ReflectionSupport;
  * <li>It fulfills the role of ComponentStarter</li>
  * <li>It provides a shutdown hook for a clean application shutdown</li>
  * </ul>
- * 
+ *
+ * @author jmeetsma
  * @see Assembly
  * @see ComponentStarter
- * @author jmeetsma
- *
  */
 public class ServerEnvironment extends ComponentStarter implements Runnable {
 
 	//TODO reset()
-	
+
 	private Thread shutdownHook;
 	private boolean isRunning;
 	private Assembly assembly;
 	private ExtendedClassPathClassLoader extClassLoader;
-	
+
 
 	/**
-	 * 
+	 *
 	 */
 	public ServerEnvironment(Assembly assembly) {
-		
+
 		super();
 		this.assembly = assembly;
 		Component serverComponent = new StandardComponent(this);
@@ -81,13 +79,12 @@ public class ServerEnvironment extends ComponentStarter implements Runnable {
 	}
 
 	/**
-	 * 
 	 * @param args
 	 * @throws InstantiationException
 	 * @throws ConfigurationException
 	 */
-	public ServerEnvironment(String ... args) throws InstantiationException, ConfigurationException {
-		
+	public ServerEnvironment(String... args) throws InstantiationException, ConfigurationException {
+
 		super();
 		String className = args[0];
 		Properties settings = PropertiesSupport.getCommandLineProperties(args);
@@ -152,34 +149,33 @@ public class ServerEnvironment extends ComponentStarter implements Runnable {
 				}
 			}
 		}
-	}	
+	}
 
 	private Assembly instantiateAssembly(String className, Properties settings)
 			throws InstantiationException {
-		if(settings.containsKey("xcl")) {
+		if (settings.containsKey("xcl")) {
 			String extendedPath = settings.getProperty("xcl");
-			if("".equals(extendedPath)) {
+			if ("".equals(extendedPath)) {
 				throw new ConfigurationException("-xcp : extended class path is missing");
 			}
 			extClassLoader = new ExtendedClassPathClassLoader(extendedPath, Assembly.class.getPackage());
 			Map<String, Set<Object>> multipleResourceLocations = extClassLoader.getMultipleLocationsForResources();
-			if(multipleResourceLocations.size() > 0) {
+			if (multipleResourceLocations.size() > 0) {
 				System.out.print(new LogEntry(Level.CRITICAL, "extended class loader reports multiple locations for " + multipleResourceLocations.size() + " resources"));
 				//System.out.println(new LogEntry("", (Serializable) multipleResourceLocations));
 			}
 			Thread.currentThread().setContextClassLoader(extClassLoader);
-			return (Assembly)ReflectionSupport.instantiateClass(extClassLoader, className);
-		}
-		else {
-			return (Assembly)ReflectionSupport.instantiateClass(className);
+			return (Assembly) ReflectionSupport.instantiateClass(extClassLoader, className);
+		} else {
+			return (Assembly) ReflectionSupport.instantiateClass(className);
 		}
 	}
-	
+
 	public void reset() {
 		stop();
 		start();
 	}
-	
+
 	public void shutDown() {
 		stop();
 	}
@@ -189,32 +185,30 @@ public class ServerEnvironment extends ComponentStarter implements Runnable {
 	}
 
 	private static void printUsage() {
-		System.out.println(	"Usage: java ServerEnvironment <assembly class name>");
-		System.out.println(	"                              [-xcl <extended class path>]");
-		System.out.println(	"                              [-rou]");
-		System.out.println(	"");
-		System.out.println(	"-xcl: enable extended class loader");
-		System.out.println(	"      provide path to jars or directories e.g.: \"./lib:./classes\"");
-		System.out.println(	"-rou: reset or reload on update of classes in extended class path");
+		System.out.println("Usage: java ServerEnvironment <assembly class name>");
+		System.out.println("                              [-xcl <extended class path>]");
+		System.out.println("                              [-rou]");
+		System.out.println("");
+		System.out.println("-xcl: enable extended class loader");
+		System.out.println("      provide path to jars or directories e.g.: \"./lib:./classes\"");
+		System.out.println("-rou: reset or reload on update of classes in extended class path");
 	}
 
 	/**
 	 * Instantiates an assembly and starts startable components.
 	 * If an extended class path is provided, eligible classes will be loaded by ExtendedClassPathClassLoader.
-	 * 
+	 * <p/>
 	 * Note: classes in package org.ijsberg.iglu.configuration will always be loaded by the default class loader.
-	 * 
+	 * <p/>
 	 * Argument "-rou", reset-on-update enables automatic reset of the application if updated classes are detected
 	 * by ExtendedClassPathClassLoader. This function may be used in a development environment.
-	 * 
-	 * 
-	 * 
+	 *
 	 * @param args <assembly class> [-xcl <extended class path>] [-rou]
-	 * @see ExtendedClassPathClassLoader
 	 * @throws Exception
+	 * @see ExtendedClassPathClassLoader
 	 */
 	public static void main(String[] args) throws Exception {
-		if(args.length == 0) {
+		if (args.length == 0) {
 			printUsage();
 		} else {
 			System.out.println("Creating server environment for assembly " + args[0]);

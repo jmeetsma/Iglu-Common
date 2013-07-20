@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -17,28 +16,28 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
  */
+package org.ijsberg.iglu.database;
 
-package org.ijsberg.iglu.server.connection.invocation;
+import java.sql.Types;
 
 /**
+ * Is used to pass nulls in an array of params parameters (Object[]) and still specifying the required SQL type
  */
-public class AssemblyCommandLine extends CommandLine {
+public class JdbcNullObject {
+	private int sqlType = Types.NULL;
 
-
-	public AssemblyCommandLine(String commandLine) {
-		super(commandLine);
+	/**
+	 * @param type
+	 */
+	public JdbcNullObject(int type) {
+		sqlType = type;
 	}
 
-	public String getClusterId() {
-		return getUnitIdentifierSequence()[0];
-	}
 
-	public String getComponentId() {
-		return getUnitIdentifierSequence()[1];
+	/**
+	 * @return
+	 */
+	public int getType() {
+		return sqlType;
 	}
-
-	public String getMethodName() {
-		return getUnitIdentifierSequence()[2];
-	}
-
 }

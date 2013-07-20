@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -20,29 +19,18 @@
 
 package org.ijsberg.iglu.configuration.classloading;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
 import org.ijsberg.iglu.exception.ResourceException;
 import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.io.StreamSupport;
 import org.ijsberg.iglu.util.misc.StringSupport;
+
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 
 /**
@@ -102,10 +90,8 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 	private TreeMap<String, Object> mixedResourceLocations = new TreeMap<String, Object>();
 
 	private Map<String, Set<Object>> multipleLocationsForResource = new TreeMap<String, Set<Object>>();
-	
-	
 
-	
+
 	private String classpath = "./classes:./lib";
 	private String[] excludedPackageNames = new String[0];
 	private HashMap<File, Long> fileCreationTimes = new HashMap<File, Long>();
@@ -123,44 +109,43 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 		init();
 	}
 
-	
+
 	/**
-	 * @param classpath a dedicated class path; both colons and semicolons are valid separators
+	 * @param classpath       a dedicated class path; both colons and semicolons are valid separators
 	 * @param excludedPackage packages of which classes must be loaded by super class loader
 	 */
-	public ExtendedClassPathClassLoader(String classpath, Package ... excludedPackage) {
+	public ExtendedClassPathClassLoader(String classpath, Package... excludedPackage) {
 		super(new URL[]{});
 		this.classpath = classpath;
 		this.excludedPackageNames = new String[excludedPackage.length];
-		for(int i = 0; i < excludedPackage.length; i++) {
+		for (int i = 0; i < excludedPackage.length; i++) {
 			this.excludedPackageNames[i] = excludedPackage[i].getName();
 		}
 		init();
 	}
-	
+
 	private boolean belongsToExcludedPackage(String className) {
-		for(int i = 0; i < excludedPackageNames.length; i++) {
-			if(className.startsWith(excludedPackageNames[i])) {
+		for (int i = 0; i < excludedPackageNames.length; i++) {
+			if (className.startsWith(excludedPackageNames[i])) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	
+
 	/**
 	 * Creates a map containing references of each resource to a jar or directory.
 	 */
 	private void init() {
 		Collection<String> paths = StringSupport.split(classpath, ";:", false);
 
-		for(String location : paths) {
-		
+		for (String location : paths) {
+
 			location = FileSupport.convertToUnixStylePath(location);
 			if (location.endsWith(".zip") || location.endsWith(".jar")) {
 				mapFilesInZip(location);
-			}
-			else {
+			} else {
 				File dir = new File(location);
 				if (dir.isDirectory()) {
 					if (!location.endsWith("/")) {
@@ -171,14 +156,12 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 						String fileName = file.getPath();
 						if ((fileName.endsWith(".jar") || fileName.endsWith(".zip")) && !file.isHidden()) {
 							mapFilesInZip(fileName);
-						}
-						else { // .class .properties etc.
+						} else { // .class .properties etc.
 							mapClassResourceEntry(file.getPath().substring(location.length()), file);
 							fileCreationTimes.put(file, new Long(file.lastModified()));
 						}
 					}
-				}
-				else {
+				} else {
 					//path can not be mapped
 				}
 			}
@@ -213,8 +196,7 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 		ZipFile zipfile;
 		try {
 			zipfile = new ZipFile(fileName);
-		}
-		catch (IOException ioe) {
+		} catch (IOException ioe) {
 			throw new NoClassDefFoundError("class location '" + fileName + "' can not be accessed by classloader: " + ioe);
 		}
 		Enumeration<? extends ZipEntry> e = zipfile.entries();
@@ -226,25 +208,24 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 		}
 		try {
 			zipfile.close();
-		}
-		catch (IOException ioe) {
+		} catch (IOException ioe) {
 			throw new NoClassDefFoundError("class fileName '" + fileName + "' can not be accessed by classloader: " + ioe);
 		}
 	}
 
-	
+
 	/**
 	 * A resource, such as class or properties file may be found in different locations.
 	 * If this is the case, only the first location is used to resolve the resource.
 	 * This may lead to problems if different versions of resources exist.
-	 * 
+	 *
 	 * @return a map of resources found in multiple locations
 	 */
 	public Map<String, Set<Object>> getMultipleLocationsForResources() {
 		return new TreeMap<String, Set<Object>>(multipleLocationsForResource);
 	}
-	
-	
+
+
 	/**
 	 * Maps (class) resources to files.
 	 *
@@ -261,10 +242,10 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 			//it may occur for other resources
 			//log those occurrences that seem suspicious
 
-			
+
 			registerMultipleLocations(fileName, location);
 			//System.out.println(new LogEntry("WARNING: " + this.getClass().getName() + " found multiple locations for resource '" + fileName + "' ('" + existingValue + "' and '" + value + "')"));
-			
+
 /*
  * TODO administer occurrences instead
 			if (!fileName.startsWith("META-INF/") && !resourcesMatchInSize(fileName, existingValue, value)) {
@@ -272,14 +253,13 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 			}
 */
 			return;
-			
-			
+
+
 		}
 		if (fileName.endsWith(".properties")) {
 			String className = convertFileNameToClassName(fileName);
 			propertiesResourceLocations.put(className, fileName);
-		}
-		else if (fileName.endsWith(".class")) {
+		} else if (fileName.endsWith(".class")) {
 			String className = convertFileNameToClassName(fileName);
 			classResourceLocations.put(className, location);
 		}
@@ -289,7 +269,7 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 
 	private void registerMultipleLocations(String fileName, Object value) {
 		Set<Object> locations = multipleLocationsForResource.get(fileName);
-		if(locations == null) {
+		if (locations == null) {
 			locations = new HashSet<Object>();
 			multipleLocationsForResource.put(fileName, locations);
 		}
@@ -318,24 +298,21 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 			if (!this.belongsToExcludedPackage(className)) {
 				try {
 					retval = findClass(className);
-					if(retval == ResourceBundle.class) {
+					if (retval == ResourceBundle.class) {
 						throw new ClassNotFoundException("found properties instead of class with name " + className);
-					}
-					else {
+					} else {
 						if (resolve) {
 							resolveClass(retval);
 						}
 						return retval;
 					}
-				}
-				catch (ClassNotFoundException e) {
-					if(retval == ResourceBundle.class) {
+				} catch (ClassNotFoundException e) {
+					if (retval == ResourceBundle.class) {
 						throw e;
 					}
 					retval = super.loadClass(className, resolve);
 				}
-			}
-			else {
+			} else {
 				retval = super.loadClass(className, resolve);
 			}
 		}
@@ -357,14 +334,13 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 			if (fileName.endsWith(".properties")) {
 				//notify invoker that file is present as properties file
 				return ResourceBundle.class;
-			}
-			else {
+			} else {
 				throw new ClassNotFoundException("resource '" + fileName + "' for class '" + className + "' has incompatible format");
 			}
 		}
-        if(className.startsWith("java.")) {
-            return super.findClass(className);
-        }
+		if (className.startsWith("java.")) {
+			return super.findClass(className);
+		}
 		if (location == null) {
 			throw new ClassNotFoundException("class '" + className + "' not found in " + classpath);
 		}
@@ -373,8 +349,7 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 		byte[] data;
 		try {
 			data = getData(fileName, location);
-		}
-		catch (IOException ioe) {
+		} catch (IOException ioe) {
 			throw new NoClassDefFoundError("class '" + className + "' could not be loaded from '" + location + "' with message: " + ioe);
 		}
 		return defineClass(className, data, 0, data.length);
@@ -402,8 +377,7 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 		try {
 			ZipEntry entry = FileSupport.getZipEntryFromJar(filename, (String) location);
 			return entry.getSize();// + "-" + new Date(entry.getTime());
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 		}
 		return 0;
 	}
@@ -420,13 +394,11 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 		byte[] data;
 		if (location instanceof String) {
 			data = FileSupport.getBinaryFromJar(fileName, (String) location);
-		}
-		else if (location instanceof File) {
+		} else if (location instanceof File) {
 			InputStream in = new FileInputStream((File) location);
 			data = StreamSupport.absorbInputStream(in);
 			in.close();
-		}
-		else {
+		} else {
 			throw new NoClassDefFoundError("file '" + fileName + "' could not be loaded from '" + location + '\'');
 		}
 		return data;
@@ -445,11 +417,10 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 			return super.findResource(fileName);
 		}
 		String url;
-		if(location instanceof File) {
-			url = "file:/" + FileSupport.convertToUnixStylePath(((File)location).getAbsolutePath());
-		}
-		else {
-			url = "jar:file:" + FileSupport.convertToUnixStylePath((String)location) + "!/" + fileName;
+		if (location instanceof File) {
+			url = "file:/" + FileSupport.convertToUnixStylePath(((File) location).getAbsolutePath());
+		} else {
+			url = "jar:file:" + FileSupport.convertToUnixStylePath((String) location) + "!/" + fileName;
 		}
 		try {
 			return new URL(url);
@@ -478,8 +449,7 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 			byte[] data;
 			try {
 				data = getData(fileName, location);
-			}
-			catch (IOException ioe) {
+			} catch (IOException ioe) {
 				return null;
 			}
 			if (data == null) {
@@ -526,8 +496,7 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 		for (File file : fileCreationTimes.keySet()) {
 			if (!file.exists()) {
 				nrofResourcesDeleted++;
-			}
-			else if (file.lastModified() != ((Long) fileCreationTimes.get(file)).longValue()) {
+			} else if (file.lastModified() != ((Long) fileCreationTimes.get(file)).longValue()) {
 				nrofResourcesUpdated++;
 			}
 		}

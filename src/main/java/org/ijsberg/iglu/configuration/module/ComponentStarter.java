@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -20,20 +19,20 @@
 
 package org.ijsberg.iglu.configuration.module;
 
-import java.util.*;
-
 import org.ijsberg.iglu.configuration.Startable;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * If ComponentStarter is added to a cluster, it will register Startable components.
  * Registered Startables can be controlled by ComponentStarter instead of having
  * to start and stop them separately.
- * 
- * @see Startable
- * @author jmeetsma
  *
+ * @author jmeetsma
+ * @see Startable
  */
 public class ComponentStarter implements Startable {
 

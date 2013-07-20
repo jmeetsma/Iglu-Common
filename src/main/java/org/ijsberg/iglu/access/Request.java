@@ -1,3 +1,22 @@
+/*
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
+ *
+ * This file is part of Iglu.
+ *
+ * Iglu is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Iglu is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.ijsberg.iglu.access;
 
 import java.util.Map;
@@ -27,15 +46,13 @@ import java.util.Properties;
  *
  * @see EntryPoint
  */
-public interface Request
-{
+public interface Request {
 	/**
 	 * @return the application this request is accessing
 	 */
 	//Application getApplication();
 
 	/**
-	 *
 	 * @param create indicates if a session must be created if unavailable
 	 * @return a session if available
 	 */
@@ -72,7 +89,7 @@ public interface Request
 	 * a user in if authenticated.
 	 * A logged in user is stored on a session.
 	 * The type of credentials used, is entirely up to the implementing framework.
-	 *
+	 * <p/>
 	 * Implementations may throw some runtime exception if authentication fails
 	 * for another reason than simply invalid credentials,
 	 * such as an expired password.
@@ -93,7 +110,6 @@ public interface Request
 	User getUser();
 
 	/**
-	 *
 	 * @return true if a session was resolved or just created
 	 */
 	boolean isSessionAvailable();
@@ -148,7 +164,7 @@ public interface Request
 	/**
 	 * Stores some object as attribute on the request.
 	 *
-	 * @param key attribute key
+	 * @param key   attribute key
 	 * @param value attribute value
 	 */
 	void setAttribute(Object key, Object value);
@@ -160,7 +176,6 @@ public interface Request
 	Object getAttribute(Object key);
 
 	/**
-	 *
 	 * @return a map containing all stored attributes
 	 */
 	Map getAttributeMap();
@@ -174,9 +189,9 @@ public interface Request
 	 * @return the number of times a user request has passed an entry point
 	 */
 	int getTimesEntered();
-	
+
 	void increaseTimesEntered();
-	
+
 	/**
 	 * @return a layer passed or currently accessed by the user request
 	 */
@@ -237,9 +252,10 @@ public interface Request
 //	public boolean isBoundToCurrentThread();
 
 	/**
-	 * Retrieves session and, if found, stores a reference in the request.  
+	 * Retrieves session and, if found, stores a reference in the request.
+	 *
 	 * @param sessionToken (secret) token stored in client
-	 * @param userId user ID, if available
+	 * @param userId       user ID, if available
 	 * @return session resolved by the given token or null
 	 */
 	Session resolveSession(String sessionToken, String userId);

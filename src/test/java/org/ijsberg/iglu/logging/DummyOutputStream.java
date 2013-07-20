@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -29,7 +28,7 @@ public class DummyOutputStream extends ByteArrayOutputStream {
 
 	public String getLastOutput() {
 		byte[] bytes = toByteArray();
-		if(bytes.length != 0) {
+		if (bytes.length != 0) {
 			lastOutput = new String(bytes);
 			reset();
 		}

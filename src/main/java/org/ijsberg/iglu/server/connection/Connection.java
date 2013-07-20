@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -23,8 +22,7 @@ package org.ijsberg.iglu.server.connection;
 /**
  * Represents a low level, active connection to a client.
  */
-public interface Connection
-{
+public interface Connection {
 	/**
 	 * @param cause
 	 */
@@ -35,7 +33,6 @@ public interface Connection
 	public void close();
 
 	/**
-	 *
 	 * @return
 	 */
 	public boolean isClosed();

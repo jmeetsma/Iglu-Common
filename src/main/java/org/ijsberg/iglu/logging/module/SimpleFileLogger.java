@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -20,15 +19,6 @@
 
 package org.ijsberg.iglu.logging.module;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Properties;
-
 import org.ijsberg.iglu.configuration.Startable;
 import org.ijsberg.iglu.exception.ResourceException;
 import org.ijsberg.iglu.logging.Level;
@@ -36,7 +26,14 @@ import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.logging.LogPrintStream;
 import org.ijsberg.iglu.logging.Logger;
 import org.ijsberg.iglu.util.io.FileSupport;
-import org.ijsberg.iglu.util.misc.StringSupport;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Properties;
 
 /**
  */
@@ -64,8 +61,7 @@ public class SimpleFileLogger implements Logger, Startable {
 	protected void openLogStream() {
 		try {
 			logFilePrintStream = new PrintStream(new FileOutputStream(FileSupport.createFile(fileName + ".log")));
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw new ResourceException("unable to open new logfile '" + fileName + ".log'", e);
 
 		}
@@ -80,7 +76,7 @@ public class SimpleFileLogger implements Logger, Startable {
 
 	public void log(LogEntry entry) {
 		//System.out.println(entry.getLevel().ordinal() + ">=" + logLevelOrdinal);
-		if(entry.getLevel().ordinal() >= logLevelOrdinal) {
+		if (entry.getLevel().ordinal() >= logLevelOrdinal) {
 			synchronized (lock) {
 				writeEntry(entry);
 			}
@@ -92,29 +88,28 @@ public class SimpleFileLogger implements Logger, Startable {
 				new SimpleDateFormat(dateFormat).format(new Date(entry.getTimeInMillis())) +
 				(entry.getMessage() != null ? " " + entry.getMessage() : ""));
 
-		if(entry.getData() != null) {
+		if (entry.getData() != null) {
 			logFilePrintStream.println(entry.getData());
-			if(entry.getData() instanceof Throwable) {
-				printStackTrace(((Throwable)entry.getData()).getStackTrace());
+			if (entry.getData() instanceof Throwable) {
+				printStackTrace(((Throwable) entry.getData()).getStackTrace());
 			}
 		}
 
-		if(entryOriginStackTraceDepth > 0) {
+		if (entryOriginStackTraceDepth > 0) {
 			printStackTrace(getStackTracePart(4, entryOriginStackTraceDepth));
 		}
 	}
 
-	private void printStackTrace(StackTraceElement[] stackTrace)
-	{
-		for(int i = 0; i < stackTrace.length; i++) {
+	private void printStackTrace(StackTraceElement[] stackTrace) {
+		for (int i = 0; i < stackTrace.length; i++) {
 			logFilePrintStream.println("at " + stackTrace[i]);
 		}
 	}
 
 	public static StackTraceElement[] getStackTracePart(int start, int desiredLength) {
 		StackTraceElement[] fullStackTrace = Thread.currentThread().getStackTrace();
-		for(int nrofGetSTCalls = 0; nrofGetSTCalls <= fullStackTrace.length; nrofGetSTCalls++) {
-			if(!"java.lang.Thread".equals(fullStackTrace[nrofGetSTCalls].getClassName())) {
+		for (int nrofGetSTCalls = 0; nrofGetSTCalls <= fullStackTrace.length; nrofGetSTCalls++) {
+			if (!"java.lang.Thread".equals(fullStackTrace[nrofGetSTCalls].getClassName())) {
 				return getStackTracePart(fullStackTrace, start + nrofGetSTCalls, desiredLength);
 			}
 		}
@@ -123,14 +118,14 @@ public class SimpleFileLogger implements Logger, Startable {
 
 	public static StackTraceElement[] getStackTracePart(StackTraceElement[] fullStackTrace, int start, int desiredLength) {
 		int actualLength = desiredLength;
-		if(fullStackTrace.length - start < desiredLength) {
+		if (fullStackTrace.length - start < desiredLength) {
 			actualLength = fullStackTrace.length - start;
 		}
-		if(actualLength < 0) {
+		if (actualLength < 0) {
 			actualLength = 0;
 		}
 		StackTraceElement[] desiredStackTrace = new StackTraceElement[actualLength];
-		if(actualLength == 0) {
+		if (actualLength == 0) {
 			return desiredStackTrace;
 		}
 		System.arraycopy(fullStackTrace, start, desiredStackTrace, 0, actualLength);
@@ -161,13 +156,11 @@ public class SimpleFileLogger implements Logger, Startable {
 		}
 	}
 
-	public void setDateFormat(String dateFormat)
-	{
+	public void setDateFormat(String dateFormat) {
 		this.dateFormat = dateFormat;
 	}
 
-	public void setEntryOriginStackTraceDepth(int entryOriginStackTraceDepth)
-	{
+	public void setEntryOriginStackTraceDepth(int entryOriginStackTraceDepth) {
 		this.entryOriginStackTraceDepth = entryOriginStackTraceDepth;
 	}
 
@@ -190,7 +183,6 @@ public class SimpleFileLogger implements Logger, Startable {
 		entryOriginStackTraceDepth = Integer.parseInt(properties.getProperty("entry_stack_trace_depth", "" + entryOriginStackTraceDepth));
 		System.out.println(new LogEntry("log level set to " + Level.LEVEL_CONFIG_TERM[logLevelOrdinal]));
 	}
-
 
 
 }

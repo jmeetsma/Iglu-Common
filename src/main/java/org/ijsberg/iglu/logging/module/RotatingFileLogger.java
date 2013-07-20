@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -23,7 +22,7 @@ package org.ijsberg.iglu.logging.module;
 import org.ijsberg.iglu.scheduling.Pageable;
 import org.ijsberg.iglu.util.time.SafeDateFormat;
 
-import java.io.*;
+import java.io.File;
 import java.util.Date;
 import java.util.Properties;
 
@@ -42,16 +41,13 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 	}
 
 
-
 	/**
 	 * @param date
 	 * @return
 	 */
-	private String getFileName(Date date)
-	{
+	private String getFileName(Date date) {
 		String dateStr = null;
-		if (date != null)
-		{
+		if (date != null) {
 			dateStr = TIMESTAMP_LOGFILE_FORMAT.format(date);
 		}
 		return fileName + (dateStr != null ? '.' + dateStr : "") + ".log";
@@ -86,8 +82,7 @@ public class RotatingFileLogger extends SimpleFileLogger implements Pageable {
 		Date officialDate = new Date(officialTime - (nrofLogFilesToKeep * logRotateIntervalInHours * 60 * 1000));
 		String destLogFileName = getFileName(officialDate);
 		File obsoleteFile = new File(destLogFileName);
-		if (obsoleteFile.exists())
-		{
+		if (obsoleteFile.exists()) {
 			obsoleteFile.delete();
 		}
 

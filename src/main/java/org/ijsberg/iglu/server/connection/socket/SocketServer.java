@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -24,7 +23,6 @@ package org.ijsberg.iglu.server.connection.socket;
  * This interface is meant to be implemented by services that spawn
  * or administrate TCP/IP connections used by clients, such as telnet,
  * to access the application.
- *
  */
 public interface SocketServer {
 	/**

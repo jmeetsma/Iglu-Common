@@ -1,12 +1,22 @@
-/* =======================================================================
- * Copyright (c) 2003-2010 IJsberg Automatisering BV. All rights reserved.
- * Redistribution and use of this code are permitted provided that the
- * conditions of the Iglu License are met.
- * The license can be found in org.ijsberg.iglu.StandardApplication.java
- * and is also published on http://iglu.ijsberg.org/LICENSE.
- * =======================================================================
+/*
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
+ *
+ * This file is part of Iglu.
+ *
+ * Iglu is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Iglu is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ijsberg.iglu.server.database.component;
+package org.ijsberg.iglu.database.component;
 
 
 import org.ijsberg.iglu.configuration.ConfigurationException;
@@ -56,8 +66,7 @@ import java.util.logging.Logger;
  * </ul>
  */
 
-public class StandardConnectionPool implements Startable, Pageable, DataSource
-{
+public class StandardConnectionPool implements Startable, Pageable, DataSource {
 
 	public static final List<String> isolationLevelStrings = Arrays.asList(new String[]{
 			"TRANSACTION_NONE",
@@ -86,17 +95,12 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 	private int connectionRequestTimeout = 15;
 	private int connectionTimeout = 300;
 	private int connectionTimeoutCheck = 3;//min
-	private int max_concurrent;
+	private int maxNrOfConcurrentConnectionsCounted;
 
-	//Cleanup thread data
-//	private Thread cleanupThread;
-//	private final static int CLEANUP_HALTED = 0;
-//	private final static int CLEANUP_RUNNING = 1;
-//	private int currentState = CLEANUP_HALTED;
 
 	//Statistics
 	private long nrofRequests;
-	private long nrofDistributed;
+	private long nrofConnectionsDistributed;
 	private long nrofReleased;
 	private long nrofReset;
 	private long nrofRequestsTimedOut;
@@ -110,19 +114,16 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 	private StandardJdbcProcessor connectionTester;
 	private String connectionTestStatement = "select 1 from dual";
 
-    private boolean isStarted = false;
+	private boolean isStarted = false;
 
-
-
-
-
-    //default log writer
-	//TODO rather connect to standard logger
-	//connect to channel that logs
+	/**
+	 * Default log writer is System.out.
+	 *
+	 * @see this#setLogWriter(java.io.PrintWriter)
+	 */
 	private PrintWriter logWriter = new PrintWriter(System.out);
 
-	public StandardConnectionPool()
-	{
+	public StandardConnectionPool() {
 	}
 
 	public int getPageIntervalInMinutes() {
@@ -137,8 +138,7 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 	/**
 	 *
 	 */
-	public class ConnectionWrapper implements InvocationHandler
-	{
+	public class ConnectionWrapper implements InvocationHandler {
 		private String lastStatement;
 
 		private Connection conn;
@@ -161,30 +161,25 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 		private long creationDate = System.currentTimeMillis();
 
 		/**
-		 *
 		 * @param conn
 		 * @param timeout
 		 */
-		public ConnectionWrapper(Connection conn, long timeout)
-		{
+		public ConnectionWrapper(Connection conn, long timeout) {
 			this.conn = conn;
 			this.timeout = timeout;
 		}
 
 		/**
-		 *
 		 * @param conn
 		 * @param timeout
 		 * @param pool
 		 */
-		public ConnectionWrapper(Connection conn, long timeout, StandardConnectionPool pool)
-		{
+		private ConnectionWrapper(Connection conn, long timeout, StandardConnectionPool pool) {
 			this.conn = conn;
 			this.pool = pool;
 			this.timeout = timeout;
 
-			try
-			{
+			try {
 				originalAutoCommit = new Boolean(conn.getAutoCommit());
 				originalCatalog = conn.getCatalog();
 				originalReadOnly = new Boolean(conn.isReadOnly());
@@ -192,15 +187,12 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 				originalTypeMap = conn.getTypeMap();
 				originalHoldability = new Integer(conn.getHoldability());
 				setCurrentProperties();
-			}
-			catch (SQLException sqle)
-			{
+			} catch (SQLException sqle) {
 				throw new ResourceException("cannot create ConnectionWrapper with message: " + sqle.getMessage(), sqle);
 			}
 		}
 
-		private void setCurrentProperties()
-		{
+		private void setCurrentProperties() {
 			currentAutoCommit = originalAutoCommit;
 			currentCatalog = originalCatalog;
 			currentReadOnly = originalReadOnly;
@@ -216,20 +208,14 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 		 * @return
 		 * @throws Throwable
 		 */
-		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-		{
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			String methodName = method.getName();
-			if ("close".equals(methodName))
-			{
+			if ("close".equals(methodName)) {
 				close();
 				return null;
-			}
-			else if ("prepareCall".equals(methodName) || "prepareStatement".equals(methodName))
-			{
+			} else if ("prepareCall".equals(methodName) || "prepareStatement".equals(methodName)) {
 				lastStatement = (String) args[0];
-			}
-			else if (methodName.startsWith("set"))
-			{
+			} else if (methodName.startsWith("set")) {
 				storeSetValue(methodName, args);
 			}
 			//TODO this throws a number of exceptions, such as InvocationTargetException,
@@ -238,7 +224,6 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 		}
 
 		/**
-		 *
 		 * @param methodName
 		 * @param args
 		 * @return
@@ -246,66 +231,46 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 		 * @throws InvocationTargetException
 		 */
 		private void storeSetValue(String methodName, Object[] args)
-				throws IllegalAccessException, InvocationTargetException
-		{
-			if("setAutoCommit".equals(methodName) && !args[0].equals(currentAutoCommit))
-			{
-				currentAutoCommit = (Boolean)args[0];
-			}
-			else if("setReadOnly".equals(methodName) && !args[0].equals(currentReadOnly))
-			{
-				currentReadOnly = (Boolean)args[0];
-			}
-			else if("setCatalog".equals(methodName) && !args[0].equals(currentCatalog))
-			{
-				currentCatalog = (String)args[0];
-			}
-			else if("setTransactionIsolation".equals(methodName) && !args[0].equals(currentTransactionIsolation))
-			{
-				currentTransactionIsolation = (Integer)args[0];
-			}
-			else if("setTypeMap".equals(methodName) && !args[0].equals(currentTypeMap))
-			{
-				currentTypeMap = (Map)args[0];
-			}
-			else if("setHoldability".equals(methodName) && !args[0].equals(currentHoldability))
-			{
-				currentHoldability = (Integer)args[0];
+				throws IllegalAccessException, InvocationTargetException {
+			if ("setAutoCommit".equals(methodName) && !args[0].equals(currentAutoCommit)) {
+				currentAutoCommit = (Boolean) args[0];
+			} else if ("setReadOnly".equals(methodName) && !args[0].equals(currentReadOnly)) {
+				currentReadOnly = (Boolean) args[0];
+			} else if ("setCatalog".equals(methodName) && !args[0].equals(currentCatalog)) {
+				currentCatalog = (String) args[0];
+			} else if ("setTransactionIsolation".equals(methodName) && !args[0].equals(currentTransactionIsolation)) {
+				currentTransactionIsolation = (Integer) args[0];
+			} else if ("setTypeMap".equals(methodName) && !args[0].equals(currentTypeMap)) {
+				currentTypeMap = (Map) args[0];
+			} else if ("setHoldability".equals(methodName) && !args[0].equals(currentHoldability)) {
+				currentHoldability = (Integer) args[0];
 			}
 		}
 
 
-		public boolean isTimedOut()
-		{
+		public boolean isTimedOut() {
 			return System.currentTimeMillis() - creationDate > (timeout * 1000);
 		}
 
 
-		public Connection getConnection()
-		{
+		public Connection getConnection() {
 			return conn;
 		}
 
 
-		public String getLastStatement()
-		{
+		public String getLastStatement() {
 			return lastStatement;
 		}
 
 
 		//close should get invoked in all cases (finally blocks)
 		//but what if it doesn't?
-		public void close() throws SQLException
-		{
+		public void close() throws SQLException {
 			lastStatement = null;
-			try
-			{
-				if (pool == null)
-				{
+			try {
+				if (pool == null) {
 					conn.close();
-				}
-				else
-				{
+				} else {
 					//reset connection
 					conn.clearWarnings();
 					//what is this? maybe we should log warnings...
@@ -314,9 +279,7 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 					//return connection to pool
 					pool.releaseConnection(this);
 				}
-			}
-			catch (SQLException sqle)
-			{
+			} catch (SQLException sqle) {
 				System.out.println(new LogEntry(Level.CRITICAL, "Error while closing connection, will attempt to reset...", sqle));
 				//only used connections get reset
 				pool.replaceConnection(this);
@@ -324,43 +287,33 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 		}
 
 		private void resetConnectionSettings()
-				throws SQLException
-		{
-			try
-			{
-				if (!currentAutoCommit.equals(originalAutoCommit))
-				{
+				throws SQLException {
+			try {
+				if (!currentAutoCommit.equals(originalAutoCommit)) {
 					conn.setAutoCommit(originalAutoCommit.booleanValue());
 					currentAutoCommit = originalAutoCommit;
 				}
-				if(!currentCatalog.equals(originalCatalog))
-				{
+				if (!currentCatalog.equals(originalCatalog)) {
 					conn.setCatalog(originalCatalog);
 					currentCatalog = originalCatalog;
 				}
-				if(!currentReadOnly.equals(originalReadOnly))
-				{
+				if (!currentReadOnly.equals(originalReadOnly)) {
 					conn.setReadOnly(originalReadOnly.booleanValue());
 					currentReadOnly = originalReadOnly;
 				}
-				if(!currentTransactionIsolation.equals(originalTransactionIsolation))
-				{
+				if (!currentTransactionIsolation.equals(originalTransactionIsolation)) {
 					conn.setTransactionIsolation(originalTransactionIsolation.intValue());
 					currentTransactionIsolation = originalTransactionIsolation;
 				}
-				if(!currentTypeMap.equals(originalTypeMap))
-				{
+				if (!currentTypeMap.equals(originalTypeMap)) {
 					conn.setTypeMap(originalTypeMap);
 					currentTypeMap = originalTypeMap;
 				}
-				if(!currentHoldability.equals(originalHoldability))
-				{
+				if (!currentHoldability.equals(originalHoldability)) {
 					conn.setHoldability(originalHoldability.intValue());
 					currentHoldability = originalHoldability;
 				}
-			}
-			catch(RuntimeException re)
-			{
+			} catch (RuntimeException re) {
 				//connections are a 3rd party implementations
 				//
 				System.out.println(new LogEntry(Level.CRITICAL, "reset of connection settings failed " + re, re));
@@ -369,112 +322,62 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 		}
 
 
-		public boolean isClosed() throws SQLException
-		{
+		public boolean isClosed() throws SQLException {
 			return conn.isClosed();
 		}
 
-		public String toString()
-		{
+		public String toString() {
 			return "SQL connection: creation date " + new Date(creationDate) + ", last statement:" + lastStatement;
 		}
 
 	}
 
 
-//	public class ConnectionObtainer// implements Executable
-//	{
+	public Object obtainConnectionRepeated() throws InterruptedException {
+		ConnectionWrapper conn;
+		long tries = 1;
 
-//		public ConnectionObtainer(StandardConnectionPool pool)
-		{
-//			this.pool = pool;
-		}
-
-		public Object obtainConnectionRepeated() throws InterruptedException
-		{
-			ConnectionWrapper conn;
-//			StandardConnectionPool pool;
-//			boolean aborted = false;
-			long tries = 1;
-
-//			tries = 1;
-			while (tries < 100)
-			{
-				conn = obtainConnection();
-				if (conn != null)
-				{
-					System.out.println(new LogEntry("Connection obtained in " + tries + " attempts"));
-					return conn;
-				}
-				else
-				{
-					tries++;
-//					try
-					{
-						Thread.sleep(10);
-					}
-//					catch (InterruptedException ie)
-					{
-//						return null;
-					}
-				}
+		while (tries < 100) {
+			conn = obtainConnection();
+			if (conn != null) {
+				System.out.println(new LogEntry("Connection obtained in " + tries + " attempts"));
+				return conn;
+			} else {
+				tries++;
+				Thread.sleep(10);
 			}
-			return null;
 		}
-
-
-/*		public long getNrofAttempts()
-		{
-			return tries;
-		}
-
-		public ConnectionWrapper getConnection()
-		{
-			return conn;
-		}*/
-
-/*		public void abort()
-		{
-			aborted = true;
-			if (conn != null)
-			{
-				pool.releaseConnection(conn);
-			}
-		}*/
-//	}
+		return null;
+	}
 
 
 	/**
-	 * @return a database connection from the configured driver
-	 * @throws SQLException
 	 * @param dbUrl
 	 * @param username
 	 * @param password
+	 * @return a database connection from the configured driver
+	 * @throws SQLException
 	 */
-	private ConnectionWrapper createConnectionWrapper(String dbUrl, String username, String password) throws SQLException
-	{
+	private ConnectionWrapper createConnectionWrapper(String dbUrl, String username, String password) throws SQLException {
 		return new ConnectionWrapper(
 				createConnection(dbUrl, username, password), connectionTimeout, this);
 	}
 
 
 	/**
-	 * @return a database connection from the configured driver
-	 * @throws SQLException
 	 * @param dbUrl
 	 * @param username
 	 * @param password
+	 * @return a database connection from the configured driver
+	 * @throws SQLException
 	 */
-	private Connection createConnection(String dbUrl, String username, String password) throws SQLException
-	{
+	private Connection createConnection(String dbUrl, String username, String password) throws SQLException {
 		Connection conn = DriverManager.getConnection(dbUrl, username, password);
-		if (conn == null)
-		{
+		if (conn == null) {
 			nrofErrors++;
 			throw new SQLException("failed to create a connection to database URL " + dbUrl + " using account " + dbUsername);
 		}
-		if (createReadOnlyConnections)
-		{
+		if (createReadOnlyConnections) {
 			conn.setReadOnly(true);
 		}
 		return conn;
@@ -484,54 +387,43 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 	 * @return A connection to a database
 	 * @throws SQLException in case a connection can not be obtained
 	 */
-	public Connection getConnection() throws SQLException
-	{
+	public Connection getConnection() throws SQLException {
+
+		if (!isStarted()) {
+			throw new SQLException("data source is not active");
+		}
+
 		nrofRequests++;
 		long start = System.currentTimeMillis();
 
 		ConnectionWrapper conn = obtainConnection();
 
-		if (conn == null)
-		{
+		if (conn == null) {
 			System.out.println(new LogEntry("Connection not directly obtained"));
 			nrofQueuedRequests++;
 
 			//create an executable which keeps trying to obtain a connection
-//			final ConnectionObtainer connObtain = new ConnectionObtainer(this);
-			//create an executor that executes the connection obtainer
-			Executable exec = new Executable()
-				{protected Object execute() throws Throwable
-					{return obtainConnectionRepeated();}};
-			try
-			{
+			Executable exec = new Executable() {
+				protected Object execute() throws Throwable {
+					return obtainConnectionRepeated();
+				}
+			};
+			try {
 				//execute the connection obtainer within a maximum period of time
-				conn = (ConnectionWrapper)exec.executeTimed(connectionRequestTimeout * 1000);
-
-				nrofDistributed++;
-//				System.out.println(new LogEntry("Connection obtained in " + connObtain.getNrofAttempts() + " attempts");
-//				return connObtain.getConnection();
-//				conn = connObtain.getConnection();
-			}
-			catch(TimeOutException e)
-			{
-//				cumulatedResponseTime += System.currentTimeMillis() - start;
+				conn = (ConnectionWrapper) exec.executeTimed(connectionRequestTimeout * 1000);
+				nrofConnectionsDistributed++;
+			} catch (TimeOutException e) {
 				nrofRequestsTimedOut++;
-				throw new SQLException("obtaining of connection timed out");
-			}
-			catch(Throwable t)//TODO SQLException
-			{
-//				cumulatedResponseTime += System.currentTimeMillis() - start;
-//				nrofRequestsTimedOut++;
+				throw new SQLException("obtaining connection timed out");
+			} catch (Throwable t) {
 				this.nrofErrors++;
 				System.out.println(new LogEntry(Level.CRITICAL, "failed to obtain connection", t));
-				throw new SQLException("obtaining of connection failed with message: " + t.getMessage());
+				throw new SQLException("obtaining connection failed with message: " + t.getMessage());
 			}
 		}
 
 		cumulatedResponseTime += System.currentTimeMillis() - start;
-		nrofDistributed++;
-
-//		return conn;
+		nrofConnectionsDistributed++;
 
 		return (Connection) Proxy.newProxyInstance(Connection.class.getClassLoader(),
 				new Class[]{Connection.class},
@@ -541,36 +433,27 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 
 
 	/**
-	 *
 	 * To be invoked by ConnectionWrapper and StandardConnectionPool only only
 	 *
 	 * @return A database connection (wrapped in a class that implements Connection as well)
 	 */
-	ConnectionWrapper obtainConnection()
-	{
-		synchronized(allConnections)
-		{
+	ConnectionWrapper obtainConnection() {
+		synchronized (allConnections) {
 			//fails if connection pool not started
-			if (!availableConnections.isEmpty())
-			{
+			if (!availableConnections.isEmpty()) {
 				//retrieve and remove first connection from list
 				//  since released connections are added to the back, connections will rotate
 				ConnectionWrapper connWrap = (ConnectionWrapper) availableConnections.remove(0);
 				usedConnections.add(connWrap);
-				if (usedConnections.size() > max_concurrent)
-				{
-					max_concurrent = usedConnections.size();
+				if (usedConnections.size() > maxNrOfConcurrentConnectionsCounted) {
+					maxNrOfConcurrentConnectionsCounted = usedConnections.size();
 				}
 				return connWrap;
-			}
-			else
-			{
+			} else {
 				//create one if max not reached
 				//this also restores lost connections
-				if ((allConnections.size() < initialNrofConnections) || (allConnections.size() < maxNrofConnections))
-				{
-					try
-					{
+				if ((allConnections.size() < initialNrofConnections) || (allConnections.size() < maxNrofConnections)) {
+					try {
 						ConnectionWrapper connWrap = createConnectionWrapper(dbUrl, dbUsername, dbUserpassword);
 
 						allConnections.add(connWrap);
@@ -579,18 +462,14 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 						System.out.println(new LogEntry("Creating new Connection, now " + allConnections.size() + " in use"));
 
 						return connWrap;
-					}
-					catch (SQLException sqle)
-					{
+					} catch (SQLException sqle) {
 						//happens if db unreachable
 						//connection will be lost for the time being
 						nrofErrors++;
 						System.out.println(new LogEntry("Cannot create new connection to " + dbUrl + " unreachable or useless connection settings", sqle));
 						throw new ResourceException("Cannot create new connection to " + dbUrl + " unreachable or useless connection settings", sqle);
 					}
-				}
-				else
-				{
+				} else {
 					System.out.println(new LogEntry("maximum nr of connections (" + maxNrofConnections + ") reached while Application demands another"));
 				}
 				return null;
@@ -604,14 +483,10 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 	 *
 	 * @param connWrap
 	 */
-	void replaceConnection(ConnectionWrapper connWrap)
-	{
-		synchronized(allConnections)
-		{
-			try
-			{
-				if (usedConnections.remove(connWrap))
-				{
+	void replaceConnection(ConnectionWrapper connWrap) {
+		synchronized (allConnections) {
+			try {
+				if (usedConnections.remove(connWrap)) {
 					nrofReset++;
 
 					//the object was indeed locked
@@ -623,29 +498,21 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 					ConnectionWrapper newConnWrap = createConnectionWrapper(dbUrl, dbUsername, dbUserpassword);
 					availableConnections.add(newConnWrap);
 					allConnections.add(newConnWrap);
-				}
-				else
-				{
+				} else {
 					nrofErrors++;
 					System.out.println(new LogEntry(Level.CRITICAL, "error in connection pool: attempt to close a Connection that does not exist in pool"));
 				}
-			}
-			catch (SQLException sqle)
-			{
+			} catch (SQLException sqle) {
 				//happens if db unreachable
 				//connection will be lost for the time being
 				nrofErrors++;
 				System.out.println(new LogEntry(Level.CRITICAL, "can not create new connection to " + dbUrl + " unreachable or useless connection settings", sqle));
 			}
-			try
-			{
-				if (!connWrap.isClosed())
-				{
+			try {
+				if (!connWrap.isClosed()) {
 					connWrap.getConnection().close();
 				}
-			}
-			catch (SQLException sqle)
-			{
+			} catch (SQLException sqle) {
 				nrofErrors++;
 				System.out.println(new LogEntry(Level.CRITICAL, "", sqle));
 			}
@@ -653,36 +520,25 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 	}
 
 
-	void releaseConnection(ConnectionWrapper connWrap)
-	{
-		synchronized(allConnections)
-		{
-			try
-			{
-				if (!connWrap.isClosed())
-				{
-					if (usedConnections.remove(connWrap))
-					{
+	void releaseConnection(ConnectionWrapper connWrap) {
+		synchronized (allConnections) {
+			try {
+				if (!connWrap.isClosed()) {
+					if (usedConnections.remove(connWrap)) {
 						//the object was indeed locked
 						//so make it available again
 						nrofReleased++;
 						//add released connection to the end of the list
 						availableConnections.add(connWrap);
-					}
-					else
-					{
+					} else {
 						nrofErrors++;
 						System.out.println(new LogEntry(Level.VERBOSE, "Error in connection pool: attempt made to release database connection which is not in use", "connection has probably been closed (and released) before"));
 					}
-				}
-				else
-				{
+				} else {
 					//Connection might be useless
 					//Connection will be removed by cleanup
 				}
-			}
-			catch (SQLException sqle)
-			{
+			} catch (SQLException sqle) {
 				nrofErrors++;
 				System.out.println(new LogEntry(sqle));
 			}
@@ -693,8 +549,7 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 	/**
 	 * @return A text report to inform application administrators
 	 */
-	public String getReport()
-	{
+	public String getReport() {
 		StringBuffer sb = new StringBuffer("");
 		sb.append("Total connections: " + allConnections.size() + "\n");
 		sb.append("Nr available: " + availableConnections.size() + "\n");
@@ -703,17 +558,15 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 		sb.append("Nr of requests: " + nrofRequests + "\n");
 		sb.append("Nr of requests queued: " + nrofQueuedRequests + "\n");
 		sb.append("Nr of requests timed out: " + nrofRequestsTimedOut + "\n");
-		sb.append("Nr of connections distributed: " + nrofDistributed + "\n");
+		sb.append("Nr of connections distributed: " + nrofConnectionsDistributed + "\n");
 		sb.append("Nr of connections released: " + nrofReleased + "\n");
 		sb.append("Nr of connections reset: " + nrofReset + "\n");
 		sb.append("Nr of astray connections cleaned up: " + nrofStaleCleanedUp + "\n");
 		sb.append("Nr of errors: " + nrofErrors + "\n");
-		if (nrofDistributed > 0)
-		{
-			sb.append("Average response time: " + (float) cumulatedResponseTime / (float) nrofDistributed + " ms\n");
+		if (nrofConnectionsDistributed > 0) {
+			sb.append("Average response time: " + (float) cumulatedResponseTime / (float) nrofConnectionsDistributed + " ms\n");
 		}
-		if (driverInfo != null)
-		{
+		if (driverInfo != null) {
 			sb.append(driverInfo);
 		}
 		return sb.toString();
@@ -722,70 +575,39 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 	/**
 	 * @throws ConfigurationException
 	 */
-	public void start()
-	{
+	public void start() {
 		allConnections.clear();
 		availableConnections.clear();
 		usedConnections.clear();
-		try
-		{
-			for (int i = 0; i < initialNrofConnections; i++)
-			{
+		try {
+			for (int i = 0; i < initialNrofConnections; i++) {
 				ConnectionWrapper connWrap = createConnectionWrapper(dbUrl, dbUsername, dbUserpassword);
 				availableConnections.add(connWrap);
 				allConnections.add(connWrap);
 			}
-		}
-		catch (SQLException sqle)
-		{
+		} catch (SQLException sqle) {
 			System.out.println(new LogEntry(Level.CRITICAL, "unable to start connection pool, SQLException: " + sqle.getMessage(), sqle));
 			throw new ConfigurationException("connection pool is not able to initialize connections", sqle);
 		}
-
-//		startCleanup();
 
 		connectionTester = new StandardJdbcProcessor(this);
 		isStarted = true;
 	}
 
-	/**
-	 * Starts a cleanup thread
-	 */
-/*	private void startCleanup()
-	{
-		if (!(cleanupThread != null && cleanupThread.isAlive()))
-		{
-			cleanupThread = new Thread(this);
-//			application.bindInternalProcess(cleanupThread, "ConnectionPool " + service.getId() + " cleanup");
-
-			cleanupThread.start();
-		}
-	} */
 
 	//TODO make this safe for connections that are in use to make a reset safe
+
 	/**
 	 * Stops the component and closes all connections
 	 */
-	public void stop()
-	{
+	public void stop() {
 		isStarted = false;
-/*		currentState = CLEANUP_HALTED;
-		if (cleanupThread != null)
-		{
-			cleanupThread.interrupt();
-			cleanupThread = null;
-		} */
-
 		Iterator i = allConnections.iterator();
-		while (i.hasNext())
-		{
+		while (i.hasNext()) {
 			ConnectionWrapper connWrap = (ConnectionWrapper) i.next();
-			try
-			{
+			try {
 				connWrap.getConnection().close();
-			}
-			catch (SQLException e)
-			{
+			} catch (SQLException e) {
 				nrofErrors++;
 				System.out.println(new LogEntry(e));
 			}
@@ -802,11 +624,9 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 	 *
 	 * @throws ConfigurationException
 	 */
-	public void setProperties(Properties properties) throws ConfigurationException
-	{
+	public void setProperties(Properties properties) throws ConfigurationException {
 		String dbDriver = properties.getProperty("dbdriver").toString();
-		if (dbDriver == null)
-		{
+		if (dbDriver == null) {
 			throw new ConfigurationException("please specify dbDriver for connectionpool");
 		}
 
@@ -814,13 +634,10 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 		dbUsername = properties.getProperty("dbusername").toString();
 		dbUserpassword = properties.getProperty("dbuserpassword").toString();
 
-		if (properties.getProperty("nrof_connections") != null)
-		{
+		if (properties.getProperty("nrof_connections") != null) {
 			initialNrofConnections = Integer.valueOf(properties.getProperty("nrof_connections"));
 			maxNrofConnections = Integer.valueOf(properties.getProperty("nrof_connections"));
-		}
-		else
-		{
+		} else {
 			initialNrofConnections = Integer.valueOf(properties.getProperty("initial_nrof_connections", "" + initialNrofConnections));
 			maxNrofConnections = Integer.valueOf(properties.getProperty("max_nrof_connections", "" + maxNrofConnections));
 			//set default option
@@ -835,87 +652,72 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 		createReadOnlyConnections = Boolean.valueOf(properties.getProperty("create_readonly_connections", "" + createReadOnlyConnections));
 		defaultIsolationLevel = isolationLevelStrings.indexOf(properties.getProperty("default_isolaton_level", "" + defaultIsolationLevel));
 
-		try
-		{
+		try {
 			Class.forName(dbDriver);
 			Enumeration drivers = DriverManager.getDrivers();
 
 			driverInfo = "";
 			int count = 0;
-			while (drivers.hasMoreElements())
-			{
+			while (drivers.hasMoreElements()) {
 				count++;
 				Driver driver = (Driver) drivers.nextElement();
 				driverInfo += "driver " + count + ": " + driver.getMajorVersion() + '.' + driver.getMinorVersion() + "\n";
 			}
-		}
-		catch (ClassNotFoundException cnfe)
-		{
+		} catch (ClassNotFoundException cnfe) {
 			throw new ConfigurationException("ERROR: Driver \"" + dbDriver + "\" not found...");
 		}
-        resetStatistics();
+		resetStatistics();
 	}
 
-    private void resetStatistics() {
-        nrofRequests = 0;
-        nrofDistributed = 0;
-        nrofReleased = 0;
-        nrofReset = 0;
-        nrofRequestsTimedOut = 0;
-        long nrofRequestsFailed = 0;// ??
-        nrofQueuedRequests = 0;
-        nrofStaleCleanedUp = 0;
-        cumulatedResponseTime = 0;
-        nrofErrors = 0;
-    }
+	private void resetStatistics() {
+		nrofRequests = 0;
+		nrofConnectionsDistributed = 0;
+		nrofReleased = 0;
+		nrofReset = 0;
+		nrofRequestsTimedOut = 0;
+		long nrofRequestsFailed = 0;// ??
+		nrofQueuedRequests = 0;
+		nrofStaleCleanedUp = 0;
+		cumulatedResponseTime = 0;
+		nrofErrors = 0;
+	}
 
 
-    /**
+	/**
 	 * Cleanup routine that is to be called regularly
 	 */
 	public void onPageEvent(long l) {
-        System.out.println(new LogEntry("connection pool cleanup run"));
-        cleanUpHangingConnections();
-        testConnection();
+		System.out.println(new LogEntry("connection pool cleanup run"));
+		cleanUpHangingConnections();
+		testConnection();
 	}
 
 	/**
 	 * Tests proper working of 1 connection.
 	 * Since connections are rotated, this also functions as a keep-alive mechanism.
-	 * 
 	 */
-	private void testConnection()
-	{
+	private void testConnection() {
 		System.out.println(new LogEntry("performing connection test"));
-		try
-		{
+		try {
 			connectionTester.executePreparedStatement(connectionTestStatement);
-		}
-		catch (SQLException e)
-		{
+		} catch (SQLException e) {
 			System.out.println(new LogEntry(Level.CRITICAL, "connection test failed with message: " + e.getMessage(), e));
 		}
 	}
 
-	private void cleanUpHangingConnections()
-	{
+	private void cleanUpHangingConnections() {
 		ArrayList deadConnections = new ArrayList();
-		synchronized (allConnections)
-		{
-			if (isStarted() && !usedConnections.isEmpty())
-			{
+		synchronized (allConnections) {
+			if (isStarted() && !usedConnections.isEmpty()) {
 				Iterator i = usedConnections.iterator();
-				while (i.hasNext())
-				{
+				while (i.hasNext()) {
 					ConnectionWrapper connWrap = (ConnectionWrapper) i.next();
-					if (connWrap.isTimedOut())
-					{
+					if (connWrap.isTimedOut()) {
 						deadConnections.add(connWrap);
 					}
 				}
 				i = deadConnections.iterator();
-				while (i.hasNext())
-				{
+				while (i.hasNext()) {
 					ConnectionWrapper connWrap = (ConnectionWrapper) i.next();
 					nrofStaleCleanedUp++;
 					System.out.println(new LogEntry(Level.CRITICAL, "Connection kept occupied for more than " + connectionTimeout + " s", connWrap.toString()));
@@ -932,32 +734,30 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 	 * @return a newly created connection
 	 * @throws SQLException
 	 */
-	public Connection getConnection(String username, String password) throws SQLException
-	{
+	public Connection getConnection(String username, String password) throws SQLException {
 		return createConnection(dbUrl, username, password);
 	}
 
 
-	public PrintWriter getLogWriter()
-	{
+	public PrintWriter getLogWriter() {
 		return logWriter;
 	}
 
-	public void setLogWriter(PrintWriter out)
-	{
+
+	public void setLogWriter(PrintWriter out) {
 		logWriter = out;
 	}
 
 	public <T> T unwrap(Class<T> clasz) throws SQLException {
-        if(this.isWrapperFor(clasz)) {
-            return (T)this;
-        }
-        throw new SQLException("class '" + getClass().getName() + "' is not a wrapper for '" + clasz.getName() + "'");
-    }
+		if (this.isWrapperFor(clasz)) {
+			return (T) this;
+		}
+		throw new SQLException("class '" + getClass().getName() + "' is not a wrapper for '" + clasz.getName() + "'");
+	}
 
 	public boolean isWrapperFor(Class<?> clasz) throws SQLException {
-        return this.getClass().isAssignableFrom(clasz);
-    }
+		return this.getClass().isAssignableFrom(clasz);
+	}
 
 
 	@Override
@@ -966,26 +766,21 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource
 		return 0;
 	}
 
-//    @Override
-    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        throw new SQLFeatureNotSupportedException();
-    }
+	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+		throw new SQLFeatureNotSupportedException();
+	}
 
 
-    @Override
+	@Override
 	public void setLoginTimeout(int arg0) throws SQLException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public boolean isStarted() {
 		return isStarted;
 	}
-
-
-
-
 
 
 }

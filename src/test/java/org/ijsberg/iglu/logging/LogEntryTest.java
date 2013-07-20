@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -20,12 +19,12 @@
 
 package org.ijsberg.iglu.logging;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 /**
  */
@@ -40,7 +39,7 @@ public class LogEntryTest {
 	@Test
 	public void testToString() throws Exception {
 		LogEntry entry = new LogEntry("test 1");
-		assertEquals((double)System.currentTimeMillis(), entry.getTimeInMillis(), 500);
+		assertEquals((double) System.currentTimeMillis(), entry.getTimeInMillis(), 500);
 		assertEquals("DBG " + getFormattedTimestamp(entry) + " test 1", entry.toString());
 
 		entry = new LogEntry(Level.VERBOSE, "test 2");

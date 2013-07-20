@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -20,12 +19,12 @@
 
 package org.ijsberg.iglu.util;
 
-import static org.junit.Assert.assertEquals;
+import org.ijsberg.iglu.util.properties.PropertiesSupport;
+import org.junit.Test;
 
 import java.util.Properties;
 
-import org.ijsberg.iglu.util.properties.PropertiesSupport;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 /**
  */
@@ -49,10 +48,10 @@ public class PropertiesSupportTest {
 	public void testGetSubsectionsForSectionKey() throws Exception {
 		//Properties properties, String sectionkey
 	}
-	
+
 	@Test
 	public void testGetCommandLineProperties() {
-		
+
 		Properties properties = PropertiesSupport.getCommandLineProperties("-test", "true");
 		assertEquals(1, properties.size());
 		assertEquals("true", properties.getProperty("test"));

@@ -1,28 +1,30 @@
-/* =======================================================================
- * Copyright (c) 2003-2010 IJsberg Automatisering BV. All rights reserved.
- * Redistribution and use of this code are permitted provided that the
- * conditions of the Iglu License are met.
- * The license can be found in org.ijsberg.iglu.StandardApplication.java
- * and is also published on http://iglu.ijsberg.org/LICENSE.
- * =======================================================================
+/*
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
+ *
+ * This file is part of Iglu.
+ *
+ * Iglu is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Iglu is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.ijsberg.iglu.util.xml;
 
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import org.ijsberg.iglu.util.io.StreamSupport;
 import org.ijsberg.iglu.util.misc.StringSupport;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 
 /**
@@ -35,14 +37,13 @@ import org.ijsberg.iglu.util.misc.StringSupport;
  * <li>to format XML in an nice way as text</li>
  * </ul>
  */
-public class Document extends ElementList
-{
+public class Document extends ElementList {
 	//storage of XML Document header stuff
 	private String encoding = "utf-8";
 	private String name;
-	
+
 	private File file;
-	
+
 /*	private String doctype;
 	private String xmlVersion;
 	private String encoding;
@@ -52,37 +53,32 @@ public class Document extends ElementList
 	/**
 	 *
 	 */
-	public Document()
-	{
+	public Document() {
 	}
 
 	/**
 	 * @param name name of the top node
 	 */
-	public Document(String name)
-	{
+	public Document(String name) {
 		this.name = name;
 	}
 
-	public Document(File file) throws IOException, ParseException
-	{
+	public Document(File file) throws IOException, ParseException {
 		this.file = file;
 		load(file);
 	}
-	
+
 	public File getFile() {
 		return file;
 	}
 
 
-	public String getEncoding()
-	{
+	public String getEncoding() {
 		return encoding;
 	}
 
 
-	public void setEncoding(String encoding)
-	{
+	public void setEncoding(String encoding) {
 		this.encoding = encoding;
 	}
 
@@ -92,8 +88,7 @@ public class Document extends ElementList
 	 *
 	 * @param n
 	 */
-	public Document(Node n)
-	{
+	public Document(Node n) {
 		super();
 		this.name = n.getName();
 //		this.nodeAttributes = new GenericPropertyBundle(n.nodeAttributes);
@@ -103,8 +98,7 @@ public class Document extends ElementList
 	/**
 	 *
 	 */
-	public Document(boolean interpreteAsXHTML)
-	{
+	public Document(boolean interpreteAsXHTML) {
 		this.interpreteAsXHTML = interpreteAsXHTML;
 	}
 
@@ -112,9 +106,9 @@ public class Document extends ElementList
 	public void load(String input) throws IOException, ParseException {
 //		FileInputStream stream = new FileInputStream(file);
 		BufferedReader reader = new BufferedReader(new StringReader(input));
-		
+
 		load(reader);
-		
+
 
 		parse(input);
 
@@ -122,17 +116,17 @@ public class Document extends ElementList
 		//stream.close();
 	}
 
-	
+
 	public void load(File file) throws IOException, ParseException {
 		FileInputStream stream = new FileInputStream(file);
-		
+
 		FileReader fileReader = new FileReader(file);
 		encoding = fileReader.getEncoding();
-		
+
 		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-		
+
 		load(reader);
-		
+
 		stream.close();
 		stream = new FileInputStream(file);
 
@@ -142,28 +136,22 @@ public class Document extends ElementList
 		stream.close();
 	}
 
-	
-	
-	private void load(BufferedReader reader) throws IOException, ParseException
-	{
+
+	private void load(BufferedReader reader) throws IOException, ParseException {
 		String xmlDef = "";
 		int lineNr = 1;
 		LOOP:
-		while (reader.ready())
-		{
+		while (reader.ready()) {
 			xmlDef += reader.readLine();
 			lineNr++;
 			int startPos = xmlDef.indexOf('<');
-			if (startPos != -1)
-			{
-				if (xmlDef.indexOf("<?xml") != startPos)
-				{
+			if (startPos != -1) {
+				if (xmlDef.indexOf("<?xml") != startPos) {
 					//no usable xml def found
 					break LOOP;
 				}
 				int endPos = xmlDef.indexOf("?>");
-				if (endPos != -1)
-				{
+				if (endPos != -1) {
 					Tag xmlDefTag = new Tag(lineNr, xmlDef.substring(startPos, endPos + 2));
 					encoding = xmlDefTag.getAttributes().getProperty("encoding");
 					break LOOP;
@@ -173,26 +161,20 @@ public class Document extends ElementList
 		}
 	}
 
-	public void save(File file) throws IOException
-	{
+	public void save(File file) throws IOException {
 		save(file, STRETCH, 50);
 	}
 
 
-	public void save(File file, byte formattingStyle) throws IOException
-	{
+	public void save(File file, byte formattingStyle) throws IOException {
 		save(file, formattingStyle, 50);
 	}
 
-	public void save(File file, byte formattingStyle, int minimumLineLength) throws IOException
-	{
+	public void save(File file, byte formattingStyle, int minimumLineLength) throws IOException {
 		FileOutputStream out = new FileOutputStream(file);
-		if (encoding != null)
-		{
+		if (encoding != null) {
 			out.write(toString(formattingStyle, minimumLineLength).getBytes(encoding));
-		}
-		else
-		{
+		} else {
 			out.write(toString(formattingStyle, minimumLineLength).getBytes());
 		}
 		out.close();
@@ -201,8 +183,7 @@ public class Document extends ElementList
 	/**
 	 * @param name name of the top node
 	 */
-	public Document(String name, boolean interpreteAsXHTML)
-	{
+	public Document(String name, boolean interpreteAsXHTML) {
 		this.name = name;
 		this.interpreteAsXHTML = interpreteAsXHTML;
 	}
@@ -212,8 +193,7 @@ public class Document extends ElementList
 	 *
 	 * @param n
 	 */
-	public Document(Node n, boolean interpreteAsXHTML)
-	{
+	public Document(Node n, boolean interpreteAsXHTML) {
 		super();
 		this.interpreteAsXHTML = interpreteAsXHTML;
 		this.name = n.getName();
@@ -228,11 +208,10 @@ public class Document extends ElementList
 	 * Encoding is ignored.
 	 *
 	 * @param in
-	 * @throws IOException if reading the input stream fails
+	 * @throws IOException    if reading the input stream fails
 	 * @throws ParseException if the XML document can not be parsed
 	 */
-	public void parse(InputStream in) throws IOException, ParseException
-	{
+	public void parse(InputStream in) throws IOException, ParseException {
 		String input = new String(StreamSupport.absorbInputStream(in));
 		parse(input);
 	}
@@ -242,11 +221,10 @@ public class Document extends ElementList
 	 *
 	 * @param in
 	 * @param encoding encoding to use when read the input stream
-	 * @throws IOException if reading the input stream fails
+	 * @throws IOException    if reading the input stream fails
 	 * @throws ParseException if the XML document can not be parsed
 	 */
-	public void parse(InputStream in, String encoding) throws IOException, ParseException
-	{
+	public void parse(InputStream in, String encoding) throws IOException, ParseException {
 //		String input = StringSupport.absorbInputStream(in, encoding);
 		String input = new String(StreamSupport.absorbInputStream(in));
 
@@ -254,10 +232,9 @@ public class Document extends ElementList
 	}
 
 	// FIXME </endtag > does not parse because of the space
-	
-	
-	public void parse(String xmlInput) throws ParseException
-	{
+
+
+	public void parse(String xmlInput) throws ParseException {
 		parse(xmlInput, false);
 	}
 
@@ -270,11 +247,9 @@ public class Document extends ElementList
 	 * @param xmlInput
 	 * @throws ParseException if the XML document can not be parsed
 	 */
-	public void parse(String xmlInput, boolean strict) throws ParseException
-	{
+	public void parse(String xmlInput, boolean strict) throws ParseException {
 
-		if (xmlInput == null)
-		{
+		if (xmlInput == null) {
 			throw new IllegalArgumentException("input can not be null");
 		}
 		ArrayList splitContents = split(xmlInput, interpreteAsXHTML, true);
@@ -284,37 +259,27 @@ public class Document extends ElementList
 		int nodeCount = 0;
 		ArrayList contentsToRemove = new ArrayList();
 		Iterator i = contents.iterator();
-		while (i.hasNext())
-		{
+		while (i.hasNext()) {
 			Object element = i.next();
-			if (element instanceof Node)
-			{
+			if (element instanceof Node) {
 				nodeCount++;
-			}
-			else if (element instanceof Tag)
-			{
+			} else if (element instanceof Tag) {
 				Tag tag = (Tag) element;
-				if (!(tag.getType() == Tag.INSTRUCTION_TAG || tag.getType() == Tag.COMMENT_TAG))
-				{
+				if (!(tag.getType() == Tag.INSTRUCTION_TAG || tag.getType() == Tag.COMMENT_TAG)) {
 					throw new ParseException("document contains invalid element: " + StringSupport.condenseWhitespace(StringSupport.trim(element.toString(), 20, "...")));
 				}
-			}
-			else
-			{
-				if (element.toString().trim().length() > 0)
-				{
+			} else {
+				if (element.toString().trim().length() > 0) {
 					//TODO if strict throw new ParseException("document contains invalid element: " + StringSupport.condenseWhitespace(StringSupport.trim(element.toString(), 20, "...")));
 					contentsToRemove.add(element);
 				}
 			}
-			if (nodeCount > 1)
-			{
+			if (nodeCount > 1) {
 				throw new ParseException("document contains more than 1 node: " + StringSupport.condenseWhitespace(StringSupport.trim(element.toString(), 20, "...")));
 			}
 		}
 		i = contentsToRemove.iterator();
-		while (i.hasNext())
-		{
+		while (i.hasNext()) {
 			contents.remove(i.next());
 		}
 	}
@@ -324,20 +289,16 @@ public class Document extends ElementList
 	 * @return the XML document as a formatted text
 	 */
 
-	public String toString(byte formattingStyle)
-	{
+	public String toString(byte formattingStyle) {
 		return contentsToString(formattingStyle).trim();
 	}
 
-	public String toString(byte formattingStyle, int minimumLineLength)
-	{
+	public String toString(byte formattingStyle, int minimumLineLength) {
 		return contentsToString(formattingStyle, minimumLineLength).trim();
 	}
 
-	public String toString()
-	{
-		if (1 == 1)
-		{
+	public String toString() {
+		if (1 == 1) {
 			return contentsToString().trim();
 		}
 
@@ -350,13 +311,11 @@ public class Document extends ElementList
 	}
 
 
-	public boolean isPartOfText()
-	{
+	public boolean isPartOfText() {
 		return false;
 	}
 
-	public String getName()
-	{
+	public String getName() {
 		return name;
 	}
 }

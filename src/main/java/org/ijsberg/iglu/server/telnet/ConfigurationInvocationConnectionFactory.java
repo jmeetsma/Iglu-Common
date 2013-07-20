@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -18,21 +17,20 @@
  * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.ijsberg.iglu.server.connection.invocation;
-
-import java.io.IOException;
-import java.net.Socket;
+package org.ijsberg.iglu.server.telnet;
 
 import org.ijsberg.iglu.configuration.Assembly;
 import org.ijsberg.iglu.server.connection.Connection;
 import org.ijsberg.iglu.server.connection.ConnectionFactory;
 import org.ijsberg.iglu.server.connection.socket.ByteStreamReadingConnection;
-import org.ijsberg.iglu.server.telnet.TelnetAdapter;
+import org.ijsberg.iglu.server.invocation.CommandLineConfigurationInvoker;
+
+import java.io.IOException;
+import java.net.Socket;
 
 /**
  */
-public class ConfigurationInvocationConnectionFactory implements ConnectionFactory
-{
+public class ConfigurationInvocationConnectionFactory implements ConnectionFactory {
 	private Assembly assembly;
 
 	public ConfigurationInvocationConnectionFactory(Assembly assembly) {

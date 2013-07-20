@@ -1,3 +1,22 @@
+/*
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
+ *
+ * This file is part of Iglu.
+ *
+ * Iglu is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Iglu is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.ijsberg.iglu.mvc.mapping;
 
 
@@ -9,8 +28,7 @@ import java.util.Properties;
  * Dispatches a request to a resource that produces a response
  * based on the (processed) request data.
  */
-public class Dispatch extends MapElement implements ResponseWriter
-{
+public class Dispatch extends MapElement implements ResponseWriter {
 	//arguments containing additional process instructions for the dispatcher
 	private String[] additionalArguments;
 
@@ -19,8 +37,7 @@ public class Dispatch extends MapElement implements ResponseWriter
 	 * @param depth
 	 * @param lineNr
 	 */
-	public Dispatch(String[] command, int depth, int lineNr)
-	{
+	public Dispatch(String[] command, int depth, int lineNr) {
 		super(command[0], depth, lineNr);
 		additionalArguments = new String[command.length - 1];
 		System.arraycopy(command, 1, additionalArguments, 0, command.length - 1);
@@ -30,10 +47,8 @@ public class Dispatch extends MapElement implements ResponseWriter
 	 * @param dispatcher
 	 * @return an error message in case request dispatching is not possible
 	 */
-	public String check(RequestDispatcher dispatcher)
-	{
-		if (argument == null || "".equals(argument))
-		{
+	public String check(RequestDispatcher dispatcher) {
+		if (argument == null || "".equals(argument)) {
 			return "missing label";
 		}
 		return dispatcher.testDispatch(argument, additionalArguments);
@@ -46,8 +61,7 @@ public class Dispatch extends MapElement implements ResponseWriter
 	 * @param fe
 	 * @return false
 	 */
-	public boolean addFlowElement(MapElement fe)
-	{
+	public boolean addFlowElement(MapElement fe) {
 		return false;
 	}
 
@@ -69,8 +83,7 @@ public class Dispatch extends MapElement implements ResponseWriter
 	/**
 	 * @return a description of this MVC element including the nr of times invoked
 	 */
-	public String toString()
-	{
+	public String toString() {
 		return indent() + "DISPATCH " + getArgument() + " -> " + timesProcessed + "\n";
 	}
 }

@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -18,16 +17,16 @@
  * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.ijsberg.iglu.server.connection.invocation;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+package org.ijsberg.iglu.server.invocation;
 
 import org.ijsberg.iglu.server.connection.ClientSessionAware;
 import org.ijsberg.iglu.server.connection.CommandLineClientAdapter;
 import org.ijsberg.iglu.server.connection.CommandLineInterpreter;
 import org.ijsberg.iglu.util.misc.StringSupport;
 import org.ijsberg.iglu.util.reflection.ReflectionSupport;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Provides a basic command-line interface.
@@ -38,7 +37,6 @@ public class CommandLineObjectInvoker implements CommandLineInterpreter {
 	private CommandLineClientAdapter adapter;
 
 	/**
-	 *
 	 * @param invokable
 	 */
 	public CommandLineObjectInvoker(Object invokable) {
@@ -46,20 +44,18 @@ public class CommandLineObjectInvoker implements CommandLineInterpreter {
 	}
 
 	/**
-	 *
 	 * @param adapter
 	 */
 	@Override
 	public void initiateSession(CommandLineClientAdapter adapter) {
 		this.adapter = adapter;
-		if(invokable instanceof ClientSessionAware) {
+		if (invokable instanceof ClientSessionAware) {
 			((ClientSessionAware) invokable).setSession(this);
 		}
 		adapter.send("Welcome. You may invoke public methods on " + invokable.toString() + ".\n\r>");
 	}
 
 	/**
-	 *
 	 * @param message
 	 */
 	@Override
@@ -67,7 +63,6 @@ public class CommandLineObjectInvoker implements CommandLineInterpreter {
 	}
 
 	/**
-	 *
 	 * @param rawInput input from the client connection
 	 */
 	@Override
@@ -75,15 +70,13 @@ public class CommandLineObjectInvoker implements CommandLineInterpreter {
 	}
 
 	/**
-	 *
 	 * @param commandLine input from the client connection
 	 * @return
 	 */
 	@Override
 	public String processCommandLine(String commandLine) {
 		String response = "";
-		if(!"".equals(commandLine))
-		{
+		if (!"".equals(commandLine)) {
 			try {
 				Object returnValue = executeCommandLine(commandLine);
 				response = (returnValue != null ? returnValue : "ok") + "\r\n";
@@ -102,7 +95,7 @@ public class CommandLineObjectInvoker implements CommandLineInterpreter {
 		String[] commandAndArguments = AssemblyCommandLine.splitCommandLine(commandLine);
 		String command = commandAndArguments[0];
 		Object[] arguments;
-		if(commandAndArguments.length > 1) {
+		if (commandAndArguments.length > 1) {
 			arguments = AssemblyCommandLine.splitArguments(commandAndArguments[1]);
 		} else {
 			arguments = new String[0];
@@ -123,15 +116,14 @@ public class CommandLineObjectInvoker implements CommandLineInterpreter {
 	}
 
 	/**
-	 *
 	 * @param unfinishedCommand
 	 * @return
 	 */
 	@Override
 	public String completeCommand(String unfinishedCommand) {
 		Method[] invokableMethods = invokable.getClass().getMethods();
-		for(int i = 0; i < invokableMethods.length; i++) {
-			if(invokableMethods[i].getName().startsWith(unfinishedCommand)) {
+		for (int i = 0; i < invokableMethods.length; i++) {
+			if (invokableMethods[i].getName().startsWith(unfinishedCommand)) {
 				return invokableMethods[i].getName() + "(";
 			}
 		}

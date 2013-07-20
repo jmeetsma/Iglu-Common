@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -20,21 +19,17 @@
 
 package org.ijsberg.iglu.configuration.classloading;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertSame;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
-
-import java.io.File;
-import java.net.URL;
-
 import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.misc.StringSupport;
 import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+import java.net.URL;
+
+import static junit.framework.Assert.*;
 
 /**
  */
@@ -53,7 +48,7 @@ public class ExtendedClassPathClassLoaderTest {
 		Thread.sleep(100);
 
 		FileSupport.copyClassLoadableResourceToFileSystem(pathToResources + "/resources/test.properties", tmpDir.getAbsolutePath() + "/resources/");
-        FileSupport.copyClassLoadableResourceToFileSystem(pathToResources + "/jars/iglu-telnet-server-1.0.jar", tmpDir.getAbsolutePath() + "/jars/");
+		FileSupport.copyClassLoadableResourceToFileSystem(pathToResources + "/jars/iglu-telnet-server-1.0.jar", tmpDir.getAbsolutePath() + "/jars/");
 		FileSupport.copyClassLoadableResourceToFileSystem(pathToResources + "/ExtendedClassPathClassLoaderTestHelper.class", tmpDir.getAbsolutePath() + "/classes/" + pathToResources);
 	}
 
@@ -82,12 +77,16 @@ public class ExtendedClassPathClassLoaderTest {
 		try {
 			classLoader.findClass("org.ijsberg.iglu.AbsentClass");
 			fail("ClassNotFoundException expected");
-		} catch (ClassNotFoundException expected) {};
+		} catch (ClassNotFoundException expected) {
+		}
+		;
 
 		try {
 			classLoader.findClass("org.ijsberg.iglu.util.io.FileSupport");
 			fail("ClassNotFoundException expected");
-		} catch (ClassNotFoundException expected) {};
+		} catch (ClassNotFoundException expected) {
+		}
+		;
 
 		clasz = classLoader.findClass("users");
 		assertNotNull(clasz);
@@ -105,15 +104,18 @@ public class ExtendedClassPathClassLoaderTest {
 		try {
 			classLoader.loadClass("org.ijsberg.iglu.AbsentClass");
 			fail("ClassNotFoundException expected");
-		} catch (ClassNotFoundException expected) {};
+		} catch (ClassNotFoundException expected) {
+		}
+		;
 
 		clasz = classLoader.loadClass("org.ijsberg.iglu.util.io.FileSupport");
 		assertNotNull(clasz);
 		try {
 			clasz = classLoader.loadClass("users");
-			System.out.println(clasz);
 			fail("ClassNotFoundException expected");
-		} catch (ClassNotFoundException expected) {};
+		} catch (ClassNotFoundException expected) {
+		}
+		;
 
 
 	}

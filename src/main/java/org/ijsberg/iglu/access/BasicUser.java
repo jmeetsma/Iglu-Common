@@ -1,17 +1,24 @@
-/* =======================================================================
- * Copyright (c) 2003-2010 IJsberg Automatisering BV. All rights reserved.
- * Redistribution and use of this code are permitted provided that the
- * conditions of the Iglu License are met.
- * The license can be found in org.ijsberg.iglu.StandardApplication.java
- * and is also published on http://iglu.ijsberg.org/LICENSE.
- * =======================================================================
+/*
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
+ *
+ * This file is part of Iglu.
+ *
+ * Iglu is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Iglu is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.ijsberg.iglu.access;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
+
+import java.util.*;
 
 /**
  * Is the transient counterpart of an account.
@@ -22,11 +29,9 @@ import java.util.Properties;
  * When a user logs in to a realm, this object is created and stored
  * in a session.
  *
-
  * @see StandardSession
  */
-public class BasicUser implements User
-{
+public class BasicUser implements User {
 	//a direct reference to settings in account
 	private Properties settings;
 
@@ -38,14 +43,12 @@ public class BasicUser implements User
 	 * @param roles
 	 * @param settings
 	 */
-	public BasicUser(String userId, List<Role> roles, Properties settings)
-	{
+	public BasicUser(String userId, List<Role> roles, Properties settings) {
 		this.userId = userId;
 		this.settings = settings;
 
 		Iterator i = roles.iterator();
-		while (i.hasNext())
-		{
+		while (i.hasNext()) {
 			Object o = i.next();
 			Role role;
 			String roleId;
@@ -55,8 +58,7 @@ public class BasicUser implements User
 		}
 	}
 
-	public BasicUser(String userId, Properties settings)
-	{
+	public BasicUser(String userId, Properties settings) {
 		this.userId = userId;
 		this.settings = settings;
 	}
@@ -64,16 +66,14 @@ public class BasicUser implements User
 	/**
 	 * @param userId
 	 */
-	public BasicUser(String userId)
-	{
+	public BasicUser(String userId) {
 		this.userId = userId;
 	}
 
 	/**
 	 * @return
 	 */
-	public final String getId()
-	{
+	public final String getId() {
 		return userId;
 	}
 
@@ -81,8 +81,7 @@ public class BasicUser implements User
 	/**
 	 * @return the user id
 	 */
-	public String toString()
-	{
+	public String toString() {
 		return userId;
 	}
 
@@ -90,22 +89,19 @@ public class BasicUser implements User
 	/**
 	 * @return
 	 */
-	public Properties getSettings()
-	{
+	public Properties getSettings() {
 		return settings;
 	}
 
 	/**
 	 * @param roleId id of the rule a user must have,
-	 * a '*' makes the method return 'true',
-	 * which can be used to check wether a user is at least authenticated
+	 *               a '*' makes the method return 'true',
+	 *               which can be used to check wether a user is at least authenticated
 	 * @return true if a user has, or fullfills the role
 	 * @see User#hasRole(String)
 	 */
-	public boolean hasRole(String roleId)
-	{
-		if("*".equals(roleId))
-		{
+	public boolean hasRole(String roleId) {
+		if ("*".equals(roleId)) {
 			return true;
 		}
 		return roles.keySet().contains(roleId);
@@ -116,8 +112,7 @@ public class BasicUser implements User
 	 * @return
 	 * @see User#getRoles()
 	 */
-	public Role getRole(String roleId)
-	{
+	public Role getRole(String roleId) {
 		return (Role) roles.get(roleId);
 	}
 
@@ -125,17 +120,14 @@ public class BasicUser implements User
 	 * @return
 	 * @see User#getRoles()
 	 */
-	public Collection getRoles()
-	{
+	public Collection getRoles() {
 		return roles.values();
 	}
 
 	/**
-	 *
 	 * @return false
 	 */
-	public boolean isAccountBlocked()
-	{
+	public boolean isAccountBlocked() {
 		return false;
 	}
 }

@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -29,14 +28,14 @@ import static junit.framework.Assert.assertEquals;
 public class NodeTest {
 
 	private static String xmlString =
-			"<article name=\"test1\" type=\"2\" category=\"COMPANY INFO\">\n"+
-			"\t<h3>\n"+
-			"\t\t<title />\n"+
-			"\t</h3>\n"+
-			"\t<more>\n"+
-			"\t\t<img src=\"/images/read.gif\" />\n"+
-			"\t</more>\n"+
-			"</article>";
+			"<article name=\"test1\" type=\"2\" category=\"COMPANY INFO\">\n" +
+					"\t<h3>\n" +
+					"\t\t<title />\n" +
+					"\t</h3>\n" +
+					"\t<more>\n" +
+					"\t\t<img src=\"/images/read.gif\" />\n" +
+					"\t</more>\n" +
+					"</article>";
 
 
 	@Test

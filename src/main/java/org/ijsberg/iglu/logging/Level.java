@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -23,7 +22,8 @@ package org.ijsberg.iglu.logging;
 /**
  *
  */
-public enum Level {DEBUG, VERBOSE, CRITICAL;
+public enum Level {
+	DEBUG, VERBOSE, CRITICAL;
 	public static String[] LEVEL_DESC_ABBR = {"DBG", "VBS", "CRT"};
 	public static String[] LEVEL_DESC = {"debug", "verbose", "critical"};
 	public static String[] LEVEL_CONFIG_TERM = {"DEBUG", "VERBOSE", "CRITICAL"};

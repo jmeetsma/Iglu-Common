@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -18,10 +17,9 @@
  * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.ijsberg.iglu.server.connection.invocation;
+package org.ijsberg.iglu.server.invocation;
 
 import org.ijsberg.iglu.util.collection.ArraySupport;
-import org.ijsberg.iglu.util.collection.CollectionSupport;
 import org.ijsberg.iglu.util.misc.StringSupport;
 
 /**
@@ -61,7 +59,7 @@ public class CommandLine {
 		String[] commandAndArguments = splitCommandLine(commandLine);
 		unitIdentifierSequence = splitCommand(commandAndArguments[0]);
 
-		if(commandAndArguments.length > 1) {
+		if (commandAndArguments.length > 1) {
 			arguments = splitArguments(commandAndArguments[1]);
 		} else {
 			arguments = new String[0];

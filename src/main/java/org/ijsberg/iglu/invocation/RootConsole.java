@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -20,20 +19,15 @@
 
 package org.ijsberg.iglu.invocation;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.Properties;
-
 import org.ijsberg.iglu.configuration.Assembly;
 import org.ijsberg.iglu.configuration.Startable;
 import org.ijsberg.iglu.exception.ResourceException;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.util.io.FileSupport;
+
+import java.io.*;
+import java.util.Properties;
 
 /**
  * Processes command-line instructions that are read from an input file.
@@ -83,8 +77,7 @@ public class RootConsole extends CommandLineProcessor implements Startable, Runn
 		System.out.println(new LogEntry("starting root console"));
 		try {
 			openFileReader();
-		}
-		catch (IOException ioe) {
+		} catch (IOException ioe) {
 			throw new ResourceException("can not open file reader", ioe);
 		}
 		thread = new Thread(this);
@@ -104,8 +97,7 @@ public class RootConsole extends CommandLineProcessor implements Startable, Runn
 		thread.interrupt();
 		try {
 			closeFileReader();
-		}
-		catch (IOException ioe) {
+		} catch (IOException ioe) {
 			System.out.println(new LogEntry(Level.CRITICAL, "I/O exception while closing file reader: " + ioe.getMessage(), ioe));
 		}
 	}
@@ -149,14 +141,12 @@ public class RootConsole extends CommandLineProcessor implements Startable, Runn
 				}
 				try {
 					Thread.sleep(25);
-				}
-				catch (InterruptedException ie) {
+				} catch (InterruptedException ie) {
 					System.out.println(new LogEntry("console interrupted"));
 					isRunning = false;
 				}
 			}
-		}
-		catch (IOException ioe) {
+		} catch (IOException ioe) {
 			System.out.println(new LogEntry(Level.CRITICAL, "console interrupted by I/O exception: " + ioe.getMessage(), ioe));
 			stop();
 		}
@@ -167,8 +157,7 @@ public class RootConsole extends CommandLineProcessor implements Startable, Runn
 		try {
 			result = processCommandLine(commandLine);
 			System.out.println(new LogEntry("command line '" + commandLine + "' successfully processed"));
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			result = t;
 			System.out.println(new LogEntry(Level.CRITICAL, "console can not process command line '" + commandLine + "'", t));
 		}
@@ -184,8 +173,7 @@ public class RootConsole extends CommandLineProcessor implements Startable, Runn
 		File outputFile = new File(outputFileLocation);
 		File tempfile = FileSupport.createFile(tempOutputFileLocation);
 		FileOutputStream fos = null;
-		try
-		{
+		try {
 			fos = new FileOutputStream(tempfile);
 			PrintStream ps = new PrintStream(new FileOutputStream(tempfile));
 			if (result != null) {
@@ -195,8 +183,9 @@ public class RootConsole extends CommandLineProcessor implements Startable, Runn
 				ps.println(result.toString());
 			}
 			ps.close();
+		} finally {
+			fos.close();
 		}
-		finally {fos.close();}
 
 		if (outputFile.exists()) {
 			boolean success = outputFile.delete();

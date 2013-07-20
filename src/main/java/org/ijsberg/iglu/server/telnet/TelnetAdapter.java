@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -20,17 +19,17 @@
 
 package org.ijsberg.iglu.server.telnet;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.server.connection.CommandLineClientAdapter;
 import org.ijsberg.iglu.server.connection.CommandLineInterpreter;
 import org.ijsberg.iglu.server.connection.Connection;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
 
 /**
  * This class translates communication between a telnet client and an interpreter.
@@ -299,8 +298,7 @@ public class TelnetAdapter implements CommandLineClientAdapter {
 				//every byte is forwarded because the subprocess will interprete the input
 				interpreter.processRawInput(byteArray);
 			}
-		}
-		else {
+		} else {
 			processInput(byteArray);
 		}
 	}
@@ -327,8 +325,7 @@ public class TelnetAdapter implements CommandLineClientAdapter {
 			byte b2 = byteArray[i];
 			if (!controlCharCaptureMode) {
 				processCommandlineCharacter(b2);
-			}
-			else {
+			} else {
 				processControlCharacter(b2);
 			}
 		}
@@ -352,7 +349,7 @@ public class TelnetAdapter implements CommandLineClientAdapter {
 				//write/echo new line
 				handleReturn();
 				break;
-				//read all characters except returns
+			//read all characters except returns
 			case BACK:
 				//the back key in case of an MS-DOS telnet client
 				handleBackKey();
@@ -394,8 +391,7 @@ public class TelnetAdapter implements CommandLineClientAdapter {
 		//process commandline
 		try {
 			result = interpreter.processCommandLine(line).replaceAll("\n", "\r\n");
-		}
-		catch (Exception e)//interpreter is not trusted
+		} catch (Exception e)//interpreter is not trusted
 		{
 			result = "command line could not be interpreted due to exception " + e.getClass().getName() + (e.getMessage() != null ? " with message " + e.getMessage() : "");
 		}
@@ -406,8 +402,7 @@ public class TelnetAdapter implements CommandLineClientAdapter {
 			promptStr = result;
 			if (prompt == RETURN || prompt == NEWLINE) {
 				promptStr = "";
-			}
-			else if (result.indexOf(RETURN) != -1) {
+			} else if (result.indexOf(RETURN) != -1) {
 				promptStr = result.substring(result.lastIndexOf(RETURN) + 2);
 			}
 		}
@@ -442,8 +437,7 @@ public class TelnetAdapter implements CommandLineClientAdapter {
 
 		if (curPos < commandLineBuffer.size()) {
 			insertCharacterInCommandlineBuffer(b2);
-		}
-		else {
+		} else {
 			//store input
 			commandLineBuffer.write(b2);
 			curPos++;
@@ -479,8 +473,7 @@ public class TelnetAdapter implements CommandLineClientAdapter {
 		//some keys send 3 characters, others 4
 		if (controlCharIndex == 3 && controlCharBuffer[0] == IAC) {
 			disableControlCharCaptureMode();
-		}
-		else if ((controlCharIndex == 3 && b2 > 64) || controlCharIndex == 4) {
+		} else if ((controlCharIndex == 3 && b2 > 64) || controlCharIndex == 4) {
 			handleControlCharSequence();
 		}
 	}
@@ -489,26 +482,19 @@ public class TelnetAdapter implements CommandLineClientAdapter {
 		String controlStr = new String(controlCharBuffer);
 		if (controlStr.equals(new String(UP)) && history.size() > 1 && echoEnabled) {
 			showNextCommandlineFromHistory();
-		}
-		else if (controlStr.equals(new String(DOWN)) && history.size() > 1 && echoEnabled) {
+		} else if (controlStr.equals(new String(DOWN)) && history.size() > 1 && echoEnabled) {
 			showPreviousCommandlineFromHistory();
-		}
-		else if (controlStr.equals(new String(LEFT)) && echoEnabled) {
+		} else if (controlStr.equals(new String(LEFT)) && echoEnabled) {
 			moveCursorToLeft();
-		}
-		else if (controlStr.equals(new String(RIGHT)) && echoEnabled) {
+		} else if (controlStr.equals(new String(RIGHT)) && echoEnabled) {
 			moveCursorToRight();
-		}
-		else if (controlStr.equals(new String(HOME)) && echoEnabled) {
+		} else if (controlStr.equals(new String(HOME)) && echoEnabled) {
 			moveCursorToLineStart();
-		}
-		else if (controlStr.equals(new String(END)) && echoEnabled) {
+		} else if (controlStr.equals(new String(END)) && echoEnabled) {
 			moveCursorToLineEnd();
-		}
-		else if (controlStr.equals(new String(DELETE)) && echoEnabled) {
+		} else if (controlStr.equals(new String(DELETE)) && echoEnabled) {
 			handleDeleteKey();
-		}
-		else if (controlStr.equals(new String(PGUP)) && echoEnabled) {
+		} else if (controlStr.equals(new String(PGUP)) && echoEnabled) {
 			//									os.write(1);//SOH
 			//									os.write(2);//SOT
 			//									os.write(11);//VT
@@ -629,14 +615,11 @@ public class TelnetAdapter implements CommandLineClientAdapter {
 	public void send(byte[] message) {
 		try {
 			ps.write(message);
-		}
-		catch (IOException ioe) {
+		} catch (IOException ioe) {
 			System.out.println(new LogEntry(Level.CRITICAL, "IO exception occurred while writing to client", ioe));
 			connection.close("IO exception occurred while writing to client");
 		}
 	}
-
-
 
 
 	/**
@@ -645,8 +628,7 @@ public class TelnetAdapter implements CommandLineClientAdapter {
 	public void beep() {
 		try {
 			os.write(BEL);
-		}
-		catch (IOException ioe) {
+		} catch (IOException ioe) {
 			System.out.println(new LogEntry(Level.CRITICAL, "IO exception occurred while writing to client", ioe));
 			connection.close("IO exception occurred while writing to client");
 		}
@@ -662,7 +644,6 @@ public class TelnetAdapter implements CommandLineClientAdapter {
 	public void terminateSession() {
 		connection.close();
 	}
-
 
 
 	/**

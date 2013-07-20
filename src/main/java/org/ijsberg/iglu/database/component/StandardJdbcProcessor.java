@@ -1,17 +1,26 @@
-/* =======================================================================
- * Copyright (c) 2003-2010 IJsberg Automatisering BV. All rights reserved.
- * Redistribution and use of this code are permitted provided that the
- * conditions of the Iglu License are met.
- * The license can be found in org.ijsberg.iglu.StandardApplication.java
- * and is also published on http://iglu.ijsberg.org/LICENSE.
- * =======================================================================
+/*
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
+ *
+ * This file is part of Iglu.
+ *
+ * Iglu is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Iglu is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ijsberg.iglu.server.database.component;
+package org.ijsberg.iglu.database.component;
 
-import org.ijsberg.iglu.exception.ResourceException;
+import org.ijsberg.iglu.database.*;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
-import org.ijsberg.iglu.server.database.*;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -34,8 +43,7 @@ import java.util.Properties;
  */
 
 
-public class StandardJdbcProcessor implements JdbcProcessor
-{
+public class StandardJdbcProcessor implements JdbcProcessor {
 	//TODO exception handling
 	//there are categories of exceptions:
 	//1. connection trouble
@@ -62,15 +70,13 @@ public class StandardJdbcProcessor implements JdbcProcessor
 
 	/**
 	 */
-	public StandardJdbcProcessor()
-	{
+	public StandardJdbcProcessor() {
 	}
 
 
 	/**
 	 */
-	public StandardJdbcProcessor(DataSource dataSource)
-	{
+	public StandardJdbcProcessor(DataSource dataSource) {
 		super();
 		this.dataSource = dataSource;
 	}
@@ -78,26 +84,21 @@ public class StandardJdbcProcessor implements JdbcProcessor
 
 	/**
 	 */
-	public StandardJdbcProcessor(DataSource dataSource, DataSource dataSourceReadOnly)
-	{
+	public StandardJdbcProcessor(DataSource dataSource, DataSource dataSourceReadOnly) {
 		super();
 		this.dataSource = dataSource;
 		this.dataSourceReadOnly = dataSourceReadOnly;
 	}
 
-	
+
 	public void setProperties(Properties properties) {
-//		connMgrComp = section.getValue("DataSource", new GenericValue(connMgrComp), "name of the component that provides connections").toString();
 		maxRowLog = Integer.valueOf(properties.getProperty("max_row_log", "" + maxRowLog));
 		//TODO document this feature
 		allowIsolationLevelOverride = Boolean.valueOf(properties.getProperty("allow_isolationlevel_override", "" + allowIsolationLevelOverride));
 	}
 
 
-
-
-	public DataSource getDataSource()
-	{
+	public DataSource getDataSource() {
 		return dataSource;
 	}
 
@@ -110,40 +111,24 @@ public class StandardJdbcProcessor implements JdbcProcessor
 	/**
 	 * Executes a prepared statement without input and with default connections,
 	 * such as use of a connection that is not read-only.
-	 * 
+	 *
 	 * @param statement
 	 * @return
 	 * @throws SQLException
 	 */
-	public Object executePreparedStatement(String statement) throws SQLException
-	{
-		return executePreparedStatement(statement, new StatementInput(), new ConnectionSettings(), false);
+	public Object executePreparedStatement(String statement) throws SQLException {
+		return executePreparedStatement(statement, new StatementInput(), new ConnectionSettings());
 	}
 
-	public Object executePreparedStatement(String statement, StatementInput input) throws SQLException
-	{
-		return executePreparedStatement(statement, input, new ConnectionSettings(), false);
+	public Object executePreparedStatement(String statement, StatementInput input) throws SQLException {
+		return executePreparedStatement(statement, input, new ConnectionSettings());
 	}
 
-	public Object executePreparedStatement(String statement, StatementInput input, ConnectionSettings settings) throws SQLException
-	{
-		return executePreparedStatement(statement, input, settings, false);
-	}
-	
-	public Object executePreparedStatement(String statement, StatementInput input, boolean resolveLOBs) throws SQLException
-	{
-		return executePreparedStatement(statement, input, new ConnectionSettings(), resolveLOBs);
+
+	public Object executePreparedStatement(String statement, ConnectionSettings settings) throws SQLException {
+		return executePreparedStatement(statement, new StatementInput(), settings);
 	}
 
-	public Object executePreparedStatement(String statement, ConnectionSettings settings) throws SQLException
-	{
-		return executePreparedStatement(statement, new StatementInput(), settings, false);
-	}
-
-	public Object executePreparedStatement(String statement, ConnectionSettings settings, boolean resolveLOBs) throws SQLException
-	{
-		return executePreparedStatement(statement, new StatementInput(), settings, resolveLOBs);
-	}//	public Object executePreparedStatement(String statement, int outParamType, Object[] inParams, int[] specificSqlTypes, boolean hasReturnVal, boolean resolveLOBs, boolean readOnly, boolean isCallable) throws SQLException
 
 	////////////////////////////////////////
 	//                                    //
@@ -151,140 +136,108 @@ public class StandardJdbcProcessor implements JdbcProcessor
 	//                                    //
 	////////////////////////////////////////
 
-	public Object[] executeMultiplePreparedStatements(String[] statements, Collection inParams) throws SQLException
-	{
+	public Object[] executeMultiplePreparedStatements(String[] statements, Collection inParams) throws SQLException {
 		Object[] result;
-		if (statements.length == inParams.size())
-		{
+		if (statements.length == inParams.size()) {
 			result = new Object[inParams.size()];
 			Connection conn = null;
 
 			conn = dataSource.getConnection();
 			conn.setAutoCommit(false);
-			
-			try
-			{
+
+			try {
 				Iterator inParamsIt = inParams.iterator();
 				int count = 0;
-				while (inParamsIt.hasNext())
-				{
+				while (inParamsIt.hasNext()) {
 					Object[] params = (Object[]) inParamsIt.next();
-					result[count] = executePreparedStatement(statements[count], new StatementInput(params), false, false, conn);
+					result[count] = executePreparedStatement(statements[count], new StatementInput(params), false, conn);
 					count++;
 				}
 				conn.commit();
-			}
-			catch (SQLException e)
-			{
+			} catch (SQLException e) {
 				throw e;
-			}
-			finally
-			{
-				if (conn != null)
-				{
+			} finally {
+				if (conn != null) {
 					conn.close();
 				}
 			}
-		}
-		else
-		{
+		} else {
 			throw new SQLException("number of arguments doesn't match");
 		}
 		return result;
 	}
 
 
-	public Object executePreparedStatement(String statement, StatementInput input, ConnectionSettings settings, boolean resolveLOBs) throws SQLException
-	{
-		//TODO check if this component and connectionmanager are active!!! and connection != null
-		//TODO move getConnection to separate method
-		//TODO dataSource not necessary when PLAYing
-
-		Connection conn = null;
-
-		if (settings.readOnly && dataSourceReadOnly != null)
-		{
-			conn = dataSourceReadOnly.getConnection();
-		}
-		else
-		{
-			conn = dataSource.getConnection();
-		}
-		if (allowIsolationLevelOverride)
-		{
-			//TODO connections seem to go stale or something and throw NullPointerExc here
-			//TODO nullpointer here
-			conn.setTransactionIsolation(settings.isolationLevel);
-		}
-		try
-		{
-			return executePreparedStatement(statement, input, resolveLOBs, settings.invokeStoredProcedure, conn);
-		}
-		finally
-		{
-			if (conn != null)
-			{
+	public Object executePreparedStatement(String statement, StatementInput input, ConnectionSettings settings) throws SQLException {
+		Connection conn = getConnection(settings);
+		try {
+			return executePreparedStatement(statement, input, settings.resolveLobs, conn);
+		} finally {
+			if (conn != null) {
 				conn.close();
 			}
 		}
 	}
 
+	private Connection getConnection(ConnectionSettings settings) throws SQLException {
 
-	//	public Object executePreparedStatement(String statement, int outParamType, Object[] inParams, int[] specificSqlTypes, boolean hasReturnVal, boolean resolveLOBs, boolean readOnly, boolean isCallable, Connection conn) throws SQLException
-	public Object executePreparedStatement(String statement, StatementInput input, boolean resolveLOBs, boolean isCallable, Connection conn) throws SQLException
-	{
+		if (dataSource == null) {
+			throw new SQLException("data source missing in JDBC processor");
+		}
+
+		Connection conn = null;
+
+		if (settings.readOnly && dataSourceReadOnly != null) {
+			conn = dataSourceReadOnly.getConnection();
+		} else {
+			conn = dataSource.getConnection();
+		}
+		if (allowIsolationLevelOverride) {
+			//TODO connections seem to go stale or something and throw NullPointerExc here
+			conn.setTransactionIsolation(settings.isolationLevel);
+		}
+		return conn;
+	}
+
+
+	protected Object executePreparedStatement(String statement, StatementInput input, boolean resolveLOBs, Connection conn) throws SQLException {
 		Object result = null;
 		ResultSet rs = null;
 		StringBuffer statementDescription = new StringBuffer(statement);
 
-		for (int i = 0; i < (input.params.length); i++)
-		{
-			if (input.params[i] == null)
-			{
-				if (input.sqlTypes != null)
-				{
+		for (int i = 0; i < (input.params.length); i++) {
+			if (input.params[i] == null) {
+				if (input.sqlTypes != null) {
 					statementDescription.append("[null(" + input.sqlTypes[i] + ":resolved)]");
-				}
-				else
-				{
+				} else {
 					input.params[i] = new JdbcNullObject(Types.VARCHAR);
 					statementDescription.append("[null(VARCHAR:guessed)]");
 				}
-			}
-			else if (input.params[i] instanceof JdbcNullObject)
-			{
+			} else if (input.params[i] instanceof JdbcNullObject) {
 				statementDescription.append("[null(marked by JdbcNullObject)]");
-			}
-			else
-			{
+			} else {
 				statementDescription.append("[" + input.params[i] + ']');
 			}
 		}
 
 		PreparedStatement ps = null;
 
-		try
-		{
+		try {
 			System.out.println(new LogEntry("executing:" + statementDescription + " using " + (conn.isReadOnly() ? "READ ONLY " : "") + "connection " + conn));
 
-			if (isCallable)
-			{
+			if (ps instanceof CallableStatement) {
 				ps = conn.prepareCall(statement);
 //				StandardEventTimer.startTimingEvent(deviceId, statement);
 				result = executeStoredProcedure((CallableStatement) ps, input);
 //				StandardEventTimer.stopTimingEvent();
-			}
-			else
-			{
+			} else {
 				ps = conn.prepareStatement(statement);
 //				StandardEventTimer.startTimingEvent(deviceId, statement);
 				result = executePreparedStatement(ps, input);
 //				StandardEventTimer.stopTimingEvent();
 			}
-			if (!input.returnsVoid)
-			{
-				if (result instanceof ResultSet)
-				{
+			if (!input.returnsVoid) {
+				if (result instanceof ResultSet) {
 					rs = (ResultSet) result;
 					result = new ResultSetCopy(rs, maxRowLog, resolveLOBs);
 					rs.close();
@@ -293,120 +246,83 @@ public class StandardJdbcProcessor implements JdbcProcessor
 			}
 			System.out.println(new LogEntry(result != null ? " (return type: " + result.getClass().getName() + ')' : ""));
 			return result;
-		}
-		catch (SQLException sqle)
-		{
-//some SQL errors occur due to:
-// -communication problems -> reset connection(pool) / retry
-// -deadlock or other internal database problems - retry
-// -error in SQL - forward exception
-// -database constraint - forward exception
-//TODO load a list of known exceptions and how to handle them
+		} catch (SQLException sqle) {
+			//some SQL errors occur due to:
+			// -communication problems -> reset connection(pool) / retry
+			// -deadlock or other internal database problems - retry
+			// -error in SQL - forward exception
+			// -database constraint - forward exception
+			//TODO load a list of known exceptions and how to handle them
 			//TODO resetconnection must immediately return the freshly made connection
 			//reset connection, try again, that's it (no list)
 //			StandardEventTimer.abortTimingEvent(sqle.getMessage() + '(' + statementDescription + ')');
 			System.out.println(new LogEntry(sqle));
 			throw new SQLException(sqle.getMessage() + '(' + statementDescription + ')');
-		}
-		catch (IOException ioe)
-		{
-//			StandardEventTimer.abortTimingEvent("failed to read LOB with message: " + ioe.getMessage() + '(' + statement + ')');
-			System.out.println(new LogEntry("failed to read LOB", ioe));
-			throw new SQLException("failed to read LOB with message: " + ioe.getMessage() + '(' + statement + ')');
-		}
-		finally
-		{
-			if (ps != null)
-			{
-//				try
-				{
-					ps.close();
-				}
-//				catch (IOException e)
-				{
-				}
+		} catch (IOException ioe) {
+//			StandardEventTimer.abortTimingEvent("failed to read input stream with message: " + ioe.getMessage() + '(' + statement + ')');
+			System.out.println(new LogEntry("failed to read input stream", ioe));
+			throw new SQLException("failed to read input stream with message: " + ioe.getMessage() + '(' + statement + ')');
+		} finally {
+			if (ps != null) {
+				ps.close();
 			}
-/*			if (conn != null)
-			{
-				conn.terminateSession();
-			}
-*/
 		}
 	}
 
 
-	public Object executeStoredProcedure(CallableStatement callableStatement, StatementInput input) throws SQLException
-	{
+	public Object executeStoredProcedure(CallableStatement callableStatement, StatementInput input) throws SQLException {
 		int paramCountCorrection = 1;
-		if (!input.returnsVoid)
-		{
+		if (!input.returnsVoid) {
 			callableStatement.registerOutParameter(1, input.returnValType);
 			paramCountCorrection = 2;
 		}
 		bindParameters(callableStatement, input, paramCountCorrection);
 		callableStatement.execute();
 		Object result = null;
-		if (!input.returnsVoid)
-		{
+		if (!input.returnsVoid) {
 			result = callableStatement.getObject(1);
 		}
 		return result;
 	}
 
 
-	public Object executePreparedStatement(PreparedStatement preparedStatement, StatementInput input) throws SQLException
-	{
+	public Object executePreparedStatement(PreparedStatement preparedStatement, StatementInput input) throws SQLException {
 		int paramCountCorrection = 1;
 		bindParameters(preparedStatement, input, paramCountCorrection);
 		Object result = null;
 		preparedStatement.execute();
 
 		result = preparedStatement.getResultSet();
-		if (result == null)
-		{
+		if (result == null) {
 			result = new Integer(preparedStatement.getUpdateCount());
 		}
 		return result;
 	}
 
 
-	private static void bindParameters(PreparedStatement preparedStatement, StatementInput input, int paramCountCorrection) throws SQLException
-	{
+	private static void bindParameters(PreparedStatement preparedStatement, StatementInput input, int paramCountCorrection) throws SQLException {
 		boolean errorOccurred = false;
 
-		for (int i = 0; i < (input.params.length); i++)
-		{
-			try
-			{
-				if (input.params[i] == null)
-				{
-					if (input.sqlTypes != null)
-					{
+		for (int i = 0; i < (input.params.length); i++) {
+			try {
+				if (input.params[i] == null) {
+					if (input.sqlTypes != null) {
 						//find out an approprate datatype
 						preparedStatement.setNull(i + paramCountCorrection, input.sqlTypes[i]);
-					}
-					else
-					{
+					} else {
 						preparedStatement.setNull(i + paramCountCorrection, Types.BIGINT);
 					}
-				}
-				else if (input.params[i] instanceof JdbcNullObject)
-				{
+				} else if (input.params[i] instanceof JdbcNullObject) {
 					preparedStatement.setNull(i + paramCountCorrection, ((JdbcNullObject) input.params[i]).getType());
-				}
-				else
-				{
+				} else {
 					preparedStatement.setObject(i + paramCountCorrection, input.params[i]);
 				}
-			}
-			catch (SQLException e)
-			{
+			} catch (SQLException e) {
 				System.out.println(new LogEntry("Error while binding object (" + i + ':' + input.params[i] + ") to prepared statement", e));
 				errorOccurred = true;
 			}
 		}
-		if (errorOccurred)
-		{
+		if (errorOccurred) {
 			throw new SQLException("Errors occured while processing prepared statement");
 		}
 	}
@@ -417,8 +333,7 @@ public class StandardJdbcProcessor implements JdbcProcessor
 	//                                  //
 	//////////////////////////////////////
 
-	public int[] executeBatchPreparedStatement(String statement, Collection inParamsBatch) throws SQLException
-	{
+	public int[] executeBatchPreparedStatement(String statement, Collection inParamsBatch) throws SQLException {
 		return executeBatchPreparedStatement(statement, inParamsBatch, true);
 	}
 
@@ -426,101 +341,71 @@ public class StandardJdbcProcessor implements JdbcProcessor
 	 * A batch prepared statement is capable of carrying out a batch of updates in one go
 	 * The statement or stored procedure must have been constructed in a such a way that it can handle a batch update
 	 *
-	 * @param statement declaration of the prepared statement
+	 * @param statement     declaration of the prepared statement
 	 * @param inParamsBatch a collection of arrays of parameters to feed the stored procedure
-	 * @param isCallable must be true if the statement should be regarded as a stored procedure instead of an SQL statment
+	 * @param isCallable    must be true if the statement should be regarded as a stored procedure instead of an SQL statment
 	 * @return an array containing the number of affected rows per statement
 	 * @throws SQLException if execution fails
 	 */
-	public int[] executeBatchPreparedStatement(String statement, Collection inParamsBatch, boolean isCallable) throws SQLException
-	{
+	public int[] executeBatchPreparedStatement(String statement, Collection inParamsBatch, boolean isCallable) throws SQLException {
 		Connection conn = null;
-//		boolean errorOccurred = false;
 		PreparedStatement ps = null;
 
-		try
-		{
+		try {
 			//read only connections not supported
 			conn = dataSource.getConnection();
 			conn.setAutoCommit(false);
 
 
-			if (isCallable)
-			{
+			if (isCallable) {
 				ps = conn.prepareCall(statement);
-			}
-			else
-			{
+			} else {
 				ps = conn.prepareStatement(statement);
 			}
-
-//			ps = conn.prepareCall(statement);
 
 			Iterator x = inParamsBatch.iterator();
 
 			System.out.println(new LogEntry("Executing:" + statement + " for " + inParamsBatch.size() + " input rows"));
 
-			while (x.hasNext())
-			{
+			while (x.hasNext()) {
 				Object[] inParams = (Object[]) x.next();
 
-				for (int i = 0; i < (inParams.length); i++)
-				{
-					try
-					{
-						if (inParams[i] instanceof JdbcNullObject)
-						{
+				for (int i = 0; i < (inParams.length); i++) {
+					try {
+						if (inParams[i] instanceof JdbcNullObject) {
 							ps.setNull(i + 1, ((JdbcNullObject) inParams[i]).getType());
-						}
-						else
-						{
+						} else {
 							ps.setObject(i + 1, inParams[i]);
 						}
-					}
-					catch (SQLException e)
-					{
+					} catch (SQLException e) {
 						System.out.println(new LogEntry(e));
 						throw new SQLException("Error while binding object (nr " + i + ": [" + inParams[i] + "]) to stored procedure.", "SP:" + statement + "\n" + "OBJECT:" + inParams[i]);
-//						errorOccurred = true;
 					}
 				}
-/*				if (errorOccurred)
-				{
-					throw new SQLException("Errors occured while processing callable statement (" + statement + "), view previous exceptions for details...");
-				}
-*/
 				ps.addBatch();
 			}
 			int[] i = ps.executeBatch();
-			//TODO what if execution wasn't successful for all statements
+			//TODO what if execution wasn't successful for all statements?
 			conn.commit();
 			return i;
-		}
-		catch (SQLException e)
-		{
+		} catch (SQLException e) {
 			StringBuffer sb = new StringBuffer(e.getMessage() + '(' + statement + ")\n\n");
 			Iterator x = inParamsBatch.iterator();
-			while (x.hasNext())
-			{
+			while (x.hasNext()) {
 				sb.append('{');
 				Object[] inParams = (Object[]) x.next();
-				for (int i = 0; i < inParams.length; i++)
-				{
+				for (int i = 0; i < inParams.length; i++) {
 					sb.append((i != 0 ? ", " : "") + (inParams[i] instanceof String ? "'" : "") + inParams[i] + (inParams[i] instanceof String ? "'" : ""));
 				}
 				sb.append("}\n");
 			}
 			System.out.println(new LogEntry(Level.CRITICAL, "batch processing of " + statement + " failed", sb));
 			throw new SQLException(e.getMessage() + '(' + statement + ')');
-		}
-		finally
-		{
-			if (ps != null)
-			{
+		} finally {
+			if (ps != null) {
 				ps.close();
 			}
-			if (conn != null)
-			{
+			if (conn != null) {
 				conn.close();
 			}
 		}
@@ -533,8 +418,7 @@ public class StandardJdbcProcessor implements JdbcProcessor
 	///////////////
 
 
-	public ResultSetCopy executeQuery(String query) throws SQLException
-	{
+	public ResultSetCopy executeQuery(String query) throws SQLException {
 		System.out.println(new LogEntry("executing: " + query));
 
 		ResultSetCopy result = null;
@@ -542,12 +426,9 @@ public class StandardJdbcProcessor implements JdbcProcessor
 		//time execution time
 		Connection conn;
 		//use readonly connection if available
-		if (dataSourceReadOnly != null)
-		{
+		if (dataSourceReadOnly != null) {
 			conn = dataSourceReadOnly.getConnection();
-		}
-		else
-		{
+		} else {
 			conn = dataSource.getConnection();
 		}
 		Statement s = conn.createStatement();
@@ -565,11 +446,10 @@ public class StandardJdbcProcessor implements JdbcProcessor
 	//           //
 	///////////////
 
-	public int executeUpdate(String update) throws SQLException
-	{
+	public int executeUpdate(String update) throws SQLException {
 		System.out.println(new LogEntry("executing: " + update));
 
-		//time execution time
+		//TODO time execution time
 		Connection conn = dataSource.getConnection();
 		Statement s = conn.createStatement();
 		int result = s.executeUpdate(update);

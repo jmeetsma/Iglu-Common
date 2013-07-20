@@ -1,3 +1,22 @@
+/*
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
+ *
+ * This file is part of Iglu.
+ *
+ * Iglu is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Iglu is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.ijsberg.iglu.mvc.mapping;
 
 
@@ -16,32 +35,26 @@ import java.util.Properties;
  */
 //TODO introduce REDIRECT POST PARAMETERS
 //TODO introduce REDIRECT PREVIOUS / DISPATCH PREVIOUS
-public class Redirect extends MapElement implements ResponseWriter
-{
+public class Redirect extends MapElement implements ResponseWriter {
 	private String[] additionalArguments;
 
 	/**
-	 *
 	 * @param command
 	 * @param depth
 	 * @param lineNr
 	 */
-	public Redirect(String[] command, int depth, int lineNr)
-	{
+	public Redirect(String[] command, int depth, int lineNr) {
 		super(command[0], depth, lineNr);
 		additionalArguments = new String[command.length - 1];
 		System.arraycopy(command, 1, additionalArguments, 0, command.length - 1);
 	}
 
 	/**
-	 *
 	 * @param dispatcher
 	 * @return
 	 */
-	public String check(RequestDispatcher dispatcher)
-	{
-		if (argument == null || "".equals(argument))
-		{
+	public String check(RequestDispatcher dispatcher) {
+		if (argument == null || "".equals(argument)) {
 			return "missing label";
 		}
 		return dispatcher.testRedirect(argument, additionalArguments);
@@ -54,32 +67,27 @@ public class Redirect extends MapElement implements ResponseWriter
 	 * @param fe
 	 * @return
 	 */
-	public boolean addFlowElement(MapElement fe)
-	{
+	public boolean addFlowElement(MapElement fe) {
 		return false;
 	}
 
 	/**
-	 *
 	 * @param processArray
 	 * @param requestProperties
 	 * @param dispatcher
 	 * @return
 	 * @throws Throwable
 	 */
-	public boolean processRequest(String[] processArray, Properties requestProperties, RequestDispatcher dispatcher)
-	{
+	public boolean processRequest(String[] processArray, Properties requestProperties, RequestDispatcher dispatcher) {
 		timesProcessed++;
 		//processRequest success is ultimately defined by a successful redirect!!!
 		return dispatcher.redirect(argument, additionalArguments/*, switchSecure, switchInsecure, copyParameters*/);
 	}
 
 	/**
-	 * 
 	 * @return
 	 */
-	public String toString()
-	{
+	public String toString() {
 		return indent() + "REDIRECT " + getArgument() + " -> " + timesProcessed + "\n";
 	}
 }

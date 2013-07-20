@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -26,11 +25,7 @@ import org.ijsberg.iglu.util.io.FileSupport;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 
 public class PropertiesSupport {
@@ -110,19 +105,19 @@ public class PropertiesSupport {
 	}
 
 	/**
-	 * Collects command line properties of the following form: 
+	 * Collects command line properties of the following form:
 	 * java Command -key value
-	 * 
+	 *
 	 * @param args
 	 * @return
 	 */
-	public static Properties getCommandLineProperties(String ... args) {
+	public static Properties getCommandLineProperties(String... args) {
 		Properties retval = new Properties();
-		for(int i = 0; i < args.length; i++) {
-			if(args[i].startsWith("-") && args[i].length() > 1) {
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].startsWith("-") && args[i].length() > 1) {
 				String key = args[i].substring(1);
 				String value = "";
-				if(i + 1 < args.length && !args[i + 1].startsWith("-")) {
+				if (i + 1 < args.length && !args[i + 1].startsWith("-")) {
 					value = args[++i];
 				}
 				retval.setProperty(key, value);
@@ -131,21 +126,20 @@ public class PropertiesSupport {
 		return retval;
 	}
 
-    public static Properties loadProperties(String fileName) {
-        Properties retval = new Properties();
-        try {
-            File file = new File(fileName);
-            if(file.exists()) {
-                retval.load(new FileInputStream(file));
-            } else {
-                retval.load(FileSupport.getInputStreamFromClassLoader(fileName));
-            }
-        } catch (IOException ioe) {
-            throw new ResourceException("can not load properties from file '" + fileName + "'", ioe);
-        }
-        return retval;
-    }
-
+	public static Properties loadProperties(String fileName) {
+		Properties retval = new Properties();
+		try {
+			File file = new File(fileName);
+			if (file.exists()) {
+				retval.load(new FileInputStream(file));
+			} else {
+				retval.load(FileSupport.getInputStreamFromClassLoader(fileName));
+			}
+		} catch (IOException ioe) {
+			throw new ResourceException("can not load properties from file '" + fileName + "'", ioe);
+		}
+		return retval;
+	}
 
 
 }

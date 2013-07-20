@@ -1,10 +1,20 @@
-/* =======================================================================
- * Copyright (c) 2003-2010 IJsberg Automatisering BV. All rights reserved.
- * Redistribution and use of this code are permitted provided that the
- * conditions of the Iglu License are met.
- * The license can be found in org.ijsberg.iglu.StandardApplication.java
- * and is also published on http://iglu.ijsberg.org/LICENSE.
- * =======================================================================
+/*
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
+ *
+ * This file is part of Iglu.
+ *
+ * Iglu is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Iglu is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.ijsberg.iglu.content.module;
 
@@ -51,7 +61,7 @@ public class StandardTextProvider implements TextProvider {
 
 	public String getText(String key) {
 		String text = defaultTexts.getProperty(key);
-		if(text == null) {
+		if (text == null) {
 			text = defaultText;
 		}
 		return text;
@@ -59,7 +69,7 @@ public class StandardTextProvider implements TextProvider {
 
 	public String getText(String key, Object[] args) {
 		String text = getText(key);
-		if(text != null) {
+		if (text != null) {
 			return insertArgs(text, args);
 		}
 		return null;
@@ -67,7 +77,7 @@ public class StandardTextProvider implements TextProvider {
 
 	private String insertArgs(String text, Object[] args) {
 		StringBuffer textBuffer = new StringBuffer(text);
-		for(Object arg : args) {
+		for (Object arg : args) {
 			StringSupport.replaceFirst(textBuffer, substitutionString, arg.toString());
 		}
 		return textBuffer.toString();
@@ -80,10 +90,10 @@ public class StandardTextProvider implements TextProvider {
 	public String getText(String categoryKey, String key) {
 		Properties texts = textsByCategory.get(categoryKey);
 		String text = null;
-		if(texts != null) {
+		if (texts != null) {
 			text = texts.getProperty(key);
 		}
-		if(text == null) {
+		if (text == null) {
 			//get from default section
 			text = getText(key);
 		}
@@ -91,13 +101,13 @@ public class StandardTextProvider implements TextProvider {
 	}
 
 	public String getText(String categoryKey, String key,
-                          String defaultText) {
+						  String defaultText) {
 		Properties texts = textsByCategory.get(categoryKey);
 		String text = null;
-		if(texts != null) {
+		if (texts != null) {
 			text = texts.getProperty(key);
 		}
-		if(text == null) {
+		if (text == null) {
 			text = defaultText;
 		}
 		return text;
@@ -109,7 +119,7 @@ public class StandardTextProvider implements TextProvider {
 
 	public String getText(String categoryKey, String key, Object[] args) {
 		String text = getText(categoryKey, key);
-		if(text != null) {
+		if (text != null) {
 			return insertArgs(text, args);
 		}
 		return null;
@@ -117,7 +127,7 @@ public class StandardTextProvider implements TextProvider {
 
 	public String getText(String categoryKey, String key, Object[] args, String defaultText) {
 		String text = getText(categoryKey, key, defaultText);
-		if(text != null) {
+		if (text != null) {
 			return insertArgs(text, args);
 		}
 		return null;

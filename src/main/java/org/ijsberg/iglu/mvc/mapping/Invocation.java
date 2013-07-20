@@ -1,10 +1,29 @@
+/*
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
+ *
+ * This file is part of Iglu.
+ *
+ * Iglu is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Iglu is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.ijsberg.iglu.mvc.mapping;
 
 import org.ijsberg.iglu.configuration.Assembly;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.mvc.RequestDispatcher;
-import org.ijsberg.iglu.server.connection.invocation.CommandLine;
+import org.ijsberg.iglu.server.invocation.CommandLine;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -14,9 +33,8 @@ import java.util.Properties;
 /**
  * Definition of the invocation of a module method.
  */
-public class Invocation extends MapElement
-{
-//	private String commandIdentifier;
+public class Invocation extends MapElement {
+	//	private String commandIdentifier;
 //	private String[] arguments;
 	private ArrayList results = new ArrayList();
 
@@ -39,28 +57,26 @@ public class Invocation extends MapElement
 
 
 	/**
-	 *
 	 * @param assembly
 	 * @param taskName
 	 * @param depth
 	 * @param lineNr
 	 * @param async
 	 */
-	public Invocation(Assembly assembly, String taskName, int depth, int lineNr, boolean async)
-	{
+	public Invocation(Assembly assembly, String taskName, int depth, int lineNr, boolean async) {
 		super(taskName, depth, lineNr);
 
 		this.assembly = assembly;
 		command = new CommandLine(taskName);
-		if(command.getArguments().length == 1) {
+		if (command.getArguments().length == 1) {
 			formId = command.getArguments()[0].toString();
 		}
 
- /*
-		assembly.getClusters().get(command.getClusterId()).getInternalComponents().get(command.getComponentId()).get
-				invoke(methodName, arguments);
-		assembly.getClusters().get(command.getClusterId()).
-*/
+		/*
+		  assembly.getClusters().get(command.getClusterId()).getInternalComponents().get(command.getComponentId()).get
+				  invoke(methodName, arguments);
+		  assembly.getClusters().get(command.getClusterId()).
+  */
 /*
 		String[] command = disectCommandLine(taskName);
 
@@ -93,8 +109,7 @@ public class Invocation extends MapElement
 	 * @param dispatcher
 	 * @return
 	 */
-	public String check(RequestDispatcher dispatcher)
-	{
+	public String check(RequestDispatcher dispatcher) {
 //		if (command.getMethodName() == null)
 		{
 //			return "method not be determined from invocation '" + this.argument + "'";
@@ -110,17 +125,12 @@ public class Invocation extends MapElement
 	 * @param fe
 	 * @return
 	 */
-	public boolean addFlowElement(MapElement fe)
-	{
-		if (fe instanceof ExceptionHandler)
-		{
+	public boolean addFlowElement(MapElement fe) {
+		if (fe instanceof ExceptionHandler) {
 			exceptionHandler = (ExceptionHandler) fe;
 			return true;
-		}
-		else if (fe instanceof InvocationResultExpression)
-		{
-			if (results == null)
-			{
+		} else if (fe instanceof InvocationResultExpression) {
+			if (results == null) {
 				results = new ArrayList();
 			}
 			results.add(fe);
@@ -130,7 +140,6 @@ public class Invocation extends MapElement
 	}
 
 	/**
-	 *
 	 * @param processArray
 	 * @param requestProperties
 	 * @param dispatcher
@@ -138,26 +147,20 @@ public class Invocation extends MapElement
 	 * @throws ConfigurationException
 	 */
 	public boolean processRequest(String[] processArray, Properties requestProperties, RequestDispatcher dispatcher)
-			throws Exception
-	{
+			throws Exception {
 		timesProcessed++;
 
 		//success is defined by a successful redirect
 		Object result = null;
 
-		try
-		{
+		try {
 			result = dispatcher.handleInvocation(command, requestProperties);
-			if(result != null) {
+			if (result != null) {
 				requestProperties.put("result", result);
 			}
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			return handleException(processArray, requestProperties, dispatcher, e);
-		}
-		catch (Throwable t)
-		{
+		} catch (Throwable t) {
 			System.out.println(new LogEntry("exception occurred in mvc invocation", t));
 			throw new RuntimeException("unable to invoke assembly", t);
 			//TODO provide string explaining invocationType
@@ -165,16 +168,15 @@ public class Invocation extends MapElement
 					+ commandIdentifier + "' and parameters ("
 					+ CollectionSupport.format(requestProperties, ",") + ") for arguments ("
 					+ ArraySupport.format(arguments, ",") + ") invocation type=" + invocationType + "", t);
-*/		}
+*/
+		}
 
 		Iterator i = results.iterator();
 
-		while (i.hasNext())
-		{
+		while (i.hasNext()) {
 			InvocationResultExpression r = (InvocationResultExpression) i.next();
 
-			if (r.isMatch(result))
-			{
+			if (r.isMatch(result)) {
 				return r.processRequest(processArray, requestProperties, dispatcher);
 			}
 		}
@@ -193,20 +195,14 @@ public class Invocation extends MapElement
 //	private Object invoke(Properties requestProperties) throws Throwable
 
 
-
-
-
 	/**
 	 * @return
 	 */
-	public String toString()
-	{
+	public String toString() {
 		StringBuffer result = new StringBuffer(indent() + "INVOKE " + argument + " -> " + timesProcessed + "\n");
-		if (results != null)
-		{
+		if (results != null) {
 			Iterator i = results.iterator();
-			while (i.hasNext())
-			{
+			while (i.hasNext()) {
 				MapElement fe = (MapElement) i.next();
 				result.append(fe.toString());
 			}

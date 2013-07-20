@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -81,9 +80,9 @@ public class LogEntry implements Serializable {
 				(message != null ? " " + message : "") + (data != null ? "\n" +
 				(data instanceof Throwable ? "" : data) + "\n" : ""));
 
-		if(data instanceof Throwable) {
-			Throwable cause = (Throwable)data;
-			while(cause != null) {
+		if (data instanceof Throwable) {
+			Throwable cause = (Throwable) data;
+			while (cause != null) {
 				retval.append("\n" + StringSupport.getRootStackTrace(cause, 20) + "\n");
 				cause = cause.getCause();
 			}

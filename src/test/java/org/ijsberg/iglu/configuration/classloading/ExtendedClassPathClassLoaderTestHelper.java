@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -20,20 +19,19 @@
 
 package org.ijsberg.iglu.configuration.classloading;
 
-import static junit.framework.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.InputStream;
 import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
+import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 
 /**
  * The compiled class is be moved to resources and loaded by the ExtendedClassPathClassLoader.
- *
  */
 public class ExtendedClassPathClassLoaderTestHelper {
 
@@ -46,7 +44,7 @@ public class ExtendedClassPathClassLoaderTestHelper {
 
 	public void testGetResourceAsStream() throws Exception {
 
-		ExtendedClassPathClassLoader classLoader = (ExtendedClassPathClassLoader)this.getClass().getClassLoader();
+		ExtendedClassPathClassLoader classLoader = (ExtendedClassPathClassLoader) this.getClass().getClassLoader();
 		InputStream input = classLoader.getResourceAsStream("users.properties");
 		Properties properties = new Properties();
 		properties.load(input);
@@ -61,13 +59,14 @@ public class ExtendedClassPathClassLoaderTestHelper {
 		try {
 			ResourceBundle.getBundle("users");
 			fail("MissingResourceException expected");
-		} catch(MissingResourceException expected) {}
+		} catch (MissingResourceException expected) {
+		}
 
 	}
 
 	public void testGetResourceBundle() throws Exception {
 
-		ExtendedClassPathClassLoader classLoader = (ExtendedClassPathClassLoader)this.getClass().getClassLoader();
+		ExtendedClassPathClassLoader classLoader = (ExtendedClassPathClassLoader) this.getClass().getClassLoader();
 		ResourceBundle bundle = ResourceBundle.getBundle("users");
 		assertNotNull(bundle);
 		assertEquals("vikas1", bundle.getString("vikas"));

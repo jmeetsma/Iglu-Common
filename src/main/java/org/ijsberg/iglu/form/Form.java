@@ -1,10 +1,28 @@
+/*
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
+ *
+ * This file is part of Iglu.
+ *
+ * Iglu is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Iglu is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.ijsberg.iglu.form;
 
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.content.module.StandardTextProvider;
 import org.ijsberg.iglu.util.formatting.PatternMatchingSupport;
 import org.ijsberg.iglu.util.properties.PropertiesSupport;
-import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 import org.ijsberg.iglu.util.time.SafeDateFormat;
 import org.ijsberg.iglu.util.types.Converter;
 
@@ -48,14 +66,9 @@ public class Form extends StandardTextProvider {
 		copy(PropertiesSupport.getSubsection(allFormsProperties, formKey));
 	}
 
-/*	public Form(Properties properties) {
-		super();
-		copy(properties);
-	} */
-
 
 	private void copy(Properties properties) {
-		for(Object key : properties.keySet()) {
+		for (Object key : properties.keySet()) {
 			defaultTexts.put(key, properties.get(key));
 		}
 	}
@@ -74,17 +87,12 @@ public class Form extends StandardTextProvider {
 	public void fillOut(Properties values) {
 
 		//TODO reset
-
-
 		convertedValues = null;
 		validationMessages = null;
 
-//		System.out.println(defaultTexts);
-		for(Object key : values.keySet()) {
+		for (Object key : values.keySet()) {
 			defaultTexts.put(FIELD + "." + key + "." + VALUE, values.get(key));
 		}
-//		System.out.println(defaultTexts);
-
 	}
 
 	public void setValue(String key, Object value) {
@@ -111,33 +119,31 @@ public class Form extends StandardTextProvider {
 
 		Set<String> fieldKeys = PropertiesSupport.getSubsectionKeys(fieldProperties);
 
-		System.out.println(fieldProperties);
-
-		for(String fieldKey : fieldKeys) {
+		for (String fieldKey : fieldKeys) {
 			String strValue = fieldProperties.getProperty(fieldKey + "." + VALUE);
 			Object objValue = fieldProperties.get(fieldKey + "." + VALUE);
 
-			if(strValue == null || "".equals(strValue)) {
-				if(strValue == null && objValue != null) {
+			if (strValue == null || "".equals(strValue)) {
+				if (strValue == null && objValue != null) {
 					convertedValues.put(fieldKey, objValue);
-				} else if("true".equals(fieldProperties.getProperty(fieldKey + "." + REQUIRED, "false"))) {
+				} else if ("true".equals(fieldProperties.getProperty(fieldKey + "." + REQUIRED, "false"))) {
 					validationMessages.setProperty(fieldKey, getSpText(FIELD + "." + fieldKey, REQUIRED_MESSAGE));
 				}
 			} else {
 				String regex = fieldProperties.getProperty(fieldKey + "." + REGEX);
-				if(regex != null && !PatternMatchingSupport.valueMatchesRegularExpression(strValue, regex)) {
+				if (regex != null && !PatternMatchingSupport.valueMatchesRegularExpression(strValue, regex)) {
 					validationMessages.setProperty(fieldKey, getSpText(FIELD + "." + fieldKey, FORMAT_MESSAGE));
 				} else {
 
 					String type = fieldProperties.getProperty(fieldKey + "." + TYPE);
-					if(type != null) {
+					if (type != null) {
 						Class clasz = null;
 						try {
 							clasz = Class.forName(type);
 						} catch (ClassNotFoundException e) {
 							throw new ConfigurationException("type '" + type + "' can not be found", e);
 						}
-						if(Date.class.isAssignableFrom(clasz)) {
+						if (Date.class.isAssignableFrom(clasz)) {
 							String format = fieldProperties.getProperty(fieldKey + "." + FORMAT);
 							SafeDateFormat dateFormat = new SafeDateFormat(format);
 							try {
@@ -167,8 +173,8 @@ public class Form extends StandardTextProvider {
 
 	public Properties getValues() {
 
-		if(convertedValues == null) {
-			if(!validate()) {
+		if (convertedValues == null) {
+			if (!validate()) {
 				throw new ConfigurationException("trying to retrieve values of invalid form with messages " + validationMessages.toString());
 			}
 		}
@@ -179,13 +185,13 @@ public class Form extends StandardTextProvider {
 	public String getValueAsString(String key) {
 
 		Object value = defaultTexts.get(FIELD + "." + key + "." + VALUE);
-		if(value == null) {
+		if (value == null) {
 			return defaultText;
 		}
-		if(value instanceof Date) {
+		if (value instanceof Date) {
 			String format = getText(FIELD + "." + key + "." + FORMAT);
 			SafeDateFormat dateFormat = new SafeDateFormat(format);
-			return dateFormat.format((Date)value);
+			return dateFormat.format((Date) value);
 		}
 		return value.toString();
 
@@ -207,7 +213,6 @@ public class Form extends StandardTextProvider {
 	}
 
 
-
 	public String getSpText(String fieldKey, String textKey) {
 
 		String text = defaultTexts.getProperty(fieldKey + "." + textKey);
@@ -217,22 +222,18 @@ public class Form extends StandardTextProvider {
 			fieldKey = fieldKey.substring(0, fieldKey.lastIndexOf(".") - 1);
 			text = defaultTexts.getProperty(fieldKey + "." + textKey);
 		}
-		if(text == null) {
+		if (text == null) {
 			text = allFormsProperties.getProperty(textKey);
 		}
-		if(text == null) {
+		if (text == null) {
 			text = defaultText;
 		}
-		if(text == null) {
+		if (text == null) {
 			text = "";
 		}
 
 		return text;
 	}
-
-
-
-
 
 
 }

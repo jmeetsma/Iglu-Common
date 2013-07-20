@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -22,7 +21,6 @@ package org.ijsberg.iglu.server.connection;
 
 /**
  * Implementations interpret and process data from a command-line adapter.
- *
  */
 public interface CommandLineInterpreter extends ClientSession {
 	/**
@@ -36,6 +34,7 @@ public interface CommandLineInterpreter extends ClientSession {
 	/**
 	 * Is (to be) invoked by an adapter if it's is about to be terminated
 	 * and the client connection will be closed.
+	 *
 	 * @param message
 	 */
 	void onAdapterTermination(String message);
@@ -59,7 +58,6 @@ public interface CommandLineInterpreter extends ClientSession {
 	/**
 	 * Aborts sub process mode and returns to command line interpretation.
 	 * This may for instance be invoked when ctr-c is pressed.
-	 *
 	 */
 	void abortSubProcessMode();
 

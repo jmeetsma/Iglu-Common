@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -25,25 +24,23 @@ import java.util.Map;
 
 /**
  * Implementations create an assembly of components and clusters that form an application.
- * This interface provides access for administrative purposes.  
+ * This interface provides access for administrative purposes.
  */
 public interface Assembly {
 
 	/**
-	 * 
 	 * @return all clusters in the configuration
 	 */
 	Map<String, Cluster> getClusters();
-	
+
 	/**
-	 * 
 	 * @return the cluster that contains the application's core components
 	 */
 	Cluster getCoreCluster();
-	 
+
 	/**
 	 * Creates the assembly.
-	 * 
+	 *
 	 * @param args command line arguments
 	 */
 	void initialize(String[] args);

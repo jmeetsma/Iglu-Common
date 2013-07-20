@@ -1,6 +1,5 @@
 /*
- * Copyright 2011 Jeroen Meetsma
- *
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
  *
  * This file is part of Iglu.
  *
@@ -92,7 +91,6 @@ public interface CommandLineClientAdapter {
 	 * Invoked by the interpreter.
 	 * Terminates communication session.
 	 * Implementations are responsible of closing the connection as well.
-	 *
 	 */
 	void terminateSession();
 

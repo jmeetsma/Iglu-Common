@@ -1,28 +1,33 @@
-/* =======================================================================
- * Copyright (c) 2003-2010 IJsberg Automatisering BV. All rights reserved.
- * Redistribution and use of this code are permitted provided that the
- * conditions of the Iglu License are met.
- * The license can be found in org.ijsberg.iglu.StandardApplication.java
- * and is also published on http://iglu.ijsberg.org/LICENSE.
- * =======================================================================
+/*
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
+ *
+ * This file is part of Iglu.
+ *
+ * Iglu is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Iglu is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.ijsberg.iglu.util.xml;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-
 import org.ijsberg.iglu.util.misc.StringSupport;
+
+import java.io.Serializable;
+import java.util.*;
 
 //TODO create tests, clean up and move to iglu-common
 
 /**
  */
-public abstract class ElementList implements Serializable
-{
+public abstract class ElementList implements Serializable {
 	//the next flag enables load of HTML, conversion to XHTML and display of XHTML
 	protected boolean interpreteAsXHTML;
 
@@ -41,41 +46,33 @@ public abstract class ElementList implements Serializable
 	public static final byte CONDENSE = 1;
 	public static final byte STRETCH = 2;
 
-    //contains (HTML) elements that are used to mark up texts such as <b>
+	//contains (HTML) elements that are used to mark up texts such as <b>
 	protected boolean containsMarkupText;
 	protected boolean containsSingleString;
 
 	//adds contents
-	protected void build(List xmlElements, boolean interpreteAsXHTML) throws ParseException
-	{
+	protected void build(List xmlElements, boolean interpreteAsXHTML) throws ParseException {
 		this.interpreteAsXHTML = interpreteAsXHTML;
 
 		int nrofElements = xmlElements.size();
-		for (int i = 0; i < nrofElements; i++)
-		{
+		for (int i = 0; i < nrofElements; i++) {
 			Object element = xmlElements.get(i);
 
-			if (element instanceof Node)
-			{
+			if (element instanceof Node) {
 				this.addNode((Node) element);
-			}
-			else if (element instanceof Tag)
-			{
+			} else if (element instanceof Tag) {
 				Tag subtag = (Tag) element;
 
-				if (subtag.type == Tag.START_TAG)
-				{
+				if (subtag.type == Tag.START_TAG) {
 /*					if (tagname == null)
 					{
 						tagname = subtag.tagname;
 					}*/
-					if (subtag.correspondingTag != null)
-					{
+					if (subtag.correspondingTag != null) {
 						//collect elements inbetween
 						ArrayList elementsInbetween = new ArrayList();
 						int endTagPos = xmlElements.indexOf(subtag.correspondingTag);
-						for (i++; i < endTagPos; i++)
-						{
+						for (i++; i < endTagPos; i++) {
 							elementsInbetween.add(xmlElements.get(i));
 						}
 						//skip empty markup tags in case interpreted as XHTML
@@ -84,83 +81,58 @@ public abstract class ElementList implements Serializable
 						{
 							contents.add(newNode);
 //							if (interpreteAsXHTML && isHTMLMarkupTag(subtag.tagname))
-							if (interpreteAsXHTML && isHTMLMarkupTag(getName()))
-							{
+							if (interpreteAsXHTML && isHTMLMarkupTag(getName())) {
 								containsMarkupText = true;
 							}
 						}
-					}
-					else
-					{
-						if (interpreteAsXHTML)
-						{
+					} else {
+						if (interpreteAsXHTML) {
 							//add unresolved start tag as singletag node (<img src=".." />
 							Node newNode = new Node(this instanceof Node ? (Node) this : null, subtag, true, interpreteAsXHTML);
 							if (!newNode.isEmptyXHTMLMarkupNode())//skip empty markup
 							{
 								contents.add(newNode);
 							}
-						}
-						else
-						{
+						} else {
 							throw new ParseException("starttag (" + subtag.tagname + ") without endtag found");
 						}
 					}
-				}
-				else if (subtag.type == Tag.SINGLE_TAG)
-				{
+				} else if (subtag.type == Tag.SINGLE_TAG) {
 					Node newNode = new Node(this instanceof Node ? (Node) this : null, subtag, true, interpreteAsXHTML);
 					if (!newNode.isEmptyXHTMLMarkupNode())//skip empty markup
 					{
 						contents.add(newNode);
 					}
-				}
-				else if (subtag.type == Tag.END_TAG)
-				{
+				} else if (subtag.type == Tag.END_TAG) {
 					//ignore
-				}
-				else
-				{
+				} else {
 					//comment- and instruction tags
 					contents.add(element);
 				}
-			}
-			else if (element instanceof /*XMLTextElement*/ String)
-			{
+			} else if (element instanceof /*XMLTextElement*/ String) {
 				contents.add(element);
-				if (element.toString().trim().length() > 0)
-				{
+				if (element.toString().trim().length() > 0) {
 					if (contents.size() == 1) //TODO what about comment tags?
 					{
 						containsSingleString = true;
-					}
-					else
-					{
+					} else {
 						containsSingleString = false;
 						containsMarkupText = true;
 					}
 				}
-			}
-			else
-			{
+			} else {
 				throw new IllegalStateException("unexpected element of type " + element.getClass().getName());
 			}
 		}
-		if (interpreteAsXHTML && contents.size() == 1)
-		{
+		if (interpreteAsXHTML && contents.size() == 1) {
 			Object o = (contents.get(0));
-			if (o instanceof Node)
-			{
+			if (o instanceof Node) {
 				Node node = (Node) o;
-				if (node.getName().equals(getName()) && isHTMLMarkupTag(getName()))
-				{
+				if (node.getName().equals(getName()) && isHTMLMarkupTag(getName())) {
 					//subNode is obsolete
-					if (nodeAttributes == null)
-					{
+					if (nodeAttributes == null) {
 						nodeAttributes = node.nodeAttributes;
-					}
-					else
-					{
+					} else {
 						nodeAttributes.putAll(node.nodeAttributes);
 					}
 					contents = node.contents;
@@ -171,8 +143,7 @@ public abstract class ElementList implements Serializable
 	}
 
 
-	boolean isEmptyXHTMLMarkupNode()
-	{
+	boolean isEmptyXHTMLMarkupNode() {
 		return interpreteAsXHTML && contents.isEmpty() && isHTMLMarkupTag(getName());
 	}
 
@@ -194,16 +165,14 @@ public abstract class ElementList implements Serializable
 	/**
 	 * @return a list of all subnodes recursively
 	 */
-	public List<Node> getAllNodes()
-	{
+	public List<Node> getAllNodes() {
 		return getNodes(true, null);
 	}
 
 	/**
 	 * @return a list of subnodes of which this node is parent
 	 */
-	public List<Node> getNodes()
-	{
+	public List<Node> getNodes() {
 		return getNodes(false, null);
 	}
 
@@ -211,15 +180,11 @@ public abstract class ElementList implements Serializable
 	/**
 	 * @return the first subnode found or null in case it doesn't exist
 	 */
-	public Node getFirstNode()
-	{
+	public Node getFirstNode() {
 		List<Node> nodes = getNodes();
-		if (nodes.isEmpty())
-		{
+		if (nodes.isEmpty()) {
 			return null;
-		}
-		else
-		{
+		} else {
 			return (Node) getNodes().get(0);
 		}
 	}
@@ -228,8 +193,7 @@ public abstract class ElementList implements Serializable
 	 * @param name
 	 * @return the first subnode with a certain name
 	 */
-	public Node getFirstNodeByName(String name)
-	{
+	public Node getFirstNodeByName(String name) {
 		return getFirstNodeByName(name, true);
 	}
 
@@ -242,21 +206,16 @@ public abstract class ElementList implements Serializable
 	{
 		Iterator i = contents.iterator();
 		Node node = null;
-		while (i.hasNext())
-		{
+		while (i.hasNext()) {
 			Object o = i.next();
-			if (o instanceof Node)
-			{
+			if (o instanceof Node) {
 				node = (Node) o;
-				if (node.getName().equals(name))
-				{
+				if (node.getName().equals(name)) {
 					return node;
 				}
-				if (recurse)
-				{
+				if (recurse) {
 					node = node.getFirstNodeByName(name);
-					if (node != null)
-					{
+					if (node != null) {
 						return node;
 					}
 				}
@@ -269,8 +228,7 @@ public abstract class ElementList implements Serializable
 	 * @param tagname
 	 * @return a list of subnodes directly under this node, that have a certain name
 	 */
-	public List<Node> getNodesByName(String tagname)
-	{
+	public List<Node> getNodesByName(String tagname) {
 		return getNodes(false, tagname);
 	}
 
@@ -280,8 +238,7 @@ public abstract class ElementList implements Serializable
 	 * @return a list of all subnodes with a certain name
 	 */
 	//TODO tagname?
-	public List<Node> getAllNodesByName(String tagname)
-	{
+	public List<Node> getAllNodesByName(String tagname) {
 		return getNodes(true, tagname);
 	}
 
@@ -290,8 +247,7 @@ public abstract class ElementList implements Serializable
 	 * @param name
 	 * @return all subnodes that possess an attribute with a certain name
 	 */
-	public List<Node> getAllNodesByAttributeName(String name)
-	{
+	public List<Node> getAllNodesByAttributeName(String name) {
 		return getNodesByAttributeName(true, name);
 	}
 
@@ -301,12 +257,10 @@ public abstract class ElementList implements Serializable
 	 * @param oldName
 	 * @param newName
 	 */
-	public void renameNodes(String oldName, String newName)
-	{
+	public void renameNodes(String oldName, String newName) {
 		List<Node> nodes = getAllNodesByName(oldName);
 		Iterator i = nodes.iterator();
-		while (i.hasNext())
-		{
+		while (i.hasNext()) {
 			Node n = (Node) i.next();
 			n.setName(newName);
 		}
@@ -320,118 +274,86 @@ public abstract class ElementList implements Serializable
 	 * @param oldName
 	 * @param newContents
 	 */
-	public void replaceNodes(String oldName, String newContents)
-	{
+	public void replaceNodes(String oldName, String newContents) {
 		//TODO parse new contents
 		ArrayList replacedContents = new ArrayList();
 		Iterator i = contents.iterator();
-		while (i.hasNext())
-		{
+		while (i.hasNext()) {
 			Object o = i.next();
 
-			if (o instanceof Node)
-			{
+			if (o instanceof Node) {
 				Node node = (Node) o;
-				if (node.getName().equals(oldName))
-				{
+				if (node.getName().equals(oldName)) {
 					replacedContents.add(newContents);
-				}
-				else
-				{
+				} else {
 					node.replaceNodes(oldName, newContents);
 					replacedContents.add(node);
 				}
-			}
-			else
-			{
+			} else {
 				replacedContents.add(o);
 			}
 		}
 		contents = replacedContents;
 	}
 
-	public void renderNodes(String oldName, String startContents, String endContents)
-	{
+	public void renderNodes(String oldName, String startContents, String endContents) {
 		ArrayList replacedContents = new ArrayList();
 		Iterator i = contents.iterator();
-		while (i.hasNext())
-		{
+		while (i.hasNext()) {
 			Object o = i.next();
 
-			if (o instanceof Node)
-			{
+			if (o instanceof Node) {
 				Node node = (Node) o;
-				if (node.getName().equals(oldName))
-				{
+				if (node.getName().equals(oldName)) {
 					replacedContents.add(startContents + node.getContentsWithoutTags() + endContents);
-				}
-				else
-				{
+				} else {
 					node.renderNodes(oldName, startContents, endContents);
 					replacedContents.add(node);
 				}
-			}
-			else
-			{
+			} else {
 				replacedContents.add(o);
 			}
 		}
 		contents = replacedContents;
 	}
 
-	public void renderNodesMoveAttribute(String oldName, String attributeName, String startContents, String endContents)
-	{
+	public void renderNodesMoveAttribute(String oldName, String attributeName, String startContents, String endContents) {
 		ArrayList replacedContents = new ArrayList();
 		Iterator i = contents.iterator();
-		while (i.hasNext())
-		{
+		while (i.hasNext()) {
 			Object o = i.next();
 
-			if (o instanceof Node)
-			{
+			if (o instanceof Node) {
 				Node node = (Node) o;
-				if (node.getName().equals(oldName))
-				{
+				if (node.getName().equals(oldName)) {
 					replacedContents.add(node);
 					replacedContents.add(startContents + node.getAttribute(attributeName) + endContents);
-				}
-				else
-				{
+				} else {
 					node.renderNodesMoveAttribute(oldName, attributeName, startContents, endContents);
 					replacedContents.add(node);
 				}
-			}
-			else
-			{
+			} else {
 				replacedContents.add(o);
 			}
 		}
 		contents = replacedContents;
 	}
 
-	public void removeNodes(String oldName)
-	{
+	public void removeNodes(String oldName) {
 		ArrayList replacedContents = new ArrayList();
 		Iterator i = contents.iterator();
-		while (i.hasNext())
-		{
+		while (i.hasNext()) {
 			Object o = i.next();
 
-			if (o instanceof Node)
-			{
+			if (o instanceof Node) {
 				Node node = (Node) o;
-				if (!node.getName().equals(oldName))
-				{
+				if (!node.getName().equals(oldName)) {
 					node.removeNodes(oldName);
 					replacedContents.add(node);
-				}
-				else
-				{
+				} else {
 //					replacedContents.add(node);
 				}
-			}
-			else
-			{
+			} else {
 				replacedContents.add(o);
 			}
 		}
@@ -447,39 +369,32 @@ public abstract class ElementList implements Serializable
 	 * @param attributeName
 	 * @param attributeValue
 	 */
-	public void renameNodesWithAttributeValue(String oldName, String newName, String attributeName, String attributeValue)
-	{
+	public void renameNodesWithAttributeValue(String oldName, String newName, String attributeName, String attributeValue) {
 		List<Node> nodes = getAllNodesByName(oldName);
 		Iterator i = nodes.iterator();
-		while (i.hasNext())
-		{
+		while (i.hasNext()) {
 			Node n = (Node) i.next();
 			n.setName(newName);
 		}
 	}
 
 	/**
-	 * @param all indicates if all subnodes must be retrieved or only the nodes this node is parent of
+	 * @param all  indicates if all subnodes must be retrieved or only the nodes this node is parent of
 	 * @param name
 	 * @return all subnodes that possess an attribute with a certain name
 	 */
-	protected List<Node> getNodesByAttributeName(boolean all, String name)
-	{
+	protected List<Node> getNodesByAttributeName(boolean all, String name) {
 		ArrayList<Node> result = new ArrayList<Node>();
 		Iterator i = contents.iterator();
 
-		while (i.hasNext())
-		{
+		while (i.hasNext()) {
 			Object o = i.next();
-			if (o instanceof Node)
-			{
+			if (o instanceof Node) {
 				Node subNode = (Node) o;
-				if ((name == null) || (subNode.nodeAttributes != null && subNode.nodeAttributes.containsKey(name)))
-				{
+				if ((name == null) || (subNode.nodeAttributes != null && subNode.nodeAttributes.containsKey(name))) {
 					result.add(subNode);
 				}
-				if (all)
-				{
+				if (all) {
 					result.addAll(subNode.getAllNodesByAttributeName(name));
 				}
 			}
@@ -488,27 +403,22 @@ public abstract class ElementList implements Serializable
 	}
 
 	/**
-	 * @param all indicates if all subnodes must be retrieved or only the nodes this node is parent of
+	 * @param all  indicates if all subnodes must be retrieved or only the nodes this node is parent of
 	 * @param name name of nodes that must be returned (exludes nodes with other names)
 	 * @return a list of subnodes
 	 */
-	protected List<Node> getNodes(boolean all, String name)
-	{
+	protected List<Node> getNodes(boolean all, String name) {
 		ArrayList<Node> result = new ArrayList<Node>();
 		Iterator i = contents.iterator();
 
-		while (i.hasNext())
-		{
+		while (i.hasNext()) {
 			Object o = i.next();
-			if (o instanceof Node)
-			{
+			if (o instanceof Node) {
 				Node subNode = (Node) o;
-				if ((name == null) || subNode.getName().equals(name))
-				{
+				if ((name == null) || subNode.getName().equals(name)) {
 					result.add(subNode);
 				}
-				if (all)
-				{
+				if (all) {
 					result.addAll(subNode.getNodes(all, name));
 				}
 			}
@@ -519,37 +429,27 @@ public abstract class ElementList implements Serializable
 	/**
 	 * @return a list of strings and / or subnodes contained in this node, in order of appearance
 	 */
-	public ArrayList getContentsList()
-	{
+	public ArrayList getContentsList() {
 		return contents;
 	}
 
 	/**
 	 * @return the contents of this node and subnodes in text form, without any tags
 	 */
-	public String getContentsWithoutTags()
-	{
+	public String getContentsWithoutTags() {
 		StringBuffer result = new StringBuffer("");
 		Iterator i = contents.iterator();
 
-		while (i.hasNext())
-		{
+		while (i.hasNext()) {
 			Object o = i.next();
-			if (o instanceof Node)
-			{
+			if (o instanceof Node) {
 				Node subNode = (Node) o;
 				result.append(subNode.getContentsWithoutTags());
-			}
-			else if (o instanceof String)
-			{
+			} else if (o instanceof String) {
 				result.append(o.toString());
-			}
-			else if (o instanceof Tag)
-			{
+			} else if (o instanceof Tag) {
 				//skip comment etc.
-			}
-			else
-			{
+			} else {
 				throw new IllegalStateException("Node " + getName() + " contains illegal element " + o.getClass().getName() + " -> " + o);
 			}
 		}
@@ -561,12 +461,10 @@ public abstract class ElementList implements Serializable
 	 *
 	 * @param value
 	 */
-	public void setValue(String value)
-	{
+	public void setValue(String value) {
 		contents = new ArrayList();
 		contents.add(value);
-		if (value.trim().length() > 0)
-		{
+		if (value.trim().length() > 0) {
 			containsSingleString = true;
 		}
 	}
@@ -576,17 +474,12 @@ public abstract class ElementList implements Serializable
 	 *
 	 * @param value
 	 */
-	public void addValue(String value)
-	{
+	public void addValue(String value) {
 		contents.add(value);
-		if (value.trim().length() > 0)
-		{
-			if (contents.size() == 1)
-			{
+		if (value.trim().length() > 0) {
+			if (contents.size() == 1) {
 				containsSingleString = true;
-			}
-			else
-			{
+			} else {
 				containsSingleString = false;
 				containsMarkupText = true;
 			}
@@ -596,8 +489,7 @@ public abstract class ElementList implements Serializable
 	/**
 	 * Empties this node
 	 */
-	public void deleteContents()
-	{
+	public void deleteContents() {
 		contents = new ArrayList();
 		containsMarkupText = false;
 		containsSingleString = false;
@@ -608,33 +500,24 @@ public abstract class ElementList implements Serializable
 	 *
 	 * @param contents
 	 */
-	public void setContents(ArrayList contents)
-	{
+	public void setContents(ArrayList contents) {
 		this.contents = contents;
 		containsMarkupText = false;
 		containsSingleString = false;
 		Iterator i = contents.iterator();
 
-		while (i.hasNext())
-		{
+		while (i.hasNext()) {
 			Object o = i.next();
-			if (!(o instanceof Node))
-			{
-				if (o instanceof String && o.toString().trim().length() > 0)
-				{
-					if (contents.size() == 1)
-					{
+			if (!(o instanceof Node)) {
+				if (o instanceof String && o.toString().trim().length() > 0) {
+					if (contents.size() == 1) {
 						containsSingleString = true;
-					}
-					else
-					{
+					} else {
 						containsSingleString = false;
 						containsMarkupText = true;
 					}
 				}
-			}
-			else
-			{
+			} else {
 				Node node = (Node) o;
 //				node.setDepth(depth + 1);
 				node.parentNode = this instanceof Node ? (Node) this : null;
@@ -648,8 +531,7 @@ public abstract class ElementList implements Serializable
 	 *
 	 * @param contents
 	 */
-	public void setContents(String contents)
-	{
+	public void setContents(String contents) {
 /*TODO if strict        if(contents.indexOf('<') != -1 || contents.indexOf('>') != -1)
         {
             throw new IllegalArgumentException("node may not contain tag characters");
@@ -663,11 +545,9 @@ public abstract class ElementList implements Serializable
 	 *
 	 * @param subNode
 	 */
-	public Node addNode(Node subNode)
-	{
+	public Node addNode(Node subNode) {
 //		subNode.setDepth(depth + 1);
-		if (this instanceof Node)
-		{
+		if (this instanceof Node) {
 			subNode.parentNode = (Node) this;
 		}
 		contents.add(subNode);
@@ -675,8 +555,7 @@ public abstract class ElementList implements Serializable
 	}
 
 
-	public Node addNode(int index, Node subNode)
-	{
+	public Node addNode(int index, Node subNode) {
 //		subNode.setDepth(depth + 1);
 		subNode.parentNode = this instanceof Node ? (Node) this : null;
 		contents.add(index, subNode);
@@ -684,10 +563,7 @@ public abstract class ElementList implements Serializable
 	}
 
 
-
-
-	protected static class Tag
-	{
+	protected static class Tag {
 		protected String contents;
 		public static final byte UNDETERMINED_TAG = 0;
 		public static final byte COMMENT_TAG = 1;// <!..
@@ -704,12 +580,11 @@ public abstract class ElementList implements Serializable
 
 		private StringBuffer nameCollector = new StringBuffer();
 		private StringBuffer valueCollector;
-		
+
 		protected int lineNr;
 
 
-		private Tag(int lineNr, byte type, String tagname, Properties attributes, Tag correspondingTag)
-		{
+		private Tag(int lineNr, byte type, String tagname, Properties attributes, Tag correspondingTag) {
 			this.lineNr = lineNr;
 			this.type = type;
 			this.tagname = tagname;
@@ -717,108 +592,78 @@ public abstract class ElementList implements Serializable
 			this.correspondingTag = correspondingTag;
 		}
 
-		protected Tag(int lineNr, String contents) throws ParseException
-		{
+		protected Tag(int lineNr, String contents) throws ParseException {
 			this.lineNr = lineNr;
 			char firstCharacter = contents.charAt(0);
 			int contentsLength = contents.length();
 			char lastCharacter = contents.charAt(contentsLength - 1);
 			contentsLength = determineTagType(contents, firstCharacter,
 					contentsLength, lastCharacter);
-			if (type >= INSTRUCTION_TAG)
-			{
+			if (type >= INSTRUCTION_TAG) {
 				//TODO introduce method class TagParser to sort this rubbish out
-				
+
 				boolean collectingName = true;
 				boolean collectingAttrName = false;
 				boolean insideQuotes = false;
 
 				char currentChar = firstCharacter;
 				int position = 0;
-				if (type == INSTRUCTION_TAG)
-				{
+				if (type == INSTRUCTION_TAG) {
 					position = 1;
 				}
 
-				while (position < contentsLength)
-				{
+				while (position < contentsLength) {
 					currentChar = contents.charAt(position);
-					if (collectingName)
-					{
-						if (Character.isWhitespace(currentChar))
-						{
+					if (collectingName) {
+						if (Character.isWhitespace(currentChar)) {
 							collectingName = false;
 							tagname = nameCollector.toString();
 							nameCollector.delete(0, nameCollector.length());
 							collectingAttrName = true;
-						}
-						else
-						{
+						} else {
 							nameCollector.append(currentChar);
 						}
-					}
-					else if (collectingAttrName)
-					{
-						if (currentChar == '=')
-						{
+					} else if (collectingAttrName) {
+						if (currentChar == '=') {
 							collectingAttrName = false;
-						}
-						else if (!Character.isWhitespace(currentChar))
-						{
+						} else if (!Character.isWhitespace(currentChar)) {
 							//TODO check for invalid characters
 							nameCollector.append(currentChar);
 						}
-					}
-					else
-					{
-						if (valueCollector == null)
-						{
+					} else {
+						if (valueCollector == null) {
 							valueCollector = new StringBuffer();
 							attributes = new Properties();
 						}
-						if (currentChar == '"')
-						{
-							if (insideQuotes)
-							{
+						if (currentChar == '"') {
+							if (insideQuotes) {
 								appendAttribute(nameCollector.toString().trim(), valueCollector.toString());
 								nameCollector.delete(0, nameCollector.length());
 								valueCollector.delete(0, valueCollector.length());
 								insideQuotes = false;
 								collectingAttrName = true;
-							}
-							else
-							{
+							} else {
 								insideQuotes = true;
 							}
-						}
-						else if (Character.isWhitespace(currentChar))
-						{
-							if (!insideQuotes && valueCollector.length() > 0)
-							{
+						} else if (Character.isWhitespace(currentChar)) {
+							if (!insideQuotes && valueCollector.length() > 0) {
 								appendAttribute(nameCollector.toString(), valueCollector.toString());
 								nameCollector.delete(0, nameCollector.length());
 								valueCollector.delete(0, valueCollector.length());
 								insideQuotes = false;
 								collectingAttrName = true;
-							}
-							else
-							{
+							} else {
 								valueCollector.append(currentChar);
 							}
-						}
-						else
-						{
+						} else {
 							valueCollector.append(currentChar);
 						}
 					}
 					position++;
 				}
-				if (collectingName && nameCollector.length() > 0)
-				{
+				if (collectingName && nameCollector.length() > 0) {
 					tagname = nameCollector.toString();
-				}
-				else if (nameCollector.length() > 0 && valueCollector != null && valueCollector.length() > 0)
-				{
+				} else if (nameCollector.length() > 0 && valueCollector != null && valueCollector.length() > 0) {
 					appendAttribute(nameCollector.toString(), valueCollector.toString());
 				}
 				//TODO sanity checks;
@@ -826,58 +671,48 @@ public abstract class ElementList implements Serializable
 		}
 
 		private int determineTagType(String contents, char firstCharacter,
-				int contentsLength, char lastCharacter) {
-			switch (firstCharacter)
-			{
-				case'!':
+									 int contentsLength, char lastCharacter) {
+			switch (firstCharacter) {
+				case '!':
 					type = COMMENT_TAG;
 					this.contents = contents.substring(1);
 					break;
-				case'?':
+				case '?':
 					type = INSTRUCTION_TAG;
 					this.contents = contents.substring(1, contents.length() - 1);
 					break;
-				case'/':
+				case '/':
 					type = END_TAG;
 					tagname = contents.substring(1);
 					break;
 				default:
-					if (lastCharacter == '/')
-					{
+					if (lastCharacter == '/') {
 						type = SINGLE_TAG;
 						contentsLength--;
-					}
-					else
-					{
+					} else {
 						type = START_TAG;
 					}
 			}
 			return contentsLength;
 		}
 
-		public byte getType()
-		{
+		public byte getType() {
 			return type;
 		}
 
-		private void appendAttribute(String key, Object value)
-		{
-			if (attributes == null)
-			{
+		private void appendAttribute(String key, Object value) {
+			if (attributes == null) {
 				attributes = new Properties();
 			}
 			attributes.put(key, value);
 		}
 
-		public Properties getAttributes()
-		{
+		public Properties getAttributes() {
 			return attributes;
 		}
 
-		public String toString()
-		{
-			switch (type)
-			{
+		public String toString() {
+			switch (type) {
 				case COMMENT_TAG:
 					return "<!" + this.contents + '>';
 				case INSTRUCTION_TAG:
@@ -890,24 +725,20 @@ public abstract class ElementList implements Serializable
 		}
 	}
 
-	public static String contextToNodeAttributes(Properties propertyBundle)
-	{
-		if (propertyBundle == null)
-		{
+	public static String contextToNodeAttributes(Properties propertyBundle) {
+		if (propertyBundle == null) {
 			return "";
 		}
 		StringBuffer retval = new StringBuffer();
 		Iterator i = propertyBundle.keySet().iterator();
-		while (i.hasNext())
-		{
-			String p = (String)i.next();
+		while (i.hasNext()) {
+			String p = (String) i.next();
 			retval.append(' ').append(p).append("=\"").append(propertyBundle.getProperty(p)).append('\"');
 		}
 		return retval.toString();
 	}
 
-	public static ArrayList split(String xmlInput, boolean interpreteAsXHTML, boolean strict) throws ParseException
-	{
+	public static ArrayList split(String xmlInput, boolean interpreteAsXHTML, boolean strict) throws ParseException {
 		//contents will be split into starttags, endtags and pieces of text inbetween
 		//during processing start- and endtags will be matched and connected, thus determining the contents of a (sub)node
 
@@ -926,40 +757,31 @@ public abstract class ElementList implements Serializable
 		int currentPosition = 0;
 		int nextPosition = 0;
 		int testPosition = 0;
-		
-		
+
+
 		int currentLineNr = 1;
-		
+
 
 		//container for found XML elements
 		String text;
 		boolean processingCData = false;
 
-		while (nextPosition != -1)
-		{
-			if (insideTag)
-			{
+		while (nextPosition != -1) {
+			if (insideTag) {
 				//TODO extra care with script-tag
-				if (xmlInput.charAt(currentPosition) == '!')
-				{
+				if (xmlInput.charAt(currentPosition) == '!') {
 					//make sure the proper ends of comment and data tags are located
-					if (xmlInput.charAt(currentPosition + 1) == '-')
-					{
+					if (xmlInput.charAt(currentPosition + 1) == '-') {
 						nextPosition = xmlInput.indexOf("-->", currentPosition) + 2;
-					}
-					else if (xmlInput.charAt(currentPosition + 1) == '[')
-					{
+					} else if (xmlInput.charAt(currentPosition + 1) == '[') {
 						nextPosition = xmlInput.indexOf("]]>", currentPosition) + 2;
 						processingCData = true;
-					}
-					else//(in case of !DOCTYPE)
+					} else//(in case of !DOCTYPE)
 					{
 						//locate the end of the tag
 						nextPosition = xmlInput.indexOf('>', currentPosition);
 					}
-				}
-				else
-				{
+				} else {
 					//locate the end of the tag
 					nextPosition = xmlInput.indexOf('>', currentPosition);
 				}
@@ -968,9 +790,7 @@ public abstract class ElementList implements Serializable
                 {
                     throw new ParseException("misplaced '<' found: " + xmlInput.substring(testPosition, nextPosition));
                 }*/
-			}
-			else
-			{
+			} else {
 				//locate the start of the next (or first) tag
 				nextPosition = xmlInput.indexOf('<', currentPosition);
 /*      TODO if strict          testPosition = xmlInput.indexOf('>', currentPosition);
@@ -980,48 +800,38 @@ public abstract class ElementList implements Serializable
                 }*/
 			}
 
-			if (nextPosition != -1)
-			{
+			if (nextPosition != -1) {
 				//read until the end of the tag or the next tag
 				text = xmlInput.substring(currentPosition, nextPosition);
-			}
-			else
-			{
+			} else {
 				//read until the end of the input
 				text = xmlInput.substring(currentPosition);
 			}
 
 			if (insideTag)//inbetween '<' and '>'
 			{
-				if (text.length() > 0)
-				{
+				if (text.length() > 0) {
 					//construct a tag out of the text containing tagname and possibly attributes
 					Tag tag = new Tag(currentLineNr, text);
-					if (interpreteAsXHTML && tag.type != Tag.COMMENT_TAG && tag.type != Tag.INSTRUCTION_TAG)
-					{
+					if (interpreteAsXHTML && tag.type != Tag.COMMENT_TAG && tag.type != Tag.INSTRUCTION_TAG) {
 						//convert the names of XHTML tags to lower case
 						tag.tagname = tag.tagname.toLowerCase();
 					}
 					//add tag to collection
 					splitContents.add(tag);
 
-					if (tag.type == tag.START_TAG)
-					{
+					if (tag.type == tag.START_TAG) {
 						//stack starttags to be connected to appropriate endtags later
 						ArrayList looseStartTagsByName = (ArrayList) looseStartTags.get(tag.tagname);
-						if (looseStartTagsByName == null)
-						{
+						if (looseStartTagsByName == null) {
 							looseStartTagsByName = new ArrayList();
 							looseStartTags.put(tag.tagname, looseStartTagsByName);
 						}
 						looseStartTagsByName.add(tag);
-					}
-					else if (tag.type == tag.END_TAG)
-					{
+					} else if (tag.type == tag.END_TAG) {
 						//try to connect start- and endtags
 						ArrayList looseStartTagsByName = (ArrayList) looseStartTags.get(tag.tagname);
-						if (looseStartTagsByName != null && !looseStartTagsByName.isEmpty())
-						{
+						if (looseStartTagsByName != null && !looseStartTagsByName.isEmpty()) {
 							//get the starttag on top of the stack to maintain proper nesting order
 							Tag startTag = (Tag) looseStartTagsByName.remove(looseStartTagsByName.size() - 1);
 							tag.correspondingTag = startTag;
@@ -1030,28 +840,22 @@ public abstract class ElementList implements Serializable
 							int currentEndTagPos = splitContents.size() - 1;
 							int currentStartTagPos = splitContents.indexOf(startTag);
 
-							if (interpreteAsXHTML)
-							{
+							if (interpreteAsXHTML) {
 								//if the input is an HTML file we can not trust upon correct nesting of tags
 								//
 								//can we locate starttag-endtag combinations that conflict
 								//  with the starttag we just resolved?
 
 								//walk from starttag to endtag
-								for (int i = currentStartTagPos; i <= currentEndTagPos; i++)
-								{
+								for (int i = currentStartTagPos; i <= currentEndTagPos; i++) {
 									Object examinedElement = splitContents.get(i);
 
-									if (examinedElement instanceof Tag)
-									{
+									if (examinedElement instanceof Tag) {
 										Tag examinedTag = (Tag) examinedElement;
-										if (examinedTag.type == Tag.END_TAG)
-										{
+										if (examinedTag.type == Tag.END_TAG) {
 											int examinedStartTagPos = splitContents.indexOf(examinedTag.correspondingTag);
-											if (examinedStartTagPos < currentStartTagPos)
-											{
-												if (isHTMLMarkupTag(examinedTag.tagname))
-												{
+											if (examinedStartTagPos < currentStartTagPos) {
+												if (isHTMLMarkupTag(examinedTag.tagname)) {
 													//examined tag must hop over start of current tag
 													//end node
 													Tag insertedEndTag = new Tag(examinedTag.lineNr, Tag.END_TAG, examinedTag.tagname, null, examinedTag.correspondingTag);
@@ -1067,9 +871,7 @@ public abstract class ElementList implements Serializable
 													//increase position of endtag because of inserted tags
 													currentEndTagPos += 2;
 													currentStartTagPos += 1;
-												}
-												else if (isHTMLMarkupTag(startTag.tagname))
-												{
+												} else if (isHTMLMarkupTag(startTag.tagname)) {
 													//current tag must hop over end of examined tag
 													//end node
 													Tag insertedEndTag = new Tag(startTag.lineNr, Tag.END_TAG, startTag.tagname, null, startTag);
@@ -1084,11 +886,8 @@ public abstract class ElementList implements Serializable
 													i += 2;
 													//increase position of endtag because of inserted tags
 													currentEndTagPos += 2;
-												}
-												else
-												{
-													if (strict)
-													{
+												} else {
+													if (strict) {
 														throw new ParseException("cannot resolve nesting error of tags " + startTag.tagname + " and " + examinedTag.tagname);
 													}
 													//examined tag must include current tag
@@ -1108,27 +907,20 @@ public abstract class ElementList implements Serializable
 							//changed to singletags
 
 							//SHORTCUT
-							if (!interpreteAsXHTML && currentStartTagPos != 0)
-							{
+							if (!interpreteAsXHTML && currentStartTagPos != 0) {
 								List subList = splitContents.subList(currentStartTagPos + 1, currentEndTagPos);
 								Node node = new Node(null, tag.correspondingTag, subList, interpreteAsXHTML);
-								for (int x = currentStartTagPos; x <= currentEndTagPos; x++)
-								{
+								for (int x = currentStartTagPos; x <= currentEndTagPos; x++) {
 									Object o = splitContents.remove(currentStartTagPos);
 								}
 								splitContents.add(node);
 							}
-						}
-						else
-						{
+						} else {
 							//endtag without a start tag encounterd
-							if (!strict/* || interpreteAsXHTML*/)
-							{
+							if (!strict/* || interpreteAsXHTML*/) {
 								//remove loose end tags
 								splitContents.remove(splitContents.size() - 1);
-							}
-							else
-							{
+							} else {
 								//TODO line nr (count enters)
 								throw new ParseException("endtag " + tag.tagname + " without a starttag found");
 							}
@@ -1137,9 +929,7 @@ public abstract class ElementList implements Serializable
 				}
 				//text inside tag is collected, now proceed outside tag
 				insideTag = false;
-			}
-			else
-			{
+			} else {
 				splitContents.add(text);
 				//text inbetween tags is collected, now proceed inside next tag
 				insideTag = true;
@@ -1156,26 +946,22 @@ public abstract class ElementList implements Serializable
 	public static final String[] htmlMarkupTags = {"ABBR", "ACRONYM", "B", "BASEFONT", "BIG", "BLINK", "CITE", "CODE", "DEL", "DFN", "EM", "FONT", "I", "INS", "KBD", "NOBR", "Q", "S", "SAMP", "SMALL", "STRIKE", "STRONG", "SUB", "SUP", "TT", "U", "VAR", "SPAN"};
 	//structure tags that encapsulates text
 	public static final String[] htmlStructureTags = {"TABLE", "TR", "TD", "DIV", "FORM"};
-    public static final String[] htmlLineBreakSuitable = {"DIV", "BR", "P", "LI", "H1", "H2", "H3", "H4", "H5", "H6"};
+	public static final String[] htmlLineBreakSuitable = {"DIV", "BR", "P", "LI", "H1", "H2", "H3", "H4", "H5", "H6"};
 
-    /**
+	/**
 	 * @param tagName
 	 * @return true if this node stands for text markup in an HTML context
 	 */
-	public static boolean isHTMLMarkupTag(String tagName)
-	{
-		for (int i = 0; i < htmlMarkupTags.length; i++)
-		{
-			if (htmlMarkupTags[i].equalsIgnoreCase(tagName))
-			{
+	public static boolean isHTMLMarkupTag(String tagName) {
+		for (int i = 0; i < htmlMarkupTags.length; i++) {
+			if (htmlMarkupTags[i].equalsIgnoreCase(tagName)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public boolean isHTMLMarkupTag()
-	{
+	public boolean isHTMLMarkupTag() {
 		return isHTMLMarkupTag(getName());
 	}
 
@@ -1183,57 +969,46 @@ public abstract class ElementList implements Serializable
 	/**
 	 * @return the contents of the XML node as a formatted text
 	 */
-	public String contentsToString(byte formattingStyle, int minimumLineSize)
-	{
+	public String contentsToString(byte formattingStyle, int minimumLineSize) {
 		return contentsToString(EOL, formattingStyle, minimumLineSize);
 	}
 
 
-	public String contentsToString(byte formattingStyle)
-	{
+	public String contentsToString(byte formattingStyle) {
 		return contentsToString(EOL, formattingStyle, -1);
 	}
 
 
-	public String contentsToString(String lineFeed, byte formattingStyle)
-	{
+	public String contentsToString(String lineFeed, byte formattingStyle) {
 		return contentsToString(lineFeed, formattingStyle, -1);
 	}
 
 	public abstract boolean isPartOfText();
 
 
-	public boolean contentsIsWhiteSpace()
-	{
+	public boolean contentsIsWhiteSpace() {
 		Iterator i = contents.iterator();
-		while (i.hasNext())
-		{
-			if (i.next().toString().trim().length() > 0)
-			{
+		while (i.hasNext()) {
+			if (i.next().toString().trim().length() > 0) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	public String contentsToString()
-	{
+	public String contentsToString() {
 		return contentsToString(EOL, CONDENSE);
 	}
 
 	/**
 	 * @return the contents of the XML node as a formatted text
 	 */
-	public String contentsToString(String lineFeed, byte formattingStyle, int minimumLineSize)
-	{
+	public String contentsToString(String lineFeed, byte formattingStyle, int minimumLineSize) {
 		StringBuffer result = new StringBuffer();
-		if (!contents.isEmpty() && (!contentsIsWhiteSpace() || formattingStyle == LEAVE_AS_IS))
-		{
-			if (formattingStyle == STRETCH || !(containsSingleString || (containsMarkupText || isPartOfText()))/* && !(interpreteAsXHTML && this.isHTMLMarkupTag())*/)
-			{
+		if (!contents.isEmpty() && (!contentsIsWhiteSpace() || formattingStyle == LEAVE_AS_IS)) {
+			if (formattingStyle == STRETCH || !(containsSingleString || (containsMarkupText || isPartOfText()))/* && !(interpreteAsXHTML && this.isHTMLMarkupTag())*/) {
 				//start output on a new, indented line if elements are not (part of) text or formattingstyle is STRETCHED
-				if (!contentsIsWhiteSpace() && formattingStyle != LEAVE_AS_IS)
-				{
+				if (!contentsIsWhiteSpace() && formattingStyle != LEAVE_AS_IS) {
 					result.append(lineFeed);
 /*                    result.append(EOL);
                     for (int x = 0; x < depth; x++)
@@ -1248,30 +1023,23 @@ public abstract class ElementList implements Serializable
 			int currentLineLength = 0;
 			Object o;
 			LOOP:
-			while (i.hasNext())
-			{
+			while (i.hasNext()) {
 				o = i.next();
-				if (o instanceof String || o instanceof Tag)
-				{
+				if (o instanceof String || o instanceof Tag) {
 					String text = o.toString();
-					if (o instanceof String/* && isPartOfText()*/)
-					{
-						if (formattingStyle != LEAVE_AS_IS)
-						{
-							if (text.trim().length() == 0)
-							{
+					if (o instanceof String/* && isPartOfText()*/) {
+						if (formattingStyle != LEAVE_AS_IS) {
+							if (text.trim().length() == 0) {
 								continue LOOP;
 							}
 							text = StringSupport.condenseWhitespace(o.toString());
-							if (/*!isPartOfText() || */containsSingleString || formattingStyle == STRETCH)
-							{
+							if (/*!isPartOfText() || */containsSingleString || formattingStyle == STRETCH) {
 								//avoid unnecessary empty lines
 								text = text.trim();
 							}
 							currentLineLength += text.length();
 							//split long lines here if desired
-							if (minimumLineSize >= 0 && currentLineLength > minimumLineSize)
-							{
+							if (minimumLineSize >= 0 && currentLineLength > minimumLineSize) {
 //                                if(currentLineLength > 40)
 								{
 //                                    result.append(lineFeed);
@@ -1280,44 +1048,33 @@ public abstract class ElementList implements Serializable
 								currentLineLength = text.length() - text.lastIndexOf(lineFeed);
 							}
 							result.append(text);
-						}
-						else
-						{
+						} else {
 							currentLineLength += text.length();
 							result.append(text);
 						}
-					}
-					else // Tag
+					} else // Tag
 					{
 //						currentLineLength += text.length();
 //						result.append(text);
 					}
-				}
-				else if (o instanceof Node)
-				{
+				} else if (o instanceof Node) {
 //					result.append(((Node)o).toString(depth + 1, formattingStyle));
 					String text = null;
-					if (containsMarkupText || isPartOfText())
-					{
-						if (formattingStyle == STRETCH)
-						{
+					if (containsMarkupText || isPartOfText()) {
+						if (formattingStyle == STRETCH) {
 							text = ((Node) o).toString(lineFeed + TAB, formattingStyle, minimumLineSize);
-						}
-						else
-						{
+						} else {
 							text = ((Node) o).toString(lineFeed, formattingStyle, minimumLineSize);
 						}
 //                        int prevLineLength = currentLineLength;
-						if (minimumLineSize >= 0 && currentLineLength > minimumLineSize)
-						{
+						if (minimumLineSize >= 0 && currentLineLength > minimumLineSize) {
 //                            result.append(lineFeed + "3-" + prevLineLength + "-" + currentLineLength);
 //                            text.append(lineFeed + "3-" + text.lastIndexOf(TAB) + "-" + text.length());
 							text += lineFeed;
 //                            currentLineLength = 0;
 						}
 						currentLineLength = text.length() - text.lastIndexOf(lineFeed);
-						if (minimumLineSize >= 0 && currentLineLength > minimumLineSize)
-						{
+						if (minimumLineSize >= 0 && currentLineLength > minimumLineSize) {
 							text += lineFeed;
 							currentLineLength = 0;
 						}
@@ -1325,17 +1082,13 @@ public abstract class ElementList implements Serializable
                         {
                             result.append(" ");
                         }*/
-					}
-					else
-					{
+					} else {
 						text = ((Node) o).toString(lineFeed + TAB, formattingStyle, minimumLineSize);
 					}
 
 
 					result.append(text);
-				}
-				else
-				{
+				} else {
 					throw new IllegalStateException("node " + getName() + " contains invalid element " + o.getClass().getName() + " -> " + o);
 				}
 				if (formattingStyle != LEAVE_AS_IS && (formattingStyle == STRETCH || !(containsSingleString || (containsMarkupText || isPartOfText()))))
@@ -1354,113 +1107,95 @@ public abstract class ElementList implements Serializable
 	}
 
 
-    /**
-     * @return the contents of the XML node as a formatted text
-     */
-    public String contentsToMaintainableHtml() {
-        return contentsToMaintainableHtml(EOL, -1);
-    }
+	/**
+	 * @return the contents of the XML node as a formatted text
+	 */
+	public String contentsToMaintainableHtml() {
+		return contentsToMaintainableHtml(EOL, -1);
+	}
 
-    /**
-     * @return the contents of the XML node as a formatted text
-     */
-    public String contentsToMaintainableHtml(String lineFeed, int minimumLineSize)
-    {
-        StringBuffer result = new StringBuffer();
-        if (!contents.isEmpty() && !contentsIsWhiteSpace())
-        {
-            if (!(containsSingleString || (containsMarkupText || isPartOfText())))
-            {
-                //start output on a new, indented line if elements are not (part of) text or formattingstyle is STRETCHED
-                result.append(lineFeed);
-            }
-            Iterator i = contents.iterator();
+	/**
+	 * @return the contents of the XML node as a formatted text
+	 */
+	public String contentsToMaintainableHtml(String lineFeed, int minimumLineSize) {
+		StringBuffer result = new StringBuffer();
+		if (!contents.isEmpty() && !contentsIsWhiteSpace()) {
+			if (!(containsSingleString || (containsMarkupText || isPartOfText()))) {
+				//start output on a new, indented line if elements are not (part of) text or formattingstyle is STRETCHED
+				result.append(lineFeed);
+			}
+			Iterator i = contents.iterator();
 
-            int currentLineLength = 0;
-            Object o;
-            LOOP:
-            while (i.hasNext())
-            {
-                o = i.next();
-                if (o instanceof String)
-                {
-                    String text = o.toString();
-                    if (text.trim().length() == 0)
-                    {
-                        continue LOOP;
-                    }
-                    text = StringSupport.condenseWhitespace(text);
-                    if (containsSingleString)
-                    {
-                        //avoid unnecessary empty lines
-                        //text = text.trim();
-                    }
-                    currentLineLength += text.length();
-                    //split long lines here if desired
-                    if (minimumLineSize >= 0 && currentLineLength > minimumLineSize)
-                    {
-                        text = StringSupport.replaceAll(text, " ", lineFeed, minimumLineSize);
-                        currentLineLength = text.length() - text.lastIndexOf(lineFeed);
-                    }
-                    result.append(text);
-                }
-                else if (o instanceof Node)
-                {
-                    Node node = (Node)o;
-                    String text = null;
-                    if(wantsHtmlLineBreak(node)) {
-                        text = ((Node) o).toHtmlString(lineFeed, minimumLineSize);
-                        text += lineFeed;
-                    }
-                    else if (containsMarkupText || isPartOfText())
-                    {
-                        text = ((Node) o).toHtmlString(lineFeed, minimumLineSize);
-                        if (minimumLineSize >= 0 && currentLineLength > minimumLineSize)
-                        {
-                            text += lineFeed;
-                        }
-                        currentLineLength = text.length() - text.lastIndexOf(lineFeed);
-                        if (minimumLineSize >= 0 && currentLineLength > minimumLineSize)
-                        {
-                            text += lineFeed;
-                            currentLineLength = 0;
-                        }
-                    }
-                    else
-                    {
-                        text = ((Node) o).toHtmlString(lineFeed + TAB, minimumLineSize);
-                    }
-                    result.append(text);
-                } else if(o instanceof Tag) {
+			int currentLineLength = 0;
+			Object o;
+			LOOP:
+			while (i.hasNext()) {
+				o = i.next();
+				if (o instanceof String) {
+					String text = o.toString();
+					if (text.trim().length() == 0) {
+						continue LOOP;
+					}
+					text = StringSupport.condenseWhitespace(text);
+					if (containsSingleString) {
+						//avoid unnecessary empty lines
+						//text = text.trim();
+					}
+					currentLineLength += text.length();
+					//split long lines here if desired
+					if (minimumLineSize >= 0 && currentLineLength > minimumLineSize) {
+						text = StringSupport.replaceAll(text, " ", lineFeed, minimumLineSize);
+						currentLineLength = text.length() - text.lastIndexOf(lineFeed);
+					}
+					result.append(text);
+				} else if (o instanceof Node) {
+					Node node = (Node) o;
+					String text = null;
+					if (wantsHtmlLineBreak(node)) {
+						text = ((Node) o).toHtmlString(lineFeed, minimumLineSize);
+						text += lineFeed;
+					} else if (containsMarkupText || isPartOfText()) {
+						text = ((Node) o).toHtmlString(lineFeed, minimumLineSize);
+						if (minimumLineSize >= 0 && currentLineLength > minimumLineSize) {
+							text += lineFeed;
+						}
+						currentLineLength = text.length() - text.lastIndexOf(lineFeed);
+						if (minimumLineSize >= 0 && currentLineLength > minimumLineSize) {
+							text += lineFeed;
+							currentLineLength = 0;
+						}
+					} else {
+						text = ((Node) o).toHtmlString(lineFeed + TAB, minimumLineSize);
+					}
+					result.append(text);
+				} else if (o instanceof Tag) {
 
-                }
-                else
-                {
-                    throw new IllegalStateException("node " + getName() + " contains invalid element " + o.getClass().getName() + " -> " + o);
-                }
-                if ( ( !(containsSingleString || (containsMarkupText || isPartOfText()))))
+				} else {
+					throw new IllegalStateException("node " + getName() + " contains invalid element " + o.getClass().getName() + " -> " + o);
+				}
+				if ((!(containsSingleString || (containsMarkupText || isPartOfText()))))
 //                    if (formattingStyle == STRETCH || !(containsSingleString || (containsMarkupText || isPartOfText()))/* && !(interpreteAsXHTML && this.isHTMLMarkupTag())*/)
-                {
-                    result.append(lineFeed);
+				{
+					result.append(lineFeed);
 /*                    result.append(EOL);
                     for (int x = 0; x < depth; x++)
                     {
                         result.append(TAB);
                     }*/
-                }
-            }
-        }
-        return result.toString();
-    }
+				}
+			}
+		}
+		return result.toString();
+	}
 
-    private static boolean wantsHtmlLineBreak(Node node) {
-        for(String htmlTagName : htmlLineBreakSuitable)  {
-            if(node.getName().equalsIgnoreCase(htmlTagName)) {
-                return true;
-            }
-        }
-        return false;
-    }
+	private static boolean wantsHtmlLineBreak(Node node) {
+		for (String htmlTagName : htmlLineBreakSuitable) {
+			if (node.getName().equalsIgnoreCase(htmlTagName)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 
 }

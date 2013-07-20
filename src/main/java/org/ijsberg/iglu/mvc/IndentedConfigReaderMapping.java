@@ -1,10 +1,20 @@
-/* =======================================================================
- * Copyright (c) 2003-2010 IJsberg Automatisering BV. All rights reserved.
- * Redistribution and use of this code are permitted provided that the
- * conditions of the Iglu License are met.
- * The license can be found in org.ijsberg.iglu.StandardApplication.java
- * and is also published on http://iglu.ijsberg.org/LICENSE.
- * =======================================================================
+/*
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
+ *
+ * This file is part of Iglu.
+ *
+ * Iglu is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Iglu is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.ijsberg.iglu.mvc;
 
@@ -30,8 +40,7 @@ import java.util.List;
  * <li>facilitating processing of a request</li>
  * </ul>
  */
-public class IndentedConfigReaderMapping implements Mapping
-{
+public class IndentedConfigReaderMapping implements Mapping {
 	private String mappingName;
 	private String fileName;
 	private File file;
@@ -56,8 +65,7 @@ public class IndentedConfigReaderMapping implements Mapping
 	 * @param fileName
 	 * @paran initialRequest
 	 */
-	public IndentedConfigReaderMapping(String flowName, String fileName, Assembly assembly)
-	{
+	public IndentedConfigReaderMapping(String flowName, String fileName, Assembly assembly) {
 		this.mappingName = flowName;
 		this.fileName = fileName;
 
@@ -67,8 +75,7 @@ public class IndentedConfigReaderMapping implements Mapping
 		loadFlow();
 
 		file = new File(fileName);
-		if (file.exists())
-		{
+		if (file.exists()) {
 			timeLastModified = file.lastModified();
 		}
 
@@ -80,16 +87,14 @@ public class IndentedConfigReaderMapping implements Mapping
 	/**
 	 * @return name of the MVC tree
 	 */
-	public String getName()
-	{
+	public String getName() {
 		return mappingName;
 	}
 
 	/**
 	 * @return
 	 */
-	public String getFileName()
-	{
+	public String getFileName() {
 		return fileName;
 	}
 
@@ -97,12 +102,9 @@ public class IndentedConfigReaderMapping implements Mapping
 	/**
 	 * @return true if the physical MVC file has a newer timestamp than its last check
 	 */
-	public boolean isModified()
-	{
-		if (file.exists())
-		{
-			if (timeLastModified != file.lastModified())
-			{
+	public boolean isModified() {
+		if (file.exists()) {
+			if (timeLastModified != file.lastModified()) {
 				System.out.println(new LogEntry("MVC modified"));
 				timeLastModified = file.lastModified();
 				return true;
@@ -115,8 +117,7 @@ public class IndentedConfigReaderMapping implements Mapping
 	/**
 	 * @return true if the tree was successfully constructed from the definition
 	 */
-	public boolean isLoaded()
-	{
+	public boolean isLoaded() {
 		return isLoaded;
 	}
 
@@ -125,16 +126,14 @@ public class IndentedConfigReaderMapping implements Mapping
 	 * @param fe
 	 * @return a string describing the MVC element
 	 */
-	public static String getFlowElementDescription(MapElement fe)
-	{
+	public static String getFlowElementDescription(MapElement fe) {
 		return fe.getClass().getSimpleName().toLowerCase() + ':' + fe.getArgument();
 	}
 
 	/**
 	 * @return a text containing messages collected while loading the mvc tree
 	 */
-	public List getLoadMessages()
-	{
+	public List getLoadMessages() {
 		return loadMessages;
 	}
 
@@ -146,8 +145,7 @@ public class IndentedConfigReaderMapping implements Mapping
 	 * @param line
 	 * @param errorMessage
 	 */
-	private static void reportError(List messages, String fileName, int lineNr, String line, String errorMessage)
-	{
+	private static void reportError(List messages, String fileName, int lineNr, String line, String errorMessage) {
 		messages.add(new Date() + " ERROR in \"" + fileName + "\" at line " + lineNr + ':');
 		messages.add(errorMessage);
 	}
@@ -160,8 +158,7 @@ public class IndentedConfigReaderMapping implements Mapping
 	 * @param lineNr
 	 * @return
 	 */
-	private static boolean getSubProcess(String line, ArrayList mapElements, int depth, int lineNr)
-	{
+	private static boolean getSubProcess(String line, ArrayList mapElements, int depth, int lineNr) {
 		String label = line.trim();
 		Process process = new Process(label, depth, lineNr);
 		mapElements.add(process);
@@ -175,20 +172,15 @@ public class IndentedConfigReaderMapping implements Mapping
 	 * @param lineNr
 	 * @return
 	 */
-	private boolean getTask(String line, ArrayList mapElements, int depth, int lineNr)
-	{
-        if (line.indexOf("INVOKE") == 0)
-		{
+	private boolean getTask(String line, ArrayList mapElements, int depth, int lineNr) {
+		if (line.indexOf("INVOKE") == 0) {
 			boolean async = false;
 			String taskName = null;
 
-			if (line.indexOf("INVOKE ASYNC") == 0)
-			{
+			if (line.indexOf("INVOKE ASYNC") == 0) {
 				taskName = line.substring(12).trim();
 				async = true;
-			}
-			else
-			{
+			} else {
 				taskName = line.substring(6).trim();
 			}
 
@@ -206,164 +198,123 @@ public class IndentedConfigReaderMapping implements Mapping
 	 * @param lineNr
 	 * @return
 	 */
-	private boolean getResponseWriter(String lineIn, ArrayList mapElements, int depth, int lineNr)
-	{
+	private boolean getResponseWriter(String lineIn, ArrayList mapElements, int depth, int lineNr) {
 		String line = lineIn;
-        if (line.startsWith("REDIRECT"))
-        {
-            return mapElements.add(getRedirect(lineIn, depth, lineNr, line));
-        }
-        else if (line.startsWith("DISPATCH"))
-        {
-            return mapElements.add(getDispatch(lineIn, depth, lineNr, line));
-        }
-        else if (line.startsWith("RESPOND"))
-        {
-            return mapElements.add(getResponseWriter(lineIn, depth, lineNr, line));
-        }
+		if (line.startsWith("REDIRECT")) {
+			return mapElements.add(getRedirect(lineIn, depth, lineNr, line));
+		} else if (line.startsWith("DISPATCH")) {
+			return mapElements.add(getDispatch(lineIn, depth, lineNr, line));
+		} else if (line.startsWith("RESPOND")) {
+			return mapElements.add(getResponseWriter(lineIn, depth, lineNr, line));
+		}
 		return false;
 	}
 
-    private MapElement getResponseWriter(String lineIn, int depth, int lineNr, String line) {
-        MapElement responseWriter;
-        line = line.substring(7).trim();
-        //separate command from arguments inside ()
+	private MapElement getResponseWriter(String lineIn, int depth, int lineNr, String line) {
+		MapElement responseWriter;
+		line = line.substring(7).trim();
+		//separate command from arguments inside ()
 //				String[] command = disectCommandLine(line);
-        //line now contains a reference to the thing that produces a response
-        if(line.length() == 0)
-        {
-            reportError(loadMessages, fileName, lineNr, lineIn, "response must have an argument");
-            responseWriter = new UnparsableLine("response must have an argument", depth, lineNr);
-        }
-        else
-        {
-            responseWriter = new ResponseWritingInvocation(assembly, line, depth, lineNr);
-        }
-        return responseWriter;
-    }
+		//line now contains a reference to the thing that produces a response
+		if (line.length() == 0) {
+			reportError(loadMessages, fileName, lineNr, lineIn, "response must have an argument");
+			responseWriter = new UnparsableLine("response must have an argument", depth, lineNr);
+		} else {
+			responseWriter = new ResponseWritingInvocation(assembly, line, depth, lineNr);
+		}
+		return responseWriter;
+	}
 
-    private MapElement getDispatch(String lineIn, int depth, int lineNr, String line) {
-        MapElement responseWriter;
-        line = line.substring(8).trim();
-        //separate command from arguments inside ()
-        String[] command = disectCommandLine(line);
-        if(command.length == 0)
-        {
-            reportError(loadMessages, fileName, lineNr, lineIn, "response must have an argument");
-            responseWriter = new UnparsableLine("response must have an argument", depth, lineNr);
-        }
-        else
-        {
-            //line now contains a reference to the thing that produces a response
-            responseWriter = new Dispatch(command, depth, lineNr);
-        }
-        return responseWriter;
-    }
+	private MapElement getDispatch(String lineIn, int depth, int lineNr, String line) {
+		MapElement responseWriter;
+		line = line.substring(8).trim();
+		//separate command from arguments inside ()
+		String[] command = disectCommandLine(line);
+		if (command.length == 0) {
+			reportError(loadMessages, fileName, lineNr, lineIn, "response must have an argument");
+			responseWriter = new UnparsableLine("response must have an argument", depth, lineNr);
+		} else {
+			//line now contains a reference to the thing that produces a response
+			responseWriter = new Dispatch(command, depth, lineNr);
+		}
+		return responseWriter;
+	}
 
-    private MapElement getRedirect(String lineIn, int depth, int lineNr, String line) {
-        MapElement responseWriter;//indicates that request parameters should be forwarded to redirected target
-        boolean copyParameters = false;
-        //indicates that the target to which is redirected should be approached in some secure mode
-        boolean switchSecure = false;
-        //indicates that the target to which is redirected may be approached in an insecure mode
-        boolean switchInsecure = false;
+	private MapElement getRedirect(String lineIn, int depth, int lineNr, String line) {
+		MapElement responseWriter;//indicates that request parameters should be forwarded to redirected target
+		boolean copyParameters = false;
+		//indicates that the target to which is redirected should be approached in some secure mode
+		boolean switchSecure = false;
+		//indicates that the target to which is redirected may be approached in an insecure mode
+		boolean switchInsecure = false;
 
-        line = line.substring(8).trim();
-        //separate command from arguments inside ()
-        //TODO don't
-        String[] command = disectCommandLine(line);
-        //line now contains a reference to the thing that produces a response
-        if(command.length == 0)
-        {
-            reportError(loadMessages, fileName, lineNr, lineIn, "response must have an argument");
-            responseWriter = new UnparsableLine("response must have an argument", depth, lineNr);
-        }
-        else
-        {
-            responseWriter = new Redirect(command, /*switchSecure, switchInsecure, copyParameters,*/ depth, lineNr);
-        }
-        return responseWriter;
-    }
+		line = line.substring(8).trim();
+		//separate command from arguments inside ()
+		//TODO don't
+		String[] command = disectCommandLine(line);
+		//line now contains a reference to the thing that produces a response
+		if (command.length == 0) {
+			reportError(loadMessages, fileName, lineNr, lineIn, "response must have an argument");
+			responseWriter = new UnparsableLine("response must have an argument", depth, lineNr);
+		} else {
+			responseWriter = new Redirect(command, /*switchSecure, switchInsecure, copyParameters,*/ depth, lineNr);
+		}
+		return responseWriter;
+	}
 
-    /**
+	/**
 	 * @param line
 	 * @param mapElements
 	 * @param depth
 	 * @param lineNr
 	 * @return
 	 */
-	private boolean getResult(String line, ArrayList mapElements, int depth, int lineNr)
-	{
+	private boolean getResult(String line, ArrayList mapElements, int depth, int lineNr) {
 		int colon = -1;
 		int equaloffset = -1;
 
-		if (line.indexOf("RESULT") == 0 || line.indexOf("TRUE") == 0 || line.indexOf("FALSE") == 0 || line.indexOf("ERROR") == 0)
-		{
+		if (line.indexOf("RESULT") == 0 || line.indexOf("TRUE") == 0 || line.indexOf("FALSE") == 0 || line.indexOf("ERROR") == 0) {
 			colon = line.indexOf(':');
 			String resultValue = null;
 			int operatorType = InvocationResultExpression.EQ;
-			if (line.indexOf("TRUE") == 0)
-			{
+			if (line.indexOf("TRUE") == 0) {
 				resultValue = "true";
-			}
-			else if (line.indexOf("FALSE") == 0)
-			{
+			} else if (line.indexOf("FALSE") == 0) {
 				resultValue = "false";
-			}
-			else if (line.indexOf("ERROR") == 0)
-			{
+			} else if (line.indexOf("ERROR") == 0) {
 				resultValue = "false";
-			}
-			else if (line.indexOf("RESULT") == 0)
-			{
+			} else if (line.indexOf("RESULT") == 0) {
 				int operatorSize = 0;
 
-				if ((equaloffset = line.indexOf("==")) != -1)
-				{
+				if ((equaloffset = line.indexOf("==")) != -1) {
 					operatorSize = 2;
 					operatorType = InvocationResultExpression.EQ;
-				}
-				else if ((equaloffset = line.indexOf("!=")) != -1)
-				{
+				} else if ((equaloffset = line.indexOf("!=")) != -1) {
 					operatorSize = 2;
 					operatorType = InvocationResultExpression.NE;
-				}
-				else if ((equaloffset = line.indexOf('>')) != -1)
-				{
+				} else if ((equaloffset = line.indexOf('>')) != -1) {
 					operatorSize = 1;
 					operatorType = InvocationResultExpression.GT;
-				}
-				else if ((equaloffset = line.indexOf('<')) != -1)
-				{
+				} else if ((equaloffset = line.indexOf('<')) != -1) {
 					operatorSize = 1;
 					operatorType = InvocationResultExpression.LT;
-				}
-				else if ((equaloffset = line.indexOf(">=")) != -1)
-				{
+				} else if ((equaloffset = line.indexOf(">=")) != -1) {
 					operatorSize = 2;
 					operatorType = InvocationResultExpression.GE;
-				}
-				else if ((equaloffset = line.indexOf("<=")) != -1)
-				{
+				} else if ((equaloffset = line.indexOf("<=")) != -1) {
 					operatorSize = 2;
 					operatorType = InvocationResultExpression.LE;
-				}
-				else if ((equaloffset = line.indexOf('=')) != -1)
-				{
+				} else if ((equaloffset = line.indexOf('=')) != -1) {
 					operatorSize = 1;
 					operatorType = InvocationResultExpression.EQ;
 				}
-				if (colon != -1)
-				{
+				if (colon != -1) {
 					//TODO indexoutofboundsexception for 'RESULT empty: DISPATCH /practice/question.jsp'
 					resultValue = line.substring(equaloffset + operatorSize, colon).trim();
-				}
-				else
-				{
+				} else {
 					resultValue = line.substring(equaloffset + operatorSize).trim();
 				}
-				if (equaloffset == -1 || equaloffset > colon)
-				{
+				if (equaloffset == -1 || equaloffset > colon) {
 					UnparsableLine unparsableLine = new UnparsableLine("Syntax error", depth, lineNr);
 					loadMessages.add(unparsableLine.toString());
 					mapElements.add(unparsableLine);
@@ -374,8 +325,7 @@ public class IndentedConfigReaderMapping implements Mapping
 			InvocationResultExpression resultExpression = new InvocationResultExpression(resultValue, operatorType, depth, lineNr);
 			mapElements.add(resultExpression);
 
-			if (colon != -1)
-			{
+			if (colon != -1) {
 				line = line.substring(colon + 1).trim();
 				getTask(line, mapElements, depth + 1, lineNr);
 				getResponseWriter(line, mapElements, depth + 1, lineNr);
@@ -386,18 +336,15 @@ public class IndentedConfigReaderMapping implements Mapping
 	}
 
 	/**
-	 *
 	 * @param line
 	 * @param mapElements
 	 * @param depth
 	 * @param lineNr
 	 * @return
 	 */
-	private static boolean getExceptionHandler(String line, ArrayList mapElements, int depth, int lineNr)
-	{
+	private static boolean getExceptionHandler(String line, ArrayList mapElements, int depth, int lineNr) {
 		String line1 = line;
-		if (line1.indexOf("CATCH") == 0)
-		{
+		if (line1.indexOf("CATCH") == 0) {
 			line1 = line1.substring(5).trim();
 			ExceptionHandler handler = new ExceptionHandler(line1, depth, lineNr);
 			mapElements.add(handler);
@@ -409,8 +356,7 @@ public class IndentedConfigReaderMapping implements Mapping
 	/**
 	 * @return
 	 */
-	private Process loadFlow()
-	{
+	private Process loadFlow() {
 		loadMessages.clear();
 		isLoaded = true;
 //		ArrayList discoveredMapElements = new ArrayList();
@@ -418,17 +364,13 @@ public class IndentedConfigReaderMapping implements Mapping
 		rootProcess = new Process(this.mappingName, -1, 0);
 		discoveredMapElements.add(rootProcess);
 
-		try
-		{
+		try {
 			InputStream input;
 
 			File file = new File(fileName);
-			if(file.exists())
-			{
+			if (file.exists()) {
 				input = new FileInputStream(file);
-			}
-			else
-			{
+			} else {
 				//load file from classpath
 				input = getClass().getClassLoader().getResourceAsStream(fileName);
 			}
@@ -440,8 +382,7 @@ public class IndentedConfigReaderMapping implements Mapping
 					input = new FileInputStream(file);
 				}
 			}    */
-			if(input == null)
-			{
+			if (input == null) {
 				throw new ConfigurationException("can not load flow: file '" + fileName + "' can not be found at exact location or classpath");
 			}
 
@@ -454,25 +395,19 @@ public class IndentedConfigReaderMapping implements Mapping
 //			raf = new RandomAccessFile(fileName, "r");
 
 			readline:
-			do
-			{
+			do {
 				line = reader.readLine();
 				String lineSav = line;
 
-				if (line != null)
-				{
+				if (line != null) {
 					lineCount++;
 
 					//determine the depth of the String
 					int depth = 0;
-					while ((line.length() > depth) && Character.isWhitespace(line.charAt(depth)))
-					{
-						if(line.charAt(depth) == '\t')
-						{
+					while ((line.length() > depth) && Character.isWhitespace(line.charAt(depth))) {
+						if (line.charAt(depth) == '\t') {
 							this.tabsUsedAsIndentation = true;
-						}
-						else if(line.charAt(depth) == ' ')
-						{
+						} else if (line.charAt(depth) == ' ') {
 							this.spacesUsedAsIndentation = true;
 						}
 
@@ -485,14 +420,12 @@ public class IndentedConfigReaderMapping implements Mapping
 					//save line for error messages
 					lines.add(line);
 
-					if (line.startsWith("#") || line.startsWith("//") || line.startsWith(";"))
-					{
+					if (line.startsWith("#") || line.startsWith("//") || line.startsWith(";")) {
 						//comment
 						continue readline;
 					}
 
-					if (line.length() > 0)
-					{
+					if (line.length() > 0) {
 /*						if (getForm(line, discoveredMapElements, depth, lineCount))
 						{
 							continue readline;
@@ -501,24 +434,19 @@ public class IndentedConfigReaderMapping implements Mapping
 						{
 							continue readline;
 						}*/
-						if (getTask(line, discoveredMapElements, depth, lineCount))
-						{
+						if (getTask(line, discoveredMapElements, depth, lineCount)) {
 							continue readline;
 						}
-						if (getResult(line, discoveredMapElements, depth, lineCount))
-						{
+						if (getResult(line, discoveredMapElements, depth, lineCount)) {
 							continue readline;
 						}
-						if (getExceptionHandler(line, discoveredMapElements, depth, lineCount))
-						{
+						if (getExceptionHandler(line, discoveredMapElements, depth, lineCount)) {
 							continue readline;
 						}
-						if (getResponseWriter(line, discoveredMapElements, depth, lineCount))
-						{
+						if (getResponseWriter(line, discoveredMapElements, depth, lineCount)) {
 							continue readline;
 						}
-						if (getSubProcess(line, discoveredMapElements, depth, lineCount))
-						{
+						if (getSubProcess(line, discoveredMapElements, depth, lineCount)) {
 							continue readline;
 						}
 
@@ -537,18 +465,15 @@ public class IndentedConfigReaderMapping implements Mapping
 			lineCount = 0;
 
 			loop:
-			while (i.hasNext())
-			{
+			while (i.hasNext()) {
 				MapElement fe = (MapElement) i.next();
-				if (fe instanceof UnparsableLine)
-				{
+				if (fe instanceof UnparsableLine) {
 					isLoaded = false;
 					reportError(loadMessages, fileName, fe.getLineNr(), ((String) lines.get(fe.getLineNr() - 1)), fe.getArgument());
 					continue loop;
 				}
 				MapElement parent = getParent(discoveredMapElements, lineCount, fe.getDepth());
-				if (parent == null)
-				{
+				if (parent == null) {
 					rootProcess.addFlowElement(fe);
 					fe.setParent(rootProcess);
 /*					if (fe instanceof ActionBundle)
@@ -566,24 +491,16 @@ public class IndentedConfigReaderMapping implements Mapping
 						isLoaded = false;
 						reportError(fileName, fe.getLineNr(), ((String) lines.get(fe.getLineNr() - 1)), "mvc element " + getFlowElementDescription(fe) + " must be part of another element");
 					}*/
-				}
-				else
-				{
-					if (!parent.addFlowElement(fe))
-					{
+				} else {
+					if (!parent.addFlowElement(fe)) {
 						isLoaded = false;
 
-						if (parent.isTerminated())
-						{
+						if (parent.isTerminated()) {
 							reportError(loadMessages, fileName, fe.getLineNr(), ((String) lines.get(fe.getLineNr() - 1)), "unreachable statement");
-						}
-						else
-						{
+						} else {
 							reportError(loadMessages, fileName, fe.getLineNr(), ((String) lines.get(fe.getLineNr() - 1)), "can not add " + getFlowElementDescription(fe) + " to " + getFlowElementDescription(parent));
 						}
-					}
-					else
-					{
+					} else {
 						fe.setParent(parent);
 					}
 				}
@@ -591,9 +508,7 @@ public class IndentedConfigReaderMapping implements Mapping
 				lineCount++;
 			}
 			return rootProcess;
-		}
-		catch (IOException ioe)
-		{
+		} catch (IOException ioe) {
 			System.out.println(new LogEntry(Level.CRITICAL, "", ioe));
 			isLoaded = false;
 			loadMessages.add("Loading of mapping '" + mappingName + "' resulted in exception with message: " + ioe.getMessage());
@@ -602,14 +517,12 @@ public class IndentedConfigReaderMapping implements Mapping
 		}
 	}
 
-	public Process getRootProcess()
-	{
+	public Process getRootProcess() {
 		return rootProcess;
 	}
 
-	public boolean checkSanity(RequestDispatcher handle)
-	{
-		boolean ok  = true;
+	public boolean checkSanity(RequestDispatcher handle) {
+		boolean ok = true;
 		//perform sanity check
 		//errors and results must have children
 		//warning if MVC does not result in redirect
@@ -617,23 +530,19 @@ public class IndentedConfigReaderMapping implements Mapping
 		sanityCheckMessages.clear();
 
 		Iterator i = discoveredMapElements.iterator();
-		while (i.hasNext())
-		{
+		while (i.hasNext()) {
 			MapElement fe = (MapElement) i.next();
 			String message = fe.check(handle);
-			if (message != null)
-			{
+			if (message != null) {
 				ok = false;
 				reportError(sanityCheckMessages, fileName, fe.getLineNr(), ((String) lines.get(fe.getLineNr() - 1)), message);
 			}
 		}
-		if(this.tabsUsedAsIndentation && this.spacesUsedAsIndentation)
-		{
+		if (this.tabsUsedAsIndentation && this.spacesUsedAsIndentation) {
 			sanityCheckMessages.add("WARNING: both SPACEs and TABs used for indentation; this may cause unexpected behaviour!");
 		}
 		sanityCheckMessages.add(isLoaded ? "Loading of mapping '" + mappingName + "' succeeded" : "Loading of mapping '" + mappingName + "' failed with messages:\n" + loadMessages);
-		if(isLoaded)
-		{
+		if (isLoaded) {
 			sanityCheckMessages.add("Sanity check " + (ok ? "passed" : "NOT passed"));
 		}
 
@@ -646,20 +555,14 @@ public class IndentedConfigReaderMapping implements Mapping
 	 * @param depth
 	 * @return
 	 */
-	private static MapElement getParent(ArrayList mapElements, int index, int depth)
-	{
-		for (int i = index; i >= 1; i--)
-		{
+	private static MapElement getParent(ArrayList mapElements, int index, int depth) {
+		for (int i = index; i >= 1; i--) {
 			MapElement fe = (MapElement) mapElements.get(i);
 
-			if (fe.getDepth() == (depth - 1))
-			{
+			if (fe.getDepth() == (depth - 1)) {
 				return fe;
-			}
-			else
-			{
-				if (fe.getDepth() < (depth - 1))
-				{
+			} else {
+				if (fe.getDepth() < (depth - 1)) {
 					return null;
 				}
 			}
@@ -672,14 +575,12 @@ public class IndentedConfigReaderMapping implements Mapping
 	/**
 	 * @return a text describing the mvc tree
 	 */
-	public String toString()
-	{
+	public String toString() {
 		return mappingName + " -> " + this.rootProcess.toString();
 	}
 
 
-	public List getSanityCheckMessages()
-	{
+	public List getSanityCheckMessages() {
 		return sanityCheckMessages;
 	}
 
@@ -691,8 +592,7 @@ public class IndentedConfigReaderMapping implements Mapping
 	 * @param line Command line
 	 * @return String list, #0 is the command, the rest are arguments
 	 */
-	public static String[] disectCommandLine(String line)
-	{
+	public static String[] disectCommandLine(String line) {
 		return StringSupport.split(line, "() ,;", "\"", false, false, false).toArray(new String[0]);
 	}
 

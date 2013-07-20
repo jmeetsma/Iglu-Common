@@ -1,3 +1,22 @@
+/*
+ * Copyright 2011-2013 Jeroen Meetsma - IJsberg
+ *
+ * This file is part of Iglu.
+ *
+ * Iglu is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Iglu is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.ijsberg.iglu.usermanagement.module;
 
 import org.ijsberg.iglu.access.*;
@@ -26,7 +45,7 @@ import java.util.Properties;
 public class StandardUserManager implements UserManager, Authenticator, Startable {
 
 
-	private static final int ITERATIONS = 10*1024;
+	private static final int ITERATIONS = 10 * 1024;
 	private static final int SALT_LENGTH = 32;
 	private static final int KEY_LENGTH = 256;
 
@@ -67,7 +86,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 		if ("".equals(password)) {
 			throw new IllegalArgumentException("empty passwords are not supported");
 		}
-		if(!PatternMatchingSupport.valueMatchesRegularExpression(password, passwordRegex)) {
+		if (!PatternMatchingSupport.valueMatchesRegularExpression(password, passwordRegex)) {
 			throw new IllegalArgumentException("passwords does not match regular expression '" + passwordRegex + "'");
 		}
 		SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
@@ -78,8 +97,8 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 
 	private String getPasswordFromCredentials(Credentials credentials) {
 		String password = null;
-		if(credentials instanceof SimpleCredentials) {
-			password = ((SimpleCredentials)credentials).getPassword();
+		if (credentials instanceof SimpleCredentials) {
+			password = ((SimpleCredentials) credentials).getPassword();
 		}
 		return password;
 	}
@@ -89,9 +108,9 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 	public User authenticate(Credentials credentials) throws AuthenticationException {
 
 		Account account = accounts.get(credentials.getUserId());
-		if(account != null) {
+		if (account != null) {
 			String password = getPasswordFromCredentials(credentials);
-			if(passwordsMatch(password, account.getHashedPassword())) {
+			if (passwordsMatch(password, account.getHashedPassword())) {
 				return new BasicUser(account.getUserId(), account.getProperties());
 			}
 		}
@@ -143,8 +162,8 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 	private void load() {
 		try {
 			File file = new File(storageFileName);
-			if(file.exists()) {
-				accounts = (HashMap<String, Account>)FileSupport.readSerializable(storageFileName);
+			if (file.exists()) {
+				accounts = (HashMap<String, Account>) FileSupport.readSerializable(storageFileName);
 			} else {
 				accounts = new HashMap<String, Account>();
 			}
@@ -158,7 +177,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 	private void save() {
 		try {
 			File file = new File(storageFileName);
-			if(!file.exists()) {
+			if (!file.exists()) {
 				FileSupport.createFile(storageFileName);
 			}
 			FileSupport.saveSerializable(accounts, storageFileName);
