@@ -339,6 +339,7 @@ public abstract class ElementList implements Serializable {
 		contents = replacedContents;
 	}
 
+	//TODO ByName
 	public void removeNodes(String oldName) {
 		ArrayList replacedContents = new ArrayList();
 		Iterator i = contents.iterator();

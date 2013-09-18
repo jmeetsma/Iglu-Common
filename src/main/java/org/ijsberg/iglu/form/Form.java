@@ -26,6 +26,7 @@ import org.ijsberg.iglu.util.properties.PropertiesSupport;
 import org.ijsberg.iglu.util.time.SafeDateFormat;
 import org.ijsberg.iglu.util.types.Converter;
 
+import java.awt.*;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Date;

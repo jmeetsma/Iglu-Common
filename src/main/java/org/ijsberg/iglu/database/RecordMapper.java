@@ -20,6 +20,7 @@
 package org.ijsberg.iglu.database;
 
 import org.ijsberg.iglu.configuration.ConfigurationException;
+import org.ijsberg.iglu.mvc.Mapping;
 import org.ijsberg.iglu.util.types.Converter;
 
 import java.lang.reflect.Field;
@@ -34,6 +35,29 @@ public abstract class RecordMapper<T> {
 	private HashMap<String, Field> fields;
 	private Set<String> fieldNames;
 	protected T dataObject;
+	private Properties mapping;
+	private String entityName;
+
+
+	public String getFirstFieldName() {
+		return (String)fieldNames.toArray()[0];
+	}
+
+	public Object getFirstFieldValue() {
+		try {
+			return getField(fields.get(getFirstFieldName()));
+		} catch (IllegalAccessException e) {
+			throw new ConfigurationException("field " + getFirstFieldName() + " not accessible", e);
+		}
+	}
+
+	public RecordMapper(T dataObject, Properties mapping, String entityName) {
+		this.dataObject = dataObject;
+		this.fieldNames = mapping.stringPropertyNames();
+		fields = getFieldMap(dataObject.getClass(), fieldNames);
+		this.mapping = mapping;
+		this.entityName = entityName;
+	}
 
 	public RecordMapper(T dataObject, HashMap<String, Field> fieldMap) {
 		this.dataObject = dataObject;
@@ -49,16 +73,17 @@ public abstract class RecordMapper<T> {
 
 	private static HashMap<String, Field> getFieldMap(Class dataClass, Set<String> fieldNames) {
 		HashMap<String, Field> fieldMap = new HashMap<String, Field>();
-		while (dataClass != null) {
-			for (Field field : dataClass.getDeclaredFields()) {
+		Class tmpClass = dataClass;
+		while (tmpClass != null) {
+			for (Field field : tmpClass.getDeclaredFields()) {
 				if (fieldNames.contains(field.getName()) && !fieldMap.containsKey(field.getName())) {
 					fieldMap.put(field.getName(), field);
 				}
 			}
-			dataClass = dataClass.getSuperclass();
+			tmpClass = tmpClass.getSuperclass();
 		}
 		if (fieldMap.size() != fieldNames.size()) {
-			throw new ConfigurationException("not all fields in " + dataClass + " can be located: " + fieldMap.keySet() + " != " + fieldNames);
+			throw new ConfigurationException("not all fields in " + dataClass + " can be located: found " + fieldMap.keySet() + " != configured " + fieldNames);
 		}
 		return fieldMap;
 	}
