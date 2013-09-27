@@ -30,7 +30,7 @@ import java.util.Set;
 
 /**
  */
-public abstract class RecordMapper<T> {
+public class RecordMapper<T extends DataObject> {
 
 	private HashMap<String, Field> fields;
 	private Set<String> fieldNames;
@@ -131,7 +131,9 @@ public abstract class RecordMapper<T> {
 	 * @param object
 	 * @throws IllegalAccessException
 	 */
-	protected abstract void setField(Field field, Object object) throws IllegalAccessException;
+	protected void setField(Field field, Object object) throws IllegalAccessException {
+		dataObject.setField(field, object);
+	}
 
 	/**
 	 * Implement in inner class in domain class decorator to ensure access to private and protected fields
@@ -140,5 +142,7 @@ public abstract class RecordMapper<T> {
 	 * @return
 	 * @throws IllegalAccessException
 	 */
-	protected abstract Object getField(Field field) throws IllegalAccessException;
+	protected Object getField(Field field) throws IllegalAccessException {
+		return dataObject.getField(field);
+	}
 }

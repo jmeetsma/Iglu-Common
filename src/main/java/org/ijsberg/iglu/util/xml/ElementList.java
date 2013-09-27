@@ -403,6 +403,8 @@ public abstract class ElementList implements Serializable {
 		return result;
 	}
 
+	//fromTree / fromRoot <-> recursive
+
 	/**
 	 * @param all  indicates if all subnodes must be retrieved or only the nodes this node is parent of
 	 * @param name name of nodes that must be returned (exludes nodes with other names)

@@ -27,6 +27,7 @@ import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -156,29 +157,70 @@ public class MySqlJdbcProcessor extends StandardJdbcProcessor {
 	}
 
 	public <T extends DataObject> T getDataObject(TableConfig config, Object key) {
-		return (T)getDataObject(config.getType(), key, config.getTableName(),
-				config.getOrMapping().getProperty(config.getPkAttrName()), config.getOrMapping());
+		return (T)getDataObject(config.getType(),
+				config.getOrMapping(), config.getTableName(), config.getOrMapping().getProperty(config.getPkAttrName()), key);
 	}
 
-	public <T extends DataObject> T getDataObject(Class<T> type, Object key, String tableName, String columnName, Properties mapping) {
 
-		String sqlStatement = "SELECT * FROM " + tableName + " WHERE " + columnName + " = ?";
+	public <T extends DataObject> T getDataObject(Class<T> type, Properties mapping, String tableName, String columnName, Object key) {
+
+		List<T> dataObjects = getDataObjects(type, mapping, tableName, columnName, key);
+		if(dataObjects.size() > 0) {
+			return dataObjects.get(0);
+		}
+		return null;
+	}
+
+	public <T extends DataObject> List<T> getDataObjects(Class<T> type, Properties mapping, String tableName, String columnName, Object key) {
+
+		List retval = new ArrayList();
+		String sqlStatement = "SELECT * FROM " + tableName + " WHERE " + columnName + "=?";
 		try {
 			ResultSetCopy rs = (ResultSetCopy) executePreparedStatement(sqlStatement, new StatementInput(new Object[]{key}), new ConnectionSettings().setReadOnly());
-			if(rs.next()) {
-				T dataObject = null;
-				try {
-					dataObject = ReflectionSupport.instantiateClass(type, rs.rowToProperties(mapping), mapping.stringPropertyNames());
-				} catch (InstantiationException e) {
-					throw new ConfigurationException("class of type " + type + " should be instantiable as data object");
-				}
-				return dataObject;
+			while(rs.next()) {
+				T dataObject = createDataObject(type, mapping, rs);
+				retval.add(dataObject);
 			}
-			return null;
+			return retval;
 		} catch (SQLException sqle) {
 			throw new ResourceException("database call mislukt", sqle);
 		}
 	}
+
+	public <T extends DataObject> List<T> getDataObjects(TableConfig config) {
+		return (List<T>)getDataObjects(config.getType(), config.getOrMapping(), config.getTableName(), null);
+	}
+
+	public <T extends DataObject> List<T> getDataObjects(TableConfig config, String sortColumn) {
+		return (List<T>)getDataObjects(config.getType(), config.getOrMapping(), config.getTableName(), sortColumn);
+	}
+
+	public <T extends DataObject> List<T> getDataObjects(Class<T> type, Properties mapping, String tableName, String sortColumn) {
+
+		List retval = new ArrayList();
+		String sqlStatement = "SELECT * FROM " + tableName + (sortColumn != null ? " ORDER BY " + sortColumn : "");
+		try {
+			ResultSetCopy rs = (ResultSetCopy) executePreparedStatement(sqlStatement, new ConnectionSettings().setReadOnly());
+			while(rs.next()) {
+				T dataObject = createDataObject(type, mapping, rs);
+				retval.add(dataObject);
+			}
+			return retval;
+		} catch (SQLException sqle) {
+			throw new ResourceException("database call mislukt", sqle);
+		}
+	}
+
+	private <T extends DataObject> T createDataObject(Class<T> type, Properties mapping, ResultSetCopy rs) {
+		T dataObject = null;
+		try {
+			dataObject = ReflectionSupport.instantiateClass(type, rs.rowToProperties(mapping), mapping.stringPropertyNames());
+		} catch (InstantiationException e) {
+			throw new ConfigurationException("class of type " + type + " should be instantiable as data object");
+		}
+		return dataObject;
+	}
+
 
 	public void insertDataObject(TableConfig config, DataObject dataObject) {
 		insertDataObject(dataObject, config.getTableName(), config.getOrMapping());

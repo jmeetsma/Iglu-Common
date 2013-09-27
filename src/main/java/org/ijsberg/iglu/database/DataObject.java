@@ -26,5 +26,7 @@ import java.lang.reflect.Field;
 public interface DataObject {
 	RecordMapper getMapper();
 
-//	void setField(Field field, Object value) throws IllegalAccessException;
+	void setField(Field field, Object value) throws IllegalAccessException;
+
+	Object getField(Field field) throws IllegalAccessException;
 }

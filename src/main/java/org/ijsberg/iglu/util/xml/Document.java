@@ -19,6 +19,7 @@
 package org.ijsberg.iglu.util.xml;
 
 
+import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.util.io.StreamSupport;
 import org.ijsberg.iglu.util.misc.StringSupport;
 
@@ -103,17 +104,16 @@ public class Document extends ElementList {
 	}
 
 
-	public void load(String input) throws IOException, ParseException {
-//		FileInputStream stream = new FileInputStream(file);
+	public Document load(String input) throws ParseException {
 		BufferedReader reader = new BufferedReader(new StringReader(input));
-
-		load(reader);
-
-
-		parse(input);
-
-		reader.close();
-		//stream.close();
+		try {
+			load(reader);
+			parse(input);
+			reader.close();
+		} catch (IOException e) {
+			throw new ConfigurationException("String reading is not supposed to fail", e);
+		}
+		return this;
 	}
 
 
