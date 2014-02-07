@@ -697,11 +697,13 @@ public class StandardConnectionPool implements Startable, Pageable, DataSource {
 	 * Since connections are rotated, this also functions as a keep-alive mechanism.
 	 */
 	private void testConnection() {
-		System.out.println(new LogEntry("performing connection test"));
-		try {
-			connectionTester.executePreparedStatement(connectionTestStatement);
-		} catch (SQLException e) {
-			System.out.println(new LogEntry(Level.CRITICAL, "connection test failed with message: " + e.getMessage(), e));
+		if(connectionTestStatement != null && !"".equals(connectionTestStatement)) {
+			System.out.println(new LogEntry("performing connection test"));
+			try {
+				connectionTester.executePreparedStatement(connectionTestStatement);
+			} catch (SQLException e) {
+				System.out.println(new LogEntry(Level.CRITICAL, "connection test failed with message: " + e.getMessage(), e));
+			}
 		}
 	}
 

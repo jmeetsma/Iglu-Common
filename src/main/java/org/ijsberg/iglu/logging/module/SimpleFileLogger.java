@@ -31,9 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
 /**
  */
@@ -50,6 +48,8 @@ public class SimpleFileLogger implements Logger, Startable {
 
 	protected String fileName;
 	protected Object lock = new Object();
+
+	protected List<Logger> appenders;
 
 	public SimpleFileLogger(String fileName) {
 		this.fileName = fileName;
@@ -79,6 +79,11 @@ public class SimpleFileLogger implements Logger, Startable {
 		if (entry.getLevel().ordinal() >= logLevelOrdinal) {
 			synchronized (lock) {
 				writeEntry(entry);
+			}
+			if(appenders != null) {
+				for(Logger appender : appenders) {
+					appender.log(entry);
+				}
 			}
 		}
 	}
@@ -182,6 +187,14 @@ public class SimpleFileLogger implements Logger, Startable {
 		logLevelOrdinal = Arrays.asList(Level.LEVEL_CONFIG_TERM).indexOf(properties.getProperty("log_level", Level.LEVEL_CONFIG_TERM[logLevelOrdinal]));
 		entryOriginStackTraceDepth = Integer.parseInt(properties.getProperty("entry_stack_trace_depth", "" + entryOriginStackTraceDepth));
 		System.out.println(new LogEntry("log level set to " + Level.LEVEL_CONFIG_TERM[logLevelOrdinal]));
+	}
+
+
+	public void addAppender(Logger appender) {
+		if(appenders == null) {
+			appenders = new ArrayList<Logger>();
+		}
+		appenders.add(appender);
 	}
 
 

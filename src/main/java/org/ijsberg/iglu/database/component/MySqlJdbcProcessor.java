@@ -122,7 +122,7 @@ public class MySqlJdbcProcessor extends StandardJdbcProcessor {
 		}
 	}
 
-	public void updateDataObject(DataObject dataObject, String tableName, String columnName, Properties mapping) {
+	public void updateDataObject(DataObject dataObject, String tableName, String columnName, String attrName, Properties mapping) {
 		StringBuffer statement = new StringBuffer("UPDATE " + tableName + " SET ");
 
 		Properties inputProperties = dataObject.getMapper().toProperties();
@@ -137,7 +137,10 @@ public class MySqlJdbcProcessor extends StandardJdbcProcessor {
 		//delete superfluous ','
 		statement.deleteCharAt(statement.length() - 2);
 		statement.append(" WHERE " + columnName + "=?");
-		input[count] = inputProperties.get(columnName);
+
+		//System.out.println("==>" + columnName + "in: " + inputProperties);
+
+		input[count] = inputProperties.get(attrName);
 
 		try {
 			this.executePreparedStatement(statement.toString(), new StatementInput(input));
@@ -153,7 +156,7 @@ public class MySqlJdbcProcessor extends StandardJdbcProcessor {
 
 	public void updateDataObject(TableConfig config, DataObject dataObject) {
 		updateDataObject(dataObject, config.getTableName(),
-				config.getOrMapping().getProperty(config.getPkAttrName()), config.getOrMapping());
+				config.getOrMapping().getProperty(config.getPkAttrName()), config.getPkAttrName(), config.getOrMapping());
 	}
 
 	public <T extends DataObject> T getDataObject(TableConfig config, Object key) {
@@ -187,15 +190,15 @@ public class MySqlJdbcProcessor extends StandardJdbcProcessor {
 		}
 	}
 
-	public <T extends DataObject> List<T> getDataObjects(TableConfig config) {
-		return (List<T>)getDataObjects(config.getType(), config.getOrMapping(), config.getTableName(), null);
+	public <T extends DataObject> List<T> getAllDataObjects(TableConfig config) {
+		return (List<T>) getAllDataObjects(config.getType(), config.getOrMapping(), config.getTableName(), null);
 	}
 
-	public <T extends DataObject> List<T> getDataObjects(TableConfig config, String sortColumn) {
-		return (List<T>)getDataObjects(config.getType(), config.getOrMapping(), config.getTableName(), sortColumn);
+	public <T extends DataObject> List<T> getAllDataObjects(TableConfig config, String sortColumn) {
+		return (List<T>) getAllDataObjects(config.getType(), config.getOrMapping(), config.getTableName(), sortColumn);
 	}
 
-	public <T extends DataObject> List<T> getDataObjects(Class<T> type, Properties mapping, String tableName, String sortColumn) {
+	public <T extends DataObject> List<T> getAllDataObjects(Class<T> type, Properties mapping, String tableName, String sortColumn) {
 
 		List retval = new ArrayList();
 		String sqlStatement = "SELECT * FROM " + tableName + (sortColumn != null ? " ORDER BY " + sortColumn : "");
@@ -211,27 +214,33 @@ public class MySqlJdbcProcessor extends StandardJdbcProcessor {
 		}
 	}
 
+	public <T extends DataObject> List<T> getDataObjects(TableConfig config, Object key) {
+		return (List<T>) getDataObjects(config.getType(), config.getOrMapping(), config.getTableName(), config.getOrMapping().getProperty(config.getPkAttrName()), key);
+	}
+
+
 	private <T extends DataObject> T createDataObject(Class<T> type, Properties mapping, ResultSetCopy rs) {
 		T dataObject = null;
 		try {
 			dataObject = ReflectionSupport.instantiateClass(type, rs.rowToProperties(mapping), mapping.stringPropertyNames());
 		} catch (InstantiationException e) {
-			throw new ConfigurationException("class of type " + type + " should be instantiable as data object");
+			throw new ConfigurationException("class of type " + type + " should be instantiable as data object", e);
 		}
 		return dataObject;
 	}
 
 
 	public void insertDataObject(TableConfig config, DataObject dataObject) {
+//		if(dataObject.getMapper() == null)
 		insertDataObject(dataObject, config.getTableName(), config.getOrMapping());
 	}
 
 	public void deleteDataObject(TableConfig config, Object key) {
-		deleteDataObject(key, config.getTableName(),
-				config.getOrMapping().getProperty(config.getPkAttrName()));
+		deleteDataObject(config.getTableName(), config.getOrMapping().getProperty(config.getPkAttrName()), key
+		);
 	}
 
-	public void deleteDataObject(Object key, String tableName, String columnName) {
+	public void deleteDataObject(String tableName, String columnName, Object key) {
 
 		String sqlStatement = "DELETE FROM " + tableName + " WHERE " + columnName + " = ?";
 		try {
