@@ -19,11 +19,12 @@
 package org.ijsberg.iglu.access;
 
 import org.ijsberg.iglu.configuration.Component;
+import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.util.io.ReceiverQueue;
 import org.ijsberg.iglu.util.misc.KeyGenerator;
-import sun.management.Agent;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -190,6 +191,16 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 		//Iterator i = new ArrayList(agents.values()).iterator();
 
 		for (Component component : agentComponents.values()) {
+			System.out.println(component + " " + Arrays.asList(component.getInterfaces()).contains(SessionDestructionListener.class));
+			if(Arrays.asList(component.getInterfaces()).contains(SessionDestructionListener.class)) {
+				try {
+					component.invoke("onSessionDestruction");
+				} catch (InvocationTargetException e) {
+					throw new ConfigurationException(e);
+				} catch (NoSuchMethodException e) {
+					throw new ConfigurationException(e);
+				}
+			}
 			accessManager.removeAgent(component);
 		}
 		//close receivers

@@ -75,17 +75,21 @@ public class SimpleFileLogger implements Logger, Startable {
 
 
 	public void log(LogEntry entry) {
-		//System.out.println(entry.getLevel().ordinal() + ">=" + logLevelOrdinal);
 		if (entry.getLevel().ordinal() >= logLevelOrdinal) {
 			synchronized (lock) {
 				writeEntry(entry);
 			}
-			if(appenders != null) {
-				for(Logger appender : appenders) {
-					appender.log(entry);
-				}
+		}
+		if(appenders != null) {
+			for(Logger appender : appenders) {
+				appender.log(entry);
 			}
 		}
+	}
+
+	@Override
+	public String getStatus() {
+		return "nr appenders: " + (appenders == null ? "NONE" : appenders.size());
 	}
 
 	public void writeEntry(LogEntry entry) {
@@ -190,6 +194,7 @@ public class SimpleFileLogger implements Logger, Startable {
 	}
 
 
+	@Override
 	public void addAppender(Logger appender) {
 		if(appenders == null) {
 			appenders = new ArrayList<Logger>();
@@ -197,5 +202,11 @@ public class SimpleFileLogger implements Logger, Startable {
 		appenders.add(appender);
 	}
 
+	@Override
+	public void removeAppender(Logger appender) {
+		if(appenders == null) {
+			appenders.remove(appender);
+		}
+	}
 
 }
