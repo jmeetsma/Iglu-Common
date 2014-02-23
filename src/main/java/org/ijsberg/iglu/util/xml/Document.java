@@ -30,7 +30,7 @@ import java.util.Iterator;
 
 /**
  * A Document contains a well-formed XML document or is empty
- * The Application Server has its own XML library / Document for the following reasons:
+ * Iglu has its own XML library / Document for the following reasons:
  * <ul>
  * <li>to be independent of 3rd party XML libraries</li>
  * <li>to be able to deal with inconsequent use of XML</li>
@@ -45,6 +45,7 @@ public class Document extends ElementList {
 
 	private File file;
 
+    //TODO add ?xml? header
 /*	private String doctype;
 	private String xmlVersion;
 	private String encoding;
@@ -225,7 +226,6 @@ public class Document extends ElementList {
 	 * @throws ParseException if the XML document can not be parsed
 	 */
 	public void parse(InputStream in, String encoding) throws IOException, ParseException {
-//		String input = StringSupport.absorbInputStream(in, encoding);
 		String input = new String(StreamSupport.absorbInputStream(in));
 
 		parse(input);
