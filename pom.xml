@@ -130,7 +130,7 @@
     </developers>
 
     <profiles>
-        <qualityProfile>
+        <profile>
             <id>release-sign-artifacts</id>
             <activation>
                 <property>
@@ -156,7 +156,7 @@
                     </plugin>
                 </plugins>
             </build>
-        </qualityProfile>
+        </profile>
     </profiles>
 
 </project>
