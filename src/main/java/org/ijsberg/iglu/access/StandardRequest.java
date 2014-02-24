@@ -118,17 +118,7 @@ public class StandardRequest implements Request//, PropertyListener
 	/**
 	 * Creates request for request manager.
 	 */
-	public StandardRequest(/*int threadId, */EntryPoint entryPoint, AccessManager accessManager/*, boolean isAdminRequest, HashMap internalRequests*/) {
-		/*	if (entryPoint == null)
-				{
-					throw new SecurityException("cannot instantiate request without entrypoint");
-				}
-				this.threadId[0] = threadId;
-				this.internalRequests = internalRequests;
-				this.realm = entryPoint.getRealm();
-				this.application = realm.getApplication();
-				this.isAdminRequest = isAdminRequest;
-		//		this.sessionToken = sessionToken;*/
+	public StandardRequest(EntryPoint entryPoint, AccessManager accessManager) {
 		this.accessManager = accessManager;
 		this.entryPoint = entryPoint;
 		//store entrylayer as first in stack

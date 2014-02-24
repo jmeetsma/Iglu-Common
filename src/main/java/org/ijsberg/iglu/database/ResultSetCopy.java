@@ -269,7 +269,7 @@ public class ResultSetCopy implements Serializable {
 
 
 	public Properties rowToProperties() {
-		return rowToProperties((String) null);
+		return rowToProperties("");
 	}
 
 
@@ -284,6 +284,10 @@ public class ResultSetCopy implements Serializable {
 			}
 		}
 		return properties;
+	}
+
+	public Object[] getRow() {
+		return currentRow;
 	}
 
 

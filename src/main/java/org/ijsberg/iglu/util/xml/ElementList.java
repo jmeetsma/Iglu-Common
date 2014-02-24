@@ -152,7 +152,7 @@ public abstract class ElementList implements Serializable {
 /*	public GenericPropertyBundle toProperties()
 	{
 		GenericPropertyBundle bundle = new GenericPropertyBundle(this.getName());
-		Iterator i = this.getAllNodes().iterator();
+		Iterator i = this.getNodesInTree().iterator();
 		while (i.hasNext())
 		{
 			Node node = (Node) i.next();
@@ -165,14 +165,14 @@ public abstract class ElementList implements Serializable {
 	/**
 	 * @return a list of all subnodes recursively
 	 */
-	public List<Node> getAllNodes() {
+	public List<Node> getNodesInTree() {
 		return getNodes(true, null);
 	}
 
 	/**
 	 * @return a list of subnodes of which this node is parent
 	 */
-	public List<Node> getNodes() {
+	public List<Node> getNodesFromRoot() {
 		return getNodes(false, null);
 	}
 
@@ -180,12 +180,12 @@ public abstract class ElementList implements Serializable {
 	/**
 	 * @return the first subnode found or null in case it doesn't exist
 	 */
-	public Node getFirstNode() {
-		List<Node> nodes = getNodes();
+	public Node getFirstNodeInRoot() {
+		List<Node> nodes = getNodesFromRoot();
 		if (nodes.isEmpty()) {
 			return null;
 		} else {
-			return (Node) getNodes().get(0);
+			return (Node) getNodesFromRoot().get(0);
 		}
 	}
 
@@ -193,7 +193,7 @@ public abstract class ElementList implements Serializable {
 	 * @param name
 	 * @return the first subnode with a certain name
 	 */
-	public Node getFirstNodeByName(String name) {
+	public Node getFirstNodeByNameInTree(String name) {
 		return getFirstNodeByName(name, true);
 	}
 
@@ -214,7 +214,7 @@ public abstract class ElementList implements Serializable {
 					return node;
 				}
 				if (recurse) {
-					node = node.getFirstNodeByName(name);
+					node = node.getFirstNodeByNameInTree(name);
 					if (node != null) {
 						return node;
 					}
@@ -228,7 +228,7 @@ public abstract class ElementList implements Serializable {
 	 * @param tagname
 	 * @return a list of subnodes directly under this node, that have a certain name
 	 */
-	public List<Node> getNodesByName(String tagname) {
+	public List<Node> getNodesFromRootByName(String tagname) {
 		return getNodes(false, tagname);
 	}
 
@@ -238,7 +238,7 @@ public abstract class ElementList implements Serializable {
 	 * @return a list of all subnodes with a certain name
 	 */
 	//TODO tagname?
-	public List<Node> getAllNodesByName(String tagname) {
+	public List<Node> getNodesFromTreeByName(String tagname) {
 		return getNodes(true, tagname);
 	}
 
@@ -247,7 +247,7 @@ public abstract class ElementList implements Serializable {
 	 * @param name
 	 * @return all subnodes that possess an attribute with a certain name
 	 */
-	public List<Node> getAllNodesByAttributeName(String name) {
+	public List<Node> getNodesFromTreeByAttributeName(String name) {
 		return getNodesByAttributeName(true, name);
 	}
 
@@ -257,8 +257,8 @@ public abstract class ElementList implements Serializable {
 	 * @param oldName
 	 * @param newName
 	 */
-	public void renameNodes(String oldName, String newName) {
-		List<Node> nodes = getAllNodesByName(oldName);
+	public void renameNodesInTree(String oldName, String newName) {
+		List<Node> nodes = getNodesFromTreeByName(oldName);
 		Iterator i = nodes.iterator();
 		while (i.hasNext()) {
 			Node n = (Node) i.next();
@@ -274,7 +274,7 @@ public abstract class ElementList implements Serializable {
 	 * @param oldName
 	 * @param newContents
 	 */
-	public void replaceNodes(String oldName, String newContents) {
+	public void replaceNodesInTree(String oldName, String newContents) {
 		//TODO parse new contents
 		ArrayList replacedContents = new ArrayList();
 		Iterator i = contents.iterator();
@@ -286,7 +286,7 @@ public abstract class ElementList implements Serializable {
 				if (node.getName().equals(oldName)) {
 					replacedContents.add(newContents);
 				} else {
-					node.replaceNodes(oldName, newContents);
+					node.replaceNodesInTree(oldName, newContents);
 					replacedContents.add(node);
 				}
 			} else {
@@ -296,7 +296,7 @@ public abstract class ElementList implements Serializable {
 		contents = replacedContents;
 	}
 
-	public void renderNodes(String oldName, String startContents, String endContents) {
+	public void renderNodesInTree(String oldName, String startContents, String endContents) {
 		ArrayList replacedContents = new ArrayList();
 		Iterator i = contents.iterator();
 		while (i.hasNext()) {
@@ -307,7 +307,7 @@ public abstract class ElementList implements Serializable {
 				if (node.getName().equals(oldName)) {
 					replacedContents.add(startContents + node.getContentsWithoutTags() + endContents);
 				} else {
-					node.renderNodes(oldName, startContents, endContents);
+					node.renderNodesInTree(oldName, startContents, endContents);
 					replacedContents.add(node);
 				}
 			} else {
@@ -339,8 +339,7 @@ public abstract class ElementList implements Serializable {
 		contents = replacedContents;
 	}
 
-	//TODO ByName
-	public void removeNodes(String oldName) {
+	public void removeNodesInTreeByName(String oldName) {
 		ArrayList replacedContents = new ArrayList();
 		Iterator i = contents.iterator();
 		while (i.hasNext()) {
@@ -349,7 +348,7 @@ public abstract class ElementList implements Serializable {
 			if (o instanceof Node) {
 				Node node = (Node) o;
 				if (!node.getName().equals(oldName)) {
-					node.removeNodes(oldName);
+					node.removeNodesInTreeByName(oldName);
 					replacedContents.add(node);
 				} else {
 //					replacedContents.add(node);
@@ -371,7 +370,7 @@ public abstract class ElementList implements Serializable {
 	 * @param attributeValue
 	 */
 	public void renameNodesWithAttributeValue(String oldName, String newName, String attributeName, String attributeValue) {
-		List<Node> nodes = getAllNodesByName(oldName);
+		List<Node> nodes = getNodesFromTreeByName(oldName);
 		Iterator i = nodes.iterator();
 		while (i.hasNext()) {
 			Node n = (Node) i.next();
@@ -396,7 +395,7 @@ public abstract class ElementList implements Serializable {
 					result.add(subNode);
 				}
 				if (all) {
-					result.addAll(subNode.getAllNodesByAttributeName(name));
+					result.addAll(subNode.getNodesFromTreeByAttributeName(name));
 				}
 			}
 		}
@@ -406,11 +405,11 @@ public abstract class ElementList implements Serializable {
 	//fromTree / fromRoot <-> recursive
 
 	/**
-	 * @param all  indicates if all subnodes must be retrieved or only the nodes this node is parent of
+	 * @param recursive  indicates if all subnodes must be retrieved or only the nodes this node is parent of
 	 * @param name name of nodes that must be returned (exludes nodes with other names)
 	 * @return a list of subnodes
 	 */
-	protected List<Node> getNodes(boolean all, String name) {
+	protected List<Node> getNodes(boolean recursive, String name) {
 		ArrayList<Node> result = new ArrayList<Node>();
 		Iterator i = contents.iterator();
 
@@ -421,8 +420,8 @@ public abstract class ElementList implements Serializable {
 				if ((name == null) || subNode.getName().equals(name)) {
 					result.add(subNode);
 				}
-				if (all) {
-					result.addAll(subNode.getNodes(all, name));
+				if (recursive) {
+					result.addAll(subNode.getNodes(recursive, name));
 				}
 			}
 		}
@@ -549,7 +548,6 @@ public abstract class ElementList implements Serializable {
 	 * @param subNode
 	 */
 	public Node addNode(Node subNode) {
-//		subNode.setDepth(depth + 1);
 		if (this instanceof Node) {
 			subNode.parentNode = (Node) this;
 		}
@@ -559,7 +557,6 @@ public abstract class ElementList implements Serializable {
 
 
 	public Node addNode(int index, Node subNode) {
-//		subNode.setDepth(depth + 1);
 		subNode.parentNode = this instanceof Node ? (Node) this : null;
 		contents.add(index, subNode);
 		return subNode;

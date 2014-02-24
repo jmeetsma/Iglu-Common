@@ -172,6 +172,15 @@ public class Form extends StandardTextProvider {
 
 	}
 
+	public void invalidate(String fieldKey, String message) {
+		if(validationMessages == null) {
+			validationMessages = new Properties();
+		}
+		validationMessages.setProperty(fieldKey, getSpText(FIELD + "." + fieldKey, message));
+
+	}
+
+
 	public Properties getValues() {
 
 		if (convertedValues == null) {

@@ -19,10 +19,12 @@
 package org.ijsberg.iglu.access;
 
 import org.ijsberg.iglu.configuration.Component;
+import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.util.io.ReceiverQueue;
 import org.ijsberg.iglu.util.misc.KeyGenerator;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -189,6 +191,16 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 		//Iterator i = new ArrayList(agents.values()).iterator();
 
 		for (Component component : agentComponents.values()) {
+			System.out.println(component + " " + Arrays.asList(component.getInterfaces()).contains(SessionDestructionListener.class));
+			if(Arrays.asList(component.getInterfaces()).contains(SessionDestructionListener.class)) {
+				try {
+					component.invoke("onSessionDestruction");
+				} catch (InvocationTargetException e) {
+					throw new ConfigurationException(e);
+				} catch (NoSuchMethodException e) {
+					throw new ConfigurationException(e);
+				}
+			}
 			accessManager.removeAgent(component);
 		}
 		//close receivers
@@ -229,54 +241,13 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 	 */
 	public String toString() {
 		StringBuffer result = new StringBuffer(creationTime.toString());
-		/*	result.append(' ' + token);
-		Iterator i = agents.values().iterator();
-		while (i.hasNext())
-		{
-			Object so = i.next();
-			result.append(' ' + so.getClass().getName() + ':' + so);
-		}*/
+		result.append(' ' + token);
+		for(Component agent : agentComponents.values()) {
+			result.append(' ' + agent.toString());
+		}
 		return result.toString();
 	}
 
 
-	/**
-	 * Returns an existing and possibly filled out form obtained from a session
-	 * or internal attributes. If no form exists, a new form is created and
-	 * stored on the session.
-	 *
-	 * @param formId
-	 * @return
-	 */
-	/*public Form getForm(String formId)
-	{
-		Form retval = null;
-		if (forms != null)
-		{
-			retval = (Form) forms.get(formId);
-		}
-		if (retval == null)
-		{
-			retval = new StandardForm(formId, StandardPersonalizedContent.getPersonalizedContent(getUserSettings(), application));
-		}
-		putForm(formId, retval);
-
-		return retval;
-	}*/
-
-	/**
-	 * Stores a form on the session.
-	 *
-	 * @param formId
-	 * @param form
-	 */
-/*	public void putForm(Object formId, Form form)
-	{
-		if(forms == null)
-		{
-			forms = new HashMap();
-		}
-		forms.put(formId, form);
-	}*/
 
 }

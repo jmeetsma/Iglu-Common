@@ -58,13 +58,13 @@ public class DocumentTest {
 		Document doc = new Document();
 		doc.load(pieceOfXml);
 
-		assertEquals(1, doc.getNodes().size());
-		assertEquals("message", doc.getNodes().get(0).getName());
-		assertEquals("message", doc.getFirstNode().getName());
+		assertEquals(1, doc.getNodesFromRoot().size());
+		assertEquals("message", doc.getNodesFromRoot().get(0).getName());
+		assertEquals("message", doc.getFirstNodeInRoot().getName());
 
-		assertEquals(6, doc.getAllNodes().size());
+		assertEquals(6, doc.getNodesInTree().size());
 
-		Node node = doc.getFirstNodeByName("body");
+		Node node = doc.getFirstNodeByNameInTree("body");
 		assertEquals("2", node.getAttribute("attr"));
 
 		assertEquals(contents, node.contentsToString());
@@ -77,13 +77,13 @@ public class DocumentTest {
 		Document doc = new Document();
 		doc.load(pieceOfXml2);
 
-		assertEquals(1, doc.getNodes().size());
-		assertEquals("message", doc.getNodes().get(0).getName());
-		assertEquals("message", doc.getFirstNode().getName());
+		assertEquals(1, doc.getNodesFromRoot().size());
+		assertEquals("message", doc.getNodesFromRoot().get(0).getName());
+		assertEquals("message", doc.getFirstNodeInRoot().getName());
 
-		assertEquals(6, doc.getAllNodes().size());
+		assertEquals(6, doc.getNodesInTree().size());
 
-		Node node = doc.getFirstNodeByName("body");
+		Node node = doc.getFirstNodeByNameInTree("body");
 		assertEquals("2", node.getAttribute("attr"));
 
 		//	System.out.println("[" + node.contentsToString() + "]");

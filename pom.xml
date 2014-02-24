@@ -53,6 +53,11 @@
             <artifactId>iglu</artifactId>
             <version>1.0.5-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.ijsberg</groupId>
+            <artifactId>iglu</artifactId>
+            <version>1.0.5-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

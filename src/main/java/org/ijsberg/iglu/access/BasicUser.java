@@ -37,13 +37,14 @@ public class BasicUser implements User {
 
 	private String userId;
 	private HashMap roles = new HashMap();
+	private UserGroup group;
 
 	/**
 	 * @param userId
 	 * @param roles
 	 * @param settings
 	 */
-	public BasicUser(String userId, List<Role> roles, Properties settings) {
+	public BasicUser(String userId, List<Role> roles, UserGroup group, Properties settings) {
 		this.userId = userId;
 		this.settings = settings;
 
@@ -56,6 +57,7 @@ public class BasicUser implements User {
 			roleId = role.getId();
 			this.roles.put(roleId, role);
 		}
+		this.group = group;
 	}
 
 	public BasicUser(String userId, Properties settings) {
@@ -130,4 +132,10 @@ public class BasicUser implements User {
 	public boolean isAccountBlocked() {
 		return false;
 	}
+
+	@Override
+	public UserGroup getGroup() {
+		return group;
+	}
+
 }
