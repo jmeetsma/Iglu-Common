@@ -75,7 +75,6 @@ public class SimpleFileLogger implements Logger, Startable {
 
 
 	public void log(LogEntry entry) {
-		//System.out.println(entry.getLevel().ordinal() + ">=" + logLevelOrdinal);
 		if (entry.getLevel().ordinal() >= logLevelOrdinal) {
 			synchronized (lock) {
 				writeEntry(entry);
