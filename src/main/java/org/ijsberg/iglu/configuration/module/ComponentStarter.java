@@ -60,6 +60,7 @@ public class ComponentStarter implements Startable {
 			for (Startable startable : registeredStartables.values()) {
 				if (!startable.isStarted()) {
 					try {
+						System.out.println(new LogEntry(Level.VERBOSE, "starting component " + startable));
 						startable.start();
 					} catch (Exception e) {
 						System.out.println(new LogEntry(Level.CRITICAL, "unable to start component " + startable +
@@ -82,6 +83,7 @@ public class ComponentStarter implements Startable {
 		Startable[] startables = registeredStartables.values().toArray(new Startable[0]);
 		for (int i = startables.length - 1; i >= 0; i--) {
 			if (startables[i].isStarted()) {
+				System.out.println(new LogEntry(Level.VERBOSE, "stopping component " + startables[i]));
 				startables[i].stop();
 			}
 		}

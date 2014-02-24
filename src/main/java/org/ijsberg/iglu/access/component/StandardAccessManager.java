@@ -23,6 +23,7 @@ import org.ijsberg.iglu.access.*;
 import org.ijsberg.iglu.configuration.Cluster;
 import org.ijsberg.iglu.configuration.Component;
 import org.ijsberg.iglu.configuration.ConfigurationException;
+import org.ijsberg.iglu.configuration.Startable;
 import org.ijsberg.iglu.configuration.module.StandardComponent;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.scheduling.Pageable;
@@ -39,10 +40,10 @@ import java.util.*;
  * integers for distinct objects.
  */
 
-public class StandardAccessManager implements AccessManager, Pageable, RequestRegistry {
+public class StandardAccessManager implements AccessManager, Pageable, RequestRegistry, Startable {
 	//session storage
-	private final HashMap sessionsMirror = new HashMap(10);//mirror is used for cleanup
-	private final HashMap sessions = new HashMap(10);
+	private final HashMap<String, Session> sessionsMirror = new HashMap<String, Session>(10);//mirror is used for cleanup
+	private final HashMap<String, Session> sessions = new HashMap<String, Session>(10);
 	//requests that currently access the application
 	private final HashMap<Integer, Request> requestsByThreadId = new HashMap<Integer, Request>();
 	//page interval used for cleanup
@@ -324,7 +325,7 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	public void destroyCurrentSession() {
 		Session session = getCurrentSession();
 		if (session != null) {
-			destroySessionById(session.getToken());
+			destroySessionByToken(session.getToken());
 		}
 	}
 
@@ -333,7 +334,7 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	 *
 	 * @param id session id
 	 */
-	private void destroySessionById(String id) {
+	private void destroySessionByToken(String id) {
 		System.out.println(new LogEntry("destroying session " + id));
 		synchronized (sessions) {
 			synchronized (sessionsMirror) {
@@ -370,7 +371,7 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 		while (i.hasNext()) {
 			session = (StandardSession) i.next();
 			System.out.println(new LogEntry("session " + session.getToken() + " expired..."));
-			this.destroySessionById(session.getToken());
+			this.destroySessionByToken(session.getToken());
 		}
 	}
 
@@ -388,9 +389,27 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 		return pageInterval;
 	}
 
+	private boolean isStarted;
+	@Override
+	public void start() {
+		isStarted = true;
+	}
+
 	@Override
 	public boolean isStarted() {
-		return true;
+		return isStarted;
+	}
+
+
+	@Override
+	public void stop() {
+
+		synchronized (sessions) {
+			for(Session session : new ArrayList<Session>(sessions.values())) {
+				destroySessionByToken(session.getToken());
+			}
+			isStarted = false;
+		}
 	}
 
 	@Override

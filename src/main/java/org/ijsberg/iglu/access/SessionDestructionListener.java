@@ -17,17 +17,11 @@
  * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.ijsberg.iglu.logging;
+package org.ijsberg.iglu.access;
 
 /**
+ * Created by Jeroen on 18-2-14.
  */
-public interface Logger {
-
-	void log(LogEntry entry);
-
-	String getStatus();
-
-	void addAppender(Logger appender);
-
-	void removeAppender(Logger appender);
+public interface SessionDestructionListener {
+	void onSessionDestruction();
 }

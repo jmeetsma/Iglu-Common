@@ -29,6 +29,21 @@ public class DummyLogger implements Logger {
 		lastEntry = entry;
 	}
 
+	@Override
+	public String getStatus() {
+		return null;
+	}
+
+	@Override
+	public void addAppender(Logger appender) {
+
+	}
+
+	@Override
+	public void removeAppender(Logger appender) {
+
+	}
+
 	public LogEntry getLastEntry() {
 		return lastEntry;
 	}
