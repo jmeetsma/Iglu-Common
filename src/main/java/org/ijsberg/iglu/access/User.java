@@ -61,4 +61,6 @@ public interface User {
 	 * @return true if the user account is marked blocked
 	 */
 	boolean isAccountBlocked();
+
+	UserGroup getGroup();
 }
