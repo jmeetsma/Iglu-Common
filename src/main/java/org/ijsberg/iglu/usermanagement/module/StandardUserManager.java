@@ -166,6 +166,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 				accounts = (HashMap<String, Account>) FileSupport.readSerializable(storageFileName);
 			} else {
 				accounts = new HashMap<String, Account>();
+				addAccount("admin", "admin");
 			}
 		} catch (ClassNotFoundException e) {
 			throw new ConfigurationException("unable to load account data from '" + storageFileName + "'", e);

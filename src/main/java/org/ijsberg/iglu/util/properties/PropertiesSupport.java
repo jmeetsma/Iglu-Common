@@ -41,9 +41,7 @@ public class PropertiesSupport {
 	public static Properties getSubsection(Properties properties, String sectionKey) {
 		Properties retval = new Properties();
 
-		for (Object keyObj : properties.keySet()) {
-
-			String key = (String) keyObj;
+		for (String key : properties.stringPropertyNames()) {
 			if (key.startsWith(sectionKey + KEY_SEPARATOR)) {
 				String subkey = key.substring(sectionKey.length() + 1);
 				retval.put(subkey, properties.get(key));

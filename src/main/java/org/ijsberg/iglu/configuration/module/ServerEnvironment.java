@@ -19,19 +19,21 @@
 
 package org.ijsberg.iglu.configuration.module;
 
-import org.ijsberg.iglu.configuration.Assembly;
-import org.ijsberg.iglu.configuration.Component;
-import org.ijsberg.iglu.configuration.ConfigurationException;
+import org.ijsberg.iglu.configuration.*;
 import org.ijsberg.iglu.configuration.classloading.ExtendedClassPathClassLoader;
 import org.ijsberg.iglu.invocation.RootConsole;
 import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
+import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.properties.PropertiesSupport;
 import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 
+import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.zip.ZipFile;
 
 /**
  * Provides a number of functions that enables an assembly of clusters
@@ -50,7 +52,7 @@ import java.util.Set;
  * @see Assembly
  * @see ComponentStarter
  */
-public class ServerEnvironment extends ComponentStarter implements Runnable {
+public class ServerEnvironment extends ComponentStarter implements Runnable, SystemUpdater {
 
 	//TODO reset()
 
@@ -78,6 +80,8 @@ public class ServerEnvironment extends ComponentStarter implements Runnable {
 		Runtime.getRuntime().addShutdownHook(shutdownHook);
 	}
 
+	private String[] args;
+
 	/**
 	 * @param args
 	 * @throws InstantiationException
@@ -86,6 +90,7 @@ public class ServerEnvironment extends ComponentStarter implements Runnable {
 	public ServerEnvironment(String... args) throws InstantiationException, ConfigurationException {
 
 		super();
+		this.args = args;
 		String className = args[0];
 		Properties settings = PropertiesSupport.getCommandLineProperties(args);
 		assembly = instantiateAssembly(className, settings);
@@ -96,6 +101,65 @@ public class ServerEnvironment extends ComponentStarter implements Runnable {
 		assembly.getCoreCluster().connect("ServerEnvironment", serverComponent);
 
 		initializeShutdownHook();
+	}
+
+	@Override
+	public void unzipUpdate() {
+
+		File file = new File("./uploads/admin/update.zip");
+		System.out.println("./uploads/admin/update.zip exists : " + file.exists());
+		if(file.exists()) {
+			try {
+				FileSupport.unzip("../", new ZipFile(file));
+			} catch (Exception e) {
+				System.out.println(new LogEntry(Level.CRITICAL, "unzipping update failed", e));
+			}
+		}
+
+
+	}
+
+	private boolean reloadRequested = false;
+
+
+	@Override
+	public void reload() {
+		reloadRequested = true;
+	}
+
+	private synchronized void doReload() {
+		reloadRequested = false;
+		stop();
+
+
+		System.gc();
+
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			Thread.currentThread().interrupt();
+		}
+
+		extClassLoader = null;
+		assembly = null;
+		registeredStartables = new LinkedHashMap<Integer, Startable>();
+
+		System.gc();
+
+
+		try {
+			assembly = instantiateAssembly(className, settings);
+			assembly.initialize(args);
+			Component rootConsole = new StandardComponent(new RootConsole(assembly));
+			assembly.getCoreCluster().connect("RootConsole", rootConsole);
+			Component serverComponent = new StandardComponent(this);
+			assembly.getCoreCluster().connect("ServerEnvironment", serverComponent);
+			start();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 
@@ -142,6 +206,9 @@ public class ServerEnvironment extends ComponentStarter implements Runnable {
 		while (isRunning) {
 			try {
 				Thread.sleep(333);
+				if(reloadRequested) {
+					doReload();
+				}
 			} catch (InterruptedException e) {
 				if (isStarted) {
 					System.out.println(new LogEntry("Keep-alive thread interrupted..."));
@@ -151,8 +218,13 @@ public class ServerEnvironment extends ComponentStarter implements Runnable {
 		}
 	}
 
+	private String className;
+	private Properties settings;
+
 	private Assembly instantiateAssembly(String className, Properties settings)
 			throws InstantiationException {
+		this.className = className;
+		this.settings = settings;
 		if (settings.containsKey("xcl")) {
 			String extendedPath = settings.getProperty("xcl");
 			if ("".equals(extendedPath)) {
@@ -173,6 +245,11 @@ public class ServerEnvironment extends ComponentStarter implements Runnable {
 
 	public void reset() {
 		stop();
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		start();
 	}
 

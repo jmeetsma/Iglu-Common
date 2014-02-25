@@ -294,6 +294,7 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 	public synchronized Class<?> loadClass(String className, boolean resolve) throws ClassNotFoundException {
 		//find classes already loaded by this class loader
 		Class<?> retval = super.findLoadedClass(className);
+
 		if (retval == null) {
 			if (!this.belongsToExcludedPackage(className)) {
 				try {
@@ -391,6 +392,7 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 	 * @throws IOException
 	 */
 	private static byte[] getData(String fileName, Object location) throws IOException {
+
 		byte[] data;
 		if (location instanceof String) {
 			data = FileSupport.getBinaryFromJar(fileName, (String) location);
