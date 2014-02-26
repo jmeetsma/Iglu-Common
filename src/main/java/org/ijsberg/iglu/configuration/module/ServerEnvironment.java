@@ -107,13 +107,15 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 	public void unzipUpdate() {
 
 		File file = new File("./uploads/admin/update.zip");
-		System.out.println("./uploads/admin/update.zip exists : " + file.exists());
 		if(file.exists()) {
 			try {
 				FileSupport.unzip("../", new ZipFile(file));
+				FileSupport.deleteFile(file);
 			} catch (Exception e) {
 				System.out.println(new LogEntry(Level.CRITICAL, "unzipping update failed", e));
 			}
+		} else {
+			System.out.println(new LogEntry(Level.CRITICAL, "./uploads/admin/update.zip does not exist"));
 		}
 
 
