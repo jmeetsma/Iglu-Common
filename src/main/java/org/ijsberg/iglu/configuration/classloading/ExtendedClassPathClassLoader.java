@@ -376,7 +376,7 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 			return ((File) location).length();// + "-" + new Date(((File)location).lastModified());
 		}
 		try {
-			ZipEntry entry = FileSupport.getZipEntryFromJar(filename, (String) location);
+			ZipEntry entry = FileSupport.getZipEntryFromZip(filename, (String) location);
 			return entry.getSize();// + "-" + new Date(entry.getTime());
 		} catch (IOException e) {
 		}
