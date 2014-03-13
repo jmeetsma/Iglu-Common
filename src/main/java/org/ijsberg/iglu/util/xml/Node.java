@@ -63,6 +63,9 @@ public class Node extends ElementList {
 
 	Node(Node parent, Tag tag, List xmlElements, boolean interpreteAsXHTML) throws ParseException {
 		this(parent, tag, false, interpreteAsXHTML);
+
+//		System.out.println("TAG:" + tag);
+
 		build(xmlElements, interpreteAsXHTML);
 	}
 
@@ -252,9 +255,36 @@ public class Node extends ElementList {
 			result.append('>');
 			result.append(contentsToString(lineFeed, formattingStyle, minimumLineSize));
 			if ((formattingStyle == STRETCH || !(/*containsMarkupText ||*/ isPartOfText())) && result.length() > 0 && result.charAt(result.length() - 1) == TAB && formattingStyle != LEAVE_AS_IS) {
-				result.deleteCharAt(result.length() - 1);
+				result.deleteCharAt(result.length() - 1);    //?
 			}
 
+			result.append("</" + tagname + '>');
+		} else {
+			result.append(" />");
+		}
+		return result.toString();
+	}
+
+	/**
+	 * @return the XML node as a formatted text
+	 */
+	public String toStringFast(String lineFeed) {
+		if (tagname == null) {
+			return "";
+		}
+
+		StringBuffer result = new StringBuffer();
+/*		for (int x = 0; x < depth; x++)
+		{
+			result.append("x\t");
+		}*/
+		result.append("<" + tagname);
+
+		result.append(contextToNodeAttributes(nodeAttributes));
+
+		if (!contents.isEmpty() || (interpreteAsXHTML && !isSingleTag)) {
+			result.append('>');
+			result.append(contentsToStringFast(lineFeed));
 			result.append("</" + tagname + '>');
 		} else {
 			result.append(" />");

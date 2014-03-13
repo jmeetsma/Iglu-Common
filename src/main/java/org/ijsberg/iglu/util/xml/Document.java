@@ -253,6 +253,8 @@ public class Document extends ElementList {
 			throw new IllegalArgumentException("input can not be null");
 		}
 		ArrayList splitContents = split(xmlInput, interpreteAsXHTML, true);
+
+
 		build(splitContents, interpreteAsXHTML);
 
 
@@ -284,6 +286,9 @@ public class Document extends ElementList {
 		}
 	}
 
+	public String toStringFast() {
+		return contentsToStringFast(EOL);
+	}
 
 	/**
 	 * @return the XML document as a formatted text

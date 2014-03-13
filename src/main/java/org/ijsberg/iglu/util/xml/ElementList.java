@@ -1000,13 +1000,34 @@ public abstract class ElementList implements Serializable {
 		return contentsToString(EOL, CONDENSE);
 	}
 
+	public String contentsToStringFast(String lineFeed) {
+		StringBuffer result = new StringBuffer();
+
+		LOOP:
+		for(Object o : contents) {
+
+			if (o instanceof String || o instanceof Tag) {
+				String text = o.toString();
+				result.append(text);
+			} else if (o instanceof Node) {
+//					result.append(((Node)o).toString(depth + 1, formattingStyle));
+				String text = ((Node) o).toStringFast(lineFeed + TAB);
+				result.append(text);
+			} else {
+				throw new IllegalStateException("node " + getName() + " contains invalid element " + o.getClass().getName() + " -> " + o);
+			}
+			result.append(lineFeed);
+		}
+		return result.toString();
+	}
+
 	/**
 	 * @return the contents of the XML node as a formatted text
 	 */
 	public String contentsToString(String lineFeed, byte formattingStyle, int minimumLineSize) {
 		StringBuffer result = new StringBuffer();
 		if (!contents.isEmpty() && (!contentsIsWhiteSpace() || formattingStyle == LEAVE_AS_IS)) {
-			if (formattingStyle == STRETCH || !(containsSingleString || (containsMarkupText || isPartOfText()))/* && !(interpreteAsXHTML && this.isHTMLMarkupTag())*/) {
+			if (formattingStyle == STRETCH || !(containsSingleString || (containsMarkupText || isPartOfText()))) {
 				//start output on a new, indented line if elements are not (part of) text or formattingstyle is STRETCHED
 				if (!contentsIsWhiteSpace() && formattingStyle != LEAVE_AS_IS) {
 					result.append(lineFeed);
