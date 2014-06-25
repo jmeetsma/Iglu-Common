@@ -35,10 +35,10 @@ import java.util.*;
  * Results may be obtained as Values so that they can easily be transformed into the required data types
  */
 public class ResultSetCopy implements Serializable {
-	//TODO introduce max size of column to log
 	private int colCount;
 	private int rowCount;
 	private int maxRowLog = 100;
+	private static final int MAX_FIELD_WIDTH = 100;
 	private ArrayList result = new ArrayList();
 	private int index = -1;
 	private Object[] currentRow;
@@ -98,7 +98,6 @@ public class ResultSetCopy implements Serializable {
 		for (int i = 0; i < colCount; i++) {
 			s.append(format(String.valueOf(i), 3));
 			s.append(": ");
-			//TODO try to keep fixed length as short as possible
 			s.append(format(colTypeNames[i][0], 30, true));
 			s.append(": ");
 			s.append(format(colTypeNames[i][1], 40, true));
@@ -162,12 +161,11 @@ public class ResultSetCopy implements Serializable {
 		while (rs.next()) {
 			Object[] row = new Object[colCount];
 			for (int i = 0; i < colCount; i++) {
-				try {
+				//try {
 					row[i] = rs.getObject(i + 1);
-				} catch (SQLException e) {
-					//TODO log
-					row[i] = null;
-				}
+				//} catch (SQLException e) {
+				//	row[i] = null;
+				//}
 				if (resolveLOBs) {
 					if (row[i] instanceof Clob) {
 						Clob clob = rs.getClob(i + 1);
@@ -466,9 +464,8 @@ public class ResultSetCopy implements Serializable {
 						sb.append("null");
 					}
 				} else {
-					//TODO make configurable
-					if (row[j] instanceof String && ((String) row[j]).length() > 100) {
-						sb.append(((String) row[j]).substring(0, 100) + "...");
+					if (row[j] instanceof String && ((String) row[j]).length() > MAX_FIELD_WIDTH) {
+						sb.append(((String) row[j]).substring(0, MAX_FIELD_WIDTH) + "...");
 					} else {
 						sb.append(row[j]);
 					}

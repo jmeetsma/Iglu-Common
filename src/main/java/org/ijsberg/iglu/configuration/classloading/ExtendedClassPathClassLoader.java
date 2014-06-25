@@ -234,27 +234,13 @@ public class ExtendedClassPathClassLoader extends URLClassLoader {
 	 */
 	private void mapClassResourceEntry(String fileName, Object location) {
 		Object previouslyFoundLocation = mixedResourceLocations.get(fileName);
-		if (previouslyFoundLocation != null
-				//&& existingValue.getClass() == value.getClass()
-				&& !previouslyFoundLocation.equals(location)) {
+		if (previouslyFoundLocation != null && !previouslyFoundLocation.equals(location)) {
 			//this may indicate a conflict
 			//it occurs frequently for "/MANIFEST.MF" which shouldn't be a problem
 			//it may occur for other resources
 			//log those occurrences that seem suspicious
-
-
 			registerMultipleLocations(fileName, location);
-			//System.out.println(new LogEntry("WARNING: " + this.getClass().getName() + " found multiple locations for resource '" + fileName + "' ('" + existingValue + "' and '" + value + "')"));
-
-/*
- * TODO administer occurrences instead
-			if (!fileName.startsWith("META-INF/") && !resourcesMatchInSize(fileName, existingValue, value)) {
-				System.out.println(new LogEntry("WARNING: " + this.getClass().getName() + " found multiple locations for resource '" + fileName + "' ('" + existingValue + "' and '" + value + "')"));
-			}
-*/
 			return;
-
-
 		}
 		if (fileName.endsWith(".properties")) {
 			String className = convertFileNameToClassName(fileName);

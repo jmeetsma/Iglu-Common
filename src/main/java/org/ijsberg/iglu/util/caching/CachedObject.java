@@ -23,7 +23,6 @@ import java.io.Serializable;
 /**
  * Wrapper for objects which are to be stored in a cache
  *
- * @see StandardCache
  */
 
 public class CachedObject<T> implements Serializable {
@@ -33,38 +32,23 @@ public class CachedObject<T> implements Serializable {
 	private boolean isBeingRetrieved;
 
 
-	/**
-	 * Constructs an empty wrapper. TODO what for?
-	 */
 	public CachedObject() {
 		timeoutStartTime = System.currentTimeMillis();
 		lastTimeAccessed = timeoutStartTime;
 	}
 
 
-	/**
-	 * Constructs a wrapper for a cached object.
-	 *
-	 * @param object cached object
-	 */
 	public CachedObject(T object) {
 		timeoutStartTime = System.currentTimeMillis();
 		lastTimeAccessed = timeoutStartTime;
 		cachedObject = object;
 	}
 
-	/**
-	 * @return cached object
-	 */
 	public T getObject() {
 		lastTimeAccessed = System.currentTimeMillis();
 		return cachedObject;
 	}
 
-	/**
-	 * @param object
-	 * @return cached object
-	 */
 	public Object setObject(T object) {
 		timeoutStartTime = System.currentTimeMillis();
 		lastTimeAccessed = System.currentTimeMillis();

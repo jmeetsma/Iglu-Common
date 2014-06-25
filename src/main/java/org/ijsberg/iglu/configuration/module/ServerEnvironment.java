@@ -54,8 +54,6 @@ import java.util.zip.ZipFile;
  */
 public class ServerEnvironment extends ComponentStarter implements Runnable, SystemUpdater {
 
-	//TODO reset()
-
 	private Thread shutdownHook;
 	private boolean isRunning;
 	private Assembly assembly;
@@ -236,7 +234,6 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 			Map<String, Set<Object>> multipleResourceLocations = extClassLoader.getMultipleLocationsForResources();
 			if (multipleResourceLocations.size() > 0) {
 				System.out.print(new LogEntry(Level.CRITICAL, "extended class loader reports multiple locations for " + multipleResourceLocations.size() + " resources"));
-				//System.out.println(new LogEntry("", (Serializable) multipleResourceLocations));
 			}
 			Thread.currentThread().setContextClassLoader(extClassLoader);
 			return (Assembly) ReflectionSupport.instantiateClass(extClassLoader, className);

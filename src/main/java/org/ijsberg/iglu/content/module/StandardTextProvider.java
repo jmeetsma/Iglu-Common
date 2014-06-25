@@ -59,6 +59,11 @@ public class StandardTextProvider implements TextProvider {
 	}
 
 
+	public boolean containsText(String key) {
+		String text = defaultTexts.getProperty(key);
+		return text != null;
+	}
+
 	public String getText(String key) {
 		String text = defaultTexts.getProperty(key);
 		if (text == null) {
@@ -85,6 +90,15 @@ public class StandardTextProvider implements TextProvider {
 
 	public String getText(String key, Object[] args, String defaultText) {
 		throw new UnsupportedOperationException("please implement me");
+	}
+
+	public boolean containsText(String categoryKey, String key) {
+		String text = defaultTexts.getProperty(key);
+		Properties texts = textsByCategory.get(categoryKey);
+		if (texts != null) {
+			return texts.getProperty(key) != null;
+		}
+		return false;
 	}
 
 	public String getText(String categoryKey, String key) {
@@ -133,7 +147,6 @@ public class StandardTextProvider implements TextProvider {
 		return null;
 	}
 
-	//TODO rename
 	public Properties getDefaultSection(String categoryKey) {
 		return textsByCategory.get(categoryKey);
 	}

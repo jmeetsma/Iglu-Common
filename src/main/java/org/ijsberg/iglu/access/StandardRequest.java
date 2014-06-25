@@ -37,83 +37,13 @@ public class StandardRequest implements Request//, PropertyListener
 	private Session session;
 	//point where request started
 	private EntryPoint entryPoint;
-	//realm of user performing the request
-	//private Realm realm;
-	//description of internal process in case this is an internal request
-	//private String internalProcessDescription;
-	//list of requests that are known to be internal requests
-	//private HashMap internalRequests;
-	//temporary request which is used when
-	//1)system tasks must be performed
-	//it must be set by a part of the application that got it earlier
-	//and uses is it (as sticky bit) to make a user request act as an internal request
-	//2)3rd party code must be invoked with less access rights
-	//if a request is downgraded to an admin or user request,
-	//the application's getRequest method must return the represented request instead of
-	//the internal request thus:
-	//- providing the subsystem with an actual request that may refer to a realm, session and user
-	//- not providing the subsystem with an internal request that can later be used to perform core tasks
-	//private Request representedUserRequest;
-	//nesting count of request representation
-	//private int timesRepresentingInternalRequest;
-
-	//reference to request manager (which created this request)
 	private AccessManager accessManager;
-	//request stack
-	//private ArrayList componentStack = new ArrayList(3);
 	//user settings (that may affect response)
 	private Properties userSettings;
-	//source of personalizable content
-//	private PersonalizedContent personalizedContent;
-	//indication if request done by administrator
-	//private boolean isAdminRequest;
-	//id of current thread
-//	private int[] threadId = new int[1];
-	//reference to application
-//	private Application application;
 	//attributes during request scope
 	private HashMap attributes;
-	//forms are stored in a different map to avoid mix-ups with attributes
-//	private HashMap forms;
 	private String userId;
 
-	/**
-	 * Creates request for startup phase.
-	 *
-	 * @param application
-	 * @param internalProcessId
-	 */
-/*	StandardRequest(Application application, String internalProcessId)
-	{
-		this.application = application;
-		this.internalProcessDescription = internalProcessId;
-		this.internalRequests = new HashMap();
-		this.threadId[0] = Thread.currentThread().hashCode();
-		//make this request trust itself
-		internalRequests.put(this, internalProcessId);
-	}
-*/
-	/**
-	 * Creates request in startup phase as soon as realms have been created.
-	 *
-	 * @param realm
-	 * @param internalProcessDescription
-	 * @param threadId
-	 */
-	/*public StandardRequest(int threadId, Realm realm, String internalProcessDescription, HashMap internalRequests)
-	{
-		if (realm == null)
-		{
-			throw new SecurityException("cannot instantiate request without entryrealm");
-		}
-		this.threadId[0] = threadId;
-		this.realm = realm;
-		this.internalProcessDescription = internalProcessDescription;
-		this.internalRequests = internalRequests;
-		this.application = realm.getApplication();
-		//make this request trust itself
-		internalRequests.put(this, internalProcessDescription);
-	}*/
 
 	/**
 	 * Creates request for request manager.
@@ -121,17 +51,7 @@ public class StandardRequest implements Request//, PropertyListener
 	public StandardRequest(EntryPoint entryPoint, AccessManager accessManager) {
 		this.accessManager = accessManager;
 		this.entryPoint = entryPoint;
-		//store entrylayer as first in stack
-		/*	componentStack.add(0, realm.getEntryLayer());*/
 	}
-
-	/**
-	 * @return
-	 */
-/*	public Application getApplication()
-	{
-		return application;
-	}*/
 
 	/**
 	 * @param create create session if true
@@ -186,31 +106,12 @@ public class StandardRequest implements Request//, PropertyListener
 	 */
 	public String toString() {
 		StringBuffer retval = new StringBuffer("request");
-/*		if (internalProcessDescription != null)
-		{
-			retval.append(' ' + internalProcessDescription);
-			if (representedUserRequest != null)
-			{
-				retval.append(" acting as '" + representedUserRequest.toString() + '\'');
-			}
-		}
-		else
-		{
-			retval.append(" user request " + (session != null ? '(' + session.toString() + ") " : ""));
-			if (this.timesRepresentingInternalRequest > 0)
-			{
-				retval.append(" acting as internal request");
-			}
-		}
-//		retval.append(" bound to thread(s) " + CollectionSupport.format(threadId, ", "));*/
-
 		return retval.toString();
 	}
 
-	//TODO reconsider use of attributes, since it may lead to less comprehensive code 
-
 	/**
 	 * Stores object during the lifespan of the request.
+	 * Use with care.
 	 *
 	 * @param key
 	 * @param value
@@ -311,15 +212,6 @@ public class StandardRequest implements Request//, PropertyListener
 		}
 		if (userSettings == null) {
 			userSettings = new Properties();
-
-			//create clone of default settings for this realm
-/*			GenericPropertyBundle requestScopeUserSettings = new GenericPropertyBundle(realm.getDefaultUserSettings());
-			if (entryPoint != null)
-			{
-				entryPoint.importUserSettings(this, requestScopeUserSettings);
-			}
-			requestScopeUserSettings.setListener(this);
-			userSettings = requestScopeUserSettings;*/
 		}
 		return userSettings;
 	}
@@ -334,104 +226,6 @@ public class StandardRequest implements Request//, PropertyListener
 		}
 	}
 
-
-	/**
-	 * Returns an existing and possibly filled out form obtained from a session
-	 * or internal attributes. If no form exists, a new form is created and
-	 * stored on the session or request.
-	 *
-	 * @param formId
-	 * @return
-	 */
-/*	public Form getForm(String formId)
-	{
-		Form retval = null;
-		if (session != null)
-		{
-			retval = session.getForm(formId);
-		}
-		if (retval == null && forms != null)
-		{
-			retval = (Form) forms.get(formId);
-		}
-		if (retval == null)
-		{
-			retval = new StandardForm(formId, StandardPersonalizedContent.getPersonalizedContent(getUserSettings(), application));
-		}
-		if (session != null)
-		{
-			session.putForm(formId, retval);
-		}
-		else
-		{
-			if(forms == null)
-			{
-				forms = new HashMap();
-			}
-			forms.put(formId, retval);
-		}
-		return retval;
-	}
-*/
-	/**
-	 * Stores a form on the request or the session if it exists.
-	 *
-	 * @param formId
-	 * @param form
-	 */
-/*	public void putForm(Object formId, Form form)
-	{
-		if (session != null)
-		{
-			session.putForm(formId, form);
-		}
-		else
-		{
-			if(forms == null)
-			{
-				forms = new HashMap();
-			}
-			forms.put(formId, form);
-		}
-	}
-*/
-	/**
-	 * @return the request represented in case this request is a downgraded internal request
-	 */
-/*	public Request getRepresentedRequest()
-	{
-		return representedUserRequest;
-	}*/
-
-	/**
-	 *
-	 * @param currentThreadId
-	 * @return
-	 */
-/*	private boolean isBoundToThread(int currentThreadId)
-	{
-		if(threadId[0] == currentThreadId)
-		{
-			return true;
-		}
-		for(int i = 1; i < threadId.length; i++)
-		{
-			if(threadId[i] == currentThreadId)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-*/
-	/**
-	 *
-	 * @return
-	 */
-/*	public boolean isBoundToCurrentThread()
-	{
-		return isBoundToThread(Thread.currentThread().hashCode());
-	}*/
 
 	/**
 	 * Tries to get a reference to the session identified by sessionToken
@@ -450,23 +244,15 @@ public class StandardRequest implements Request//, PropertyListener
 
 	@Override
 	public int getTimesEntered() {
-		// TODO Auto-generated method stub
 		return depth;
 	}
 
-	public void increaseTimesEntered(/*Request internalRequest*/) {
-//		if (internalRequests.containsKey(internalRequest))
-		{
-			depth++;
-		}
+	public void increaseTimesEntered() {
+		depth++;
 	}
 
-	public void decreaseTimesEntered(/*Request internalRequest*/) {
-//		if (internalRequests.containsKey(internalRequest))
-		{
-			depth--;
-		}
+	public void decreaseTimesEntered() {
+		depth--;
 	}
-
 
 }

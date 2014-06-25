@@ -37,7 +37,6 @@ public interface TextProvider {
 	/**
 	 * Provides personalized texts (from the default content category).
 	 * Note: if nothing is found, the key itself is returned.
-	 * Use TODO if you want to test if a text exists.
 	 *
 	 * @param key message key
 	 * @return
