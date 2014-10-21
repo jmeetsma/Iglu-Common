@@ -93,4 +93,20 @@ public interface Session {
 
 	<T> Component getAgent(String id);
 
+
+	/**
+	 * Stores some object as attribute on the session.
+	 *
+	 * @param key   attribute key
+	 * @param value attribute value
+	 */
+	void setAttribute(Object key, Object value);
+
+	/**
+	 * @param key attribute key
+	 * @return an object previously stored under the given key
+	 */
+	Object getAttribute(Object key);
+
+
 }

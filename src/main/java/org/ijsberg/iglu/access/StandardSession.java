@@ -55,6 +55,7 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 //	private HashMap usersByRealmId = new HashMap();
 	private User user;
 
+
 //	private Application application;
 
 	private HashMap forms;
@@ -248,6 +249,29 @@ public final class StandardSession implements Serializable, Session//, PropertyL
 		return result.toString();
 	}
 
+	/**
+	 * Stores object during the lifespan of the request.
+	 * Use with care.
+	 *
+	 * @param key
+	 * @param value
+	 */
+	public void setAttribute(Object key, Object value) {
+		attributes.put(key, value);
+	}
+
+	/**
+	 * Retrieves stored object.
+	 *
+	 * @param key
+	 * @return attribute stored under the key or null
+	 */
+	public Object getAttribute(Object key) {
+		if (attributes == null) {
+			return null;
+		}
+		return attributes.get(key);
+	}
 
 
 }
