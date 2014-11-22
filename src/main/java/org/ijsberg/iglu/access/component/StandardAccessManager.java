@@ -95,9 +95,10 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	 * <li>session_timeout : session timeout in seconds</li>
 	 * </ul>
 	 */
-	protected void setProperties(Properties properties) {
+	public void setProperties(Properties properties) {
 		sessionTimeout = Integer.valueOf(properties.getProperty("session_timeout", "" + sessionTimeout));
-		defaultAdminPassword = properties.getProperty("default_admin_password");
+		System.out.println(new LogEntry("session timeout set to " + sessionTimeout + " (sec)"));
+		defaultAdminPassword = properties.getProperty("default_admin_password", defaultAdminPassword);
 	}
 
 	/**
