@@ -190,7 +190,7 @@ public class StandardRequestMapper implements RequestMapper, Startable {
 						System.out.println(new LogEntry("mapping '" + mapping.getName() + "' is modified, attempting reload"));
 						result = true;
 
-						mapping = new IndentedConfigReaderMapping(mapping.getName(), /*Application.getRoot()+"/"+*/mapping.getFileName(), assembly);
+						mapping = new IndentedConfigReaderMapping(mapping.getName(), mapping.getFileName(), assembly);
 						//depends on strict
 						loadSucceeded = mapping.isLoaded();
 
