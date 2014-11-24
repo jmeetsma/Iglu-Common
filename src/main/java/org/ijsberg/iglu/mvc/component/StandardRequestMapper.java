@@ -117,7 +117,7 @@ public class StandardRequestMapper implements RequestMapper, Startable {
 	}
 
 	/**
-	 * @return a list containing error- and warningmessages that occurred while loading the mapping files
+	 * @return a list containing error- and warning messages that occurred while loading the mapping files
 	 */
 	public List getMessages() {
 		return loadMessages;

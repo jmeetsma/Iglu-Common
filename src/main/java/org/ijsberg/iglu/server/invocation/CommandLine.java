@@ -22,6 +22,9 @@ package org.ijsberg.iglu.server.invocation;
 import org.ijsberg.iglu.util.collection.ArraySupport;
 import org.ijsberg.iglu.util.misc.StringSupport;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  */
 public class CommandLine {
@@ -41,7 +44,20 @@ public class CommandLine {
 	}
 
 	public static String[] splitArguments(String line) {
-		return StringSupport.split(line, ", ", "\"").toArray(new String[0]);
+
+//		System.out.println("==x==> " + line);
+//		System.out.println("==x==> " + StringSupport.split(line, ",", ""));
+
+		List<String> result = new ArrayList<String>();
+		for(String s : StringSupport.split(line, ",", "")) {
+			result.add(s.trim());
+		}
+
+
+
+		//String[] result = StringSupport.split(line, ",", "").toArray(new String[0]);
+//		System.out.println(result);
+		return result.toArray(new String[0]);
 	}
 
 	/**
@@ -51,7 +67,7 @@ public class CommandLine {
 	 * @return
 	 */
 	public static String[] splitCommand(String line) {
-		return StringSupport.split(line, ".", "\"").toArray(new String[0]);
+		return StringSupport.split(line, ".", "").toArray(new String[0]);
 	}
 
 

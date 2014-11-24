@@ -106,6 +106,7 @@ public class Process extends MapElement {
 		timesProcessed++;
 		//success is defined by a successful redirect
 
+
 		Iterator i = elements.iterator();
 		while (i.hasNext()) {
 			MapElement fe = (MapElement) i.next();
