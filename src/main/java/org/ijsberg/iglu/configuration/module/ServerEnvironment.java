@@ -78,7 +78,7 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 		Runtime.getRuntime().addShutdownHook(shutdownHook);
 	}
 
-	private String[] args;
+	private String[] assemblyArgs;
 
 	/**
 	 * @param args
@@ -88,11 +88,15 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 	public ServerEnvironment(String... args) throws InstantiationException, ConfigurationException {
 
 		super();
-		this.args = args;
+		if(args.length == 0) {
+			throw new ConfigurationException("please provide an assembly class name as the first argument");
+		}
+		this.assemblyArgs = new String[args.length - 1];
+		System.arraycopy(args, 1, assemblyArgs, 0, args.length - 1);
 		String className = args[0];
 		Properties settings = PropertiesSupport.getCommandLineProperties(args);
 		assembly = instantiateAssembly(className, settings);
-		assembly.initialize(args);
+		assembly.initialize(assemblyArgs);
 		Component rootConsole = new StandardComponent(new RootConsole(assembly));
 		assembly.getCoreCluster().connect("RootConsole", rootConsole);
 		Component serverComponent = new StandardComponent(this);
@@ -150,7 +154,7 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 
 		try {
 			assembly = instantiateAssembly(className, settings);
-			assembly.initialize(args);
+			assembly.initialize(assemblyArgs);
 			Component rootConsole = new StandardComponent(new RootConsole(assembly));
 			assembly.getCoreCluster().connect("RootConsole", rootConsole);
 			Component serverComponent = new StandardComponent(this);
@@ -233,7 +237,7 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 			extClassLoader = new ExtendedClassPathClassLoader(extendedPath, Assembly.class.getPackage());
 			Map<String, Set<Object>> multipleResourceLocations = extClassLoader.getMultipleLocationsForResources();
 			if (multipleResourceLocations.size() > 0) {
-				System.out.print(new LogEntry(Level.CRITICAL, "extended class loader reports multiple locations for " + multipleResourceLocations.size() + " resources"));
+				System.out.println(new LogEntry(Level.CRITICAL, "extended class loader reports multiple locations for " + multipleResourceLocations.size() + " resources"));
 			}
 			Thread.currentThread().setContextClassLoader(extClassLoader);
 			return (Assembly) ReflectionSupport.instantiateClass(extClassLoader, className);

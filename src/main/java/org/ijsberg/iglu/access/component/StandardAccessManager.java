@@ -182,7 +182,10 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	public void register(Authenticator authenticator) {
 		if (this.authenticator == null) {
 			this.authenticator = authenticator;
-			System.out.println(new LogEntry("authenticator registered with request manager"));
+		} else if (!authenticator.getClass().getSimpleName().equals(this.authenticator.getClass().getSimpleName())) {
+			throw new ConfigurationException("attempt to replace authenticator " +
+					this.authenticator.getClass().getSimpleName() + " by " +
+					authenticator.getClass().getSimpleName());
 		}
 	}
 
@@ -192,6 +195,7 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	 * @param authenticator
 	 */
 	public void setAuthenticator(Authenticator authenticator) {
+		System.out.println("AUTH : " + authenticator + " " + this);
 		this.authenticator = authenticator;
 	}
 
@@ -415,6 +419,8 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 
 	@Override
 	public User authenticate(Credentials credentials) throws AuthenticationException {
+
+		System.out.println("AUTH 3 : " + authenticator + " " + this);
 
 		if (authenticator == null) {
 			if (credentials.equals(new SimpleCredentials(defaultAdminAccountName, defaultAdminPassword))) {
