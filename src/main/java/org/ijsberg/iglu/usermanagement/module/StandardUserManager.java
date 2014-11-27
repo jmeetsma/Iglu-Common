@@ -22,6 +22,7 @@ package org.ijsberg.iglu.usermanagement.module;
 import org.ijsberg.iglu.access.*;
 import org.ijsberg.iglu.configuration.ConfigurationException;
 import org.ijsberg.iglu.configuration.Startable;
+import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.usermanagement.Account;
 import org.ijsberg.iglu.usermanagement.UserManager;
 import org.ijsberg.iglu.usermanagement.domain.SimpleAccount;
@@ -37,7 +38,9 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -50,7 +53,7 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 	private static final int KEY_LENGTH = 256;
 
 	private static String passwordRegex = "\\w{4,10}";
-	private String storageFileName = "./data/users.bin";
+	protected String storageFileName = "./data/users.bin";
 	private boolean isStarted = false;
 
 	private HashMap<String, Account> accounts;
@@ -111,9 +114,14 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 		if (account != null) {
 			String password = getPasswordFromCredentials(credentials);
 			if (passwordsMatch(password, account.getHashedPassword())) {
-				return new BasicUser(account.getUserId(), account.getProperties());
+				BasicUser user = new BasicUser(account.getUserId(), account.getProperties());
+				if(account.getProperties().containsKey("group")) {
+					user.setGroup(new UserGroup(account.getProperties().getProperty("group"), ""));
+				}
+				return user;
 			}
 		}
+		System.out.println(new LogEntry("authentication failed for login " + credentials.getUserId()));
 		throw new AuthenticationException(AuthenticationException.CREDENTIALS_INVALID);
 	}
 
@@ -147,8 +155,36 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 	public void addAccount(String userId, String password) {
 
 		Account account = new SimpleAccount(userId, getHash(password));
+
 		accounts.put(userId, account);
 		save();
+	}
+
+	@Override
+	public void removeAccount(String userId) {
+
+		accounts.remove(userId);
+		save();
+	}
+
+	@Override
+	public boolean setGroup(String userId, String groupId) {
+
+		Account account = accounts.get(userId);
+		if(account != null) {
+			account.putProperty("group", groupId);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public List<String> listAccounts() {
+		List<String> retval = new ArrayList<String>();
+		for(Account account : accounts.values()) {
+			retval.add(account.getUserId() + ":" + account.getProperties().getProperty("group"));
+		}
+		return retval;
 	}
 
 	@Override

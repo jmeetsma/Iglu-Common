@@ -21,6 +21,8 @@ package org.ijsberg.iglu.usermanagement;
 
 import org.ijsberg.iglu.access.User;
 
+import java.util.List;
+
 /**
  */
 public interface UserManager {
@@ -29,4 +31,10 @@ public interface UserManager {
 	void addAccount(String userId, String password);
 
 	void addAccount(User user, String password);
+
+	void removeAccount(String userId);
+
+	boolean setGroup(String userId, String groupId);
+
+	List<String> listAccounts();
 }

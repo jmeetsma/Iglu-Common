@@ -420,8 +420,6 @@ public class StandardAccessManager implements AccessManager, Pageable, RequestRe
 	@Override
 	public User authenticate(Credentials credentials) throws AuthenticationException {
 
-		System.out.println("AUTH 3 : " + authenticator + " " + this);
-
 		if (authenticator == null) {
 			if (credentials.equals(new SimpleCredentials(defaultAdminAccountName, defaultAdminPassword))) {
 				return new BasicUser(credentials.getUserId());

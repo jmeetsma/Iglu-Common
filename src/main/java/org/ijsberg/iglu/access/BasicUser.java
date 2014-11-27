@@ -138,4 +138,8 @@ public class BasicUser implements User {
 		return group;
 	}
 
+	public void setGroup(UserGroup group) {
+		this.group = group;
+	}
+
 }
