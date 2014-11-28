@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Jeroen Meetsma - IJsberg
+ * Copyright 2011-2014 Jeroen Meetsma - IJsberg Automatisering BV
  *
  * This file is part of Iglu.
  *
@@ -26,7 +26,6 @@ import org.ijsberg.iglu.util.properties.PropertiesSupport;
 import org.ijsberg.iglu.util.time.SafeDateFormat;
 import org.ijsberg.iglu.util.types.Converter;
 
-import java.awt.*;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Date;

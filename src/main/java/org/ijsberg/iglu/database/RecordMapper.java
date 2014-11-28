@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013 Jeroen Meetsma - IJsberg
+ * Copyright 2011-2014 Jeroen Meetsma - IJsberg Automatisering BV
  *
  * This file is part of Iglu.
  *
@@ -20,7 +20,6 @@
 package org.ijsberg.iglu.database;
 
 import org.ijsberg.iglu.configuration.ConfigurationException;
-import org.ijsberg.iglu.mvc.Mapping;
 import org.ijsberg.iglu.util.types.Converter;
 
 import java.lang.reflect.Field;
