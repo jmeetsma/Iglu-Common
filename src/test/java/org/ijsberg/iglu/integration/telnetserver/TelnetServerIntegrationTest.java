@@ -19,8 +19,8 @@
 
 package org.ijsberg.iglu.integration.telnetserver;
 
-import org.ijsberg.iglu.configuration.Assembly;
 import org.ijsberg.iglu.configuration.Cluster;
+import org.ijsberg.iglu.configuration.module.BasicAssembly;
 import org.ijsberg.iglu.configuration.module.StandardCluster;
 import org.ijsberg.iglu.configuration.module.StandardComponent;
 import org.ijsberg.iglu.sample.configuration.TestObject;
@@ -38,7 +38,7 @@ import static junit.framework.Assert.assertTrue;
 
 /**
  */
-public class TelnetServerIntegrationTest implements Assembly {
+public class TelnetServerIntegrationTest extends BasicAssembly {
 
 	private HashMap<String, Cluster> clusterMap = new HashMap<String, Cluster>();
 	private TestObject testObject;

@@ -19,8 +19,8 @@
 
 package org.ijsberg.iglu.sample.configuration;
 
-import org.ijsberg.iglu.configuration.Assembly;
 import org.ijsberg.iglu.configuration.Cluster;
+import org.ijsberg.iglu.configuration.module.BasicAssembly;
 import org.ijsberg.iglu.configuration.module.StandardCluster;
 
 import java.util.HashMap;
@@ -28,7 +28,7 @@ import java.util.Map;
 
 /**
  */
-public class TestAssembly implements Assembly {
+public class TestAssembly extends BasicAssembly {
 
 	Cluster core;
 

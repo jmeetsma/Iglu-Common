@@ -17,34 +17,11 @@
  * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.ijsberg.iglu.configuration;
-
-
-import java.io.IOException;
-import java.util.Map;
+package org.ijsberg.iglu.invocation;
 
 /**
- * Implementations create an assembly of components and clusters that form an application.
- * This interface provides access for administrative purposes.
  */
-public interface Assembly {
-
-	/**
-	 * @return all clusters in the configuration
-	 */
-	Map<String, Cluster> getClusters();
-
-	/**
-	 * @return the cluster that contains the application's core components
-	 */
-	Cluster getCoreCluster();
-
-	/**
-	 * Creates the assembly.
-	 *
-	 * @param args command line arguments
-	 */
-	void initialize(String[] args);
-
-	void saveProperties() throws IOException;
+public interface PropertiesSetter {
+	@Parameters(decriptions = {"component name", "property name", "property value"})
+	void setProperty(String componentName, String propertyName, String propertyValue);
 }

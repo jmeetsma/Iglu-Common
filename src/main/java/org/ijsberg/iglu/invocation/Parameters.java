@@ -17,34 +17,17 @@
  * along with Iglu.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.ijsberg.iglu.configuration;
+package org.ijsberg.iglu.invocation;
 
-
-import java.io.IOException;
-import java.util.Map;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Implementations create an assembly of components and clusters that form an application.
- * This interface provides access for administrative purposes.
  */
-public interface Assembly {
-
-	/**
-	 * @return all clusters in the configuration
-	 */
-	Map<String, Cluster> getClusters();
-
-	/**
-	 * @return the cluster that contains the application's core components
-	 */
-	Cluster getCoreCluster();
-
-	/**
-	 * Creates the assembly.
-	 *
-	 * @param args command line arguments
-	 */
-	void initialize(String[] args);
-
-	void saveProperties() throws IOException;
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Parameters {
+	String[] decriptions();
 }
