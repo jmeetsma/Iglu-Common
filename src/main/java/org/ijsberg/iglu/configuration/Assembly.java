@@ -20,6 +20,8 @@
 package org.ijsberg.iglu.configuration;
 
 
+import org.ijsberg.iglu.invocation.ExposeInConsole;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -46,5 +48,6 @@ public interface Assembly {
 	 */
 	void initialize(String[] args);
 
+	@ExposeInConsole(description = "saves properties of components registered with", paramDesc = {})
 	void saveProperties() throws IOException;
 }

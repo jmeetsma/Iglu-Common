@@ -20,11 +20,14 @@
 package org.ijsberg.iglu.configuration.module;
 
 import org.ijsberg.iglu.configuration.Assembly;
+import org.ijsberg.iglu.configuration.Cluster;
 import org.ijsberg.iglu.configuration.Component;
+import org.ijsberg.iglu.logging.Level;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.util.io.FileSupport;
 import org.ijsberg.iglu.util.properties.PropertiesSupport;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +38,9 @@ import java.util.Properties;
 public abstract class BasicAssembly implements Assembly {
 
 	private Map<Component, String> propertyFileNamesByComponents = new HashMap<Component, String>();
+	protected String configDir;
+	protected static Cluster core;
+
 
 	public void setProperties(Component component, String fileName) {
 		Properties properties = PropertiesSupport.loadProperties(fileName);
@@ -50,6 +56,19 @@ public abstract class BasicAssembly implements Assembly {
 			System.out.println(new LogEntry("saving properties to " + fileName));
 			FileSupport.saveProperties(component.getProperties(), fileName);
 		}
+	}
+
+
+	public void initialize(String[] args) {
+		Properties settings = PropertiesSupport.getCommandLineProperties(args);
+		if(settings.containsKey("configdir")) {
+			configDir = settings.getProperty("configdir");
+			System.out.println(new LogEntry(Level.VERBOSE, "working directory is " + new File(configDir).getAbsolutePath()));
+		} else {
+			configDir = "conf";
+			System.out.println(new LogEntry(Level.VERBOSE, "setting -configdir not found: working directory is " + new File(configDir).getAbsolutePath()));
+		}
+
 	}
 
 

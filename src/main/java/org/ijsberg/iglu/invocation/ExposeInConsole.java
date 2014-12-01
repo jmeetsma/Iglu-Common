@@ -28,6 +28,9 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Parameters {
-	String[] decriptions();
+public @interface ExposeInConsole {
+
+	String[] paramDesc();
+
+	String description();
 }

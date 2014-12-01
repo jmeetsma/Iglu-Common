@@ -22,6 +22,5 @@ package org.ijsberg.iglu.invocation;
 /**
  */
 public interface PropertiesSetter {
-	@Parameters(decriptions = {"component name", "property name", "property value"})
 	void setProperty(String componentName, String propertyName, String propertyValue);
 }

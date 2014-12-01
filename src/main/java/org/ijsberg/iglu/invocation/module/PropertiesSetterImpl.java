@@ -21,8 +21,7 @@ package org.ijsberg.iglu.invocation.module;
 
 import org.ijsberg.iglu.configuration.Cluster;
 import org.ijsberg.iglu.configuration.Component;
-import org.ijsberg.iglu.configuration.Startable;
-import org.ijsberg.iglu.invocation.Parameters;
+import org.ijsberg.iglu.invocation.ExposeInConsole;
 import org.ijsberg.iglu.invocation.PropertiesSetter;
 import org.ijsberg.iglu.logging.LogEntry;
 import org.ijsberg.iglu.util.collection.ArraySupport;
@@ -45,36 +44,36 @@ public class PropertiesSetterImpl implements PropertiesSetter {
 	}
 
 	@Override
-	@Parameters(decriptions = {"component name", "property name", "property value"})
+	@ExposeInConsole(description = "sets module property, you may need to restart the module", paramDesc = {"component name", "property name", "property value"})
 	public void setProperty(String componentName, String propertyName, String propertyValue) {
 		for(Cluster cluster : clusters) {
 			Component component = cluster.getInternalComponents().get(componentName);
 			if(component != null) {
-				Startable startable = null;
-				if(component.implementsInterface(Startable.class)) {
-					startable = component.createProxy(Startable.class);
-					System.out.println(new LogEntry("stopping component " + componentName));
-					startable.stop();
-				}
 				System.out.println(new LogEntry("setting property " + propertyName + " with value " + propertyValue + " on " + componentName));
 				Properties properties = component.getProperties();
 				properties.setProperty(propertyName, propertyValue);
-				if(startable != null) {
-					System.out.println(new LogEntry("starting component " + componentName));
-					startable.start();
-				}
 			}
 		}
+	}
+
+	@ExposeInConsole(description = "lists module properties", paramDesc = {"module name"})
+	public String listProperties(String componentName) {
+		for(Cluster cluster : clusters) {
+			Component component = cluster.getInternalComponents().get(componentName);
+			if(component != null) {
+				return component.getProperties().toString();
+			}
+		}
+		return "component with name '" + componentName + "' not found in clusters " + clusters;
 	}
 
 	/**
 	 *
 	 * @param args
 	 */
-	@Parameters(decriptions = "hop")
 	public static void main(String[] args) throws Exception {
-		Parameters param = PropertiesSetterImpl.class.getMethod("test", new Class<?>[]{}).getAnnotation(Parameters.class);
-		System.out.println(ArraySupport.format(param.decriptions(),","));
+		ExposeInConsole param = PropertiesSetterImpl.class.getMethod("test", new Class<?>[]{}).getAnnotation(ExposeInConsole.class);
+		System.out.println(ArraySupport.format(param.paramDesc(),","));
 
 	}
 
