@@ -38,7 +38,7 @@ import java.util.Properties;
 public abstract class BasicAssembly implements Assembly {
 
 	private Map<Component, String> propertyFileNamesByComponents = new HashMap<Component, String>();
-	protected String configDir;
+	protected String configDir = "conf";
 	protected static Cluster core;
 
 
@@ -65,7 +65,6 @@ public abstract class BasicAssembly implements Assembly {
 			configDir = settings.getProperty("configdir");
 			System.out.println(new LogEntry(Level.VERBOSE, "working directory is " + new File(configDir).getAbsolutePath()));
 		} else {
-			configDir = "conf";
 			System.out.println(new LogEntry(Level.VERBOSE, "setting -configdir not found: working directory is " + new File(configDir).getAbsolutePath()));
 		}
 
