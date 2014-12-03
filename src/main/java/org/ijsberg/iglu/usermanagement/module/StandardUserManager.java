@@ -86,12 +86,12 @@ public class StandardUserManager implements UserManager, Authenticator, Startabl
 	}
 
 	private static String hash(String password, byte[] salt) throws InvalidKeySpecException, NoSuchAlgorithmException {
-		if ("".equals(password)) {
+/*		if ("".equals(password)) {
 			throw new IllegalArgumentException("empty passwords are not supported");
 		}
 		if (!PatternMatchingSupport.valueMatchesRegularExpression(password, passwordRegex)) {
 			throw new IllegalArgumentException("passwords does not match regular expression '" + passwordRegex + "'");
-		}
+		}       */
 		SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
 		SecretKey key = f.generateSecret(new PBEKeySpec(password.toCharArray(), salt, ITERATIONS, KEY_LENGTH));
 		return EncodingSupport.encodeBase64(key.getEncoded());
