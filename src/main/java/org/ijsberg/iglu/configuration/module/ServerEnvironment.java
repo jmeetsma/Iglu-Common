@@ -274,6 +274,8 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 		System.out.println("-rou: reset or reload on update of classes in extended class path");
 	}
 
+	private static ServerEnvironment server;
+
 	/**
 	 * Instantiates an assembly and starts startable components.
 	 * If an extended class path is provided, eligible classes will be loaded by ExtendedClassPathClassLoader.
@@ -292,10 +294,21 @@ public class ServerEnvironment extends ComponentStarter implements Runnable, Sys
 			printUsage();
 		} else {
 			System.out.println("Creating server environment for assembly " + args[0]);
-			ServerEnvironment server = new ServerEnvironment(args);
+			server = new ServerEnvironment(args);
 			System.out.println("Starting server ...");
 			server.start();
 			System.out.println("... Server started");
 		}
+	}
+
+	public static void startAsWindowsService(String[] args) throws Exception {
+		main(args);
+		while(server.isRunning) {
+			Thread.sleep(1000);
+		}
+	}
+
+	public static void stopAsWindowsService(String[] args) throws Exception {
+		server.stop();
 	}
 }
