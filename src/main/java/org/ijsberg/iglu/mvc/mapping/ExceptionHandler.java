@@ -20,7 +20,9 @@
 package org.ijsberg.iglu.mvc.mapping;
 
 import org.ijsberg.iglu.util.misc.StringSupport;
+import org.ijsberg.iglu.util.reflection.ReflectionSupport;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -49,15 +51,24 @@ public class ExceptionHandler extends InvocationResultExpression {
 
 	/**
 	 * @param t
-	 * @return true if the throwable encountered is listed
+	 * @return true if the throwable encountered (also as superclass or wrapped) is listed
 	 */
 	public Throwable doesCatch(Throwable t) {
+
 		while (t != null) {
 			if (caughtExceptions.contains(t.getClass().getName()) || caughtExceptions.contains(t.getClass().getSimpleName())) {
 				return t;
+			}
+			ArrayList<Class<Throwable>> superClasses =  ReflectionSupport.getAllSuperClassesFromClass(t.getClass(), Throwable.class);
+			for(Class<Throwable> superClass : superClasses) {
+				if (caughtExceptions.contains(superClass.getName()) || caughtExceptions.contains(superClass.getSimpleName())) {
+					return t;
+				}
 			}
 			t = t.getCause();
 		}
 		return null;
 	}
+
+
 }

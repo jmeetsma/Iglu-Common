@@ -47,4 +47,14 @@ public class LogPrintStream extends PrintStream {
 			super.print(message);
 		}
 	}
+
+/*	public void println(String message) {   TODO leads to stack overflow
+		logger.log(new LogEntry("STDOUT " + message));
+		super.println(message);
+	}
+
+	public void print(String message) {
+		logger.log(new LogEntry("STDOUT " + message));
+		super.print(message);
+	} */
 }

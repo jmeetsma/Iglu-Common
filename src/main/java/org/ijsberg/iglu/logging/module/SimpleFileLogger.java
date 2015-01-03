@@ -159,6 +159,7 @@ public class SimpleFileLogger implements Logger, Startable {
 
 
 	public synchronized void start() {
+		System.out.println(new LogEntry("starting file logging to " + this.fileName));
 		synchronized (lock) {
 			System.setOut(filteredSystemOut);
 			isStarted = true;
@@ -175,6 +176,7 @@ public class SimpleFileLogger implements Logger, Startable {
 
 	public void stop() {
 		synchronized (lock) {
+			System.out.println(new LogEntry("stopping file logging to " + this.fileName));
 			isStarted = false;
 			System.setOut(originalSystemOut);
 			logFilePrintStream.close();

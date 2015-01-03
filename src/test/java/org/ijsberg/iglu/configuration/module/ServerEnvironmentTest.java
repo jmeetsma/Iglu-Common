@@ -35,8 +35,8 @@ public class ServerEnvironmentTest {
 		ServerEnvironment env;// = new ServerEnvironment();
 		try {
 			env = new ServerEnvironment();
-			fail("ArrayIndexOutOfBoundsException expected");
-		} catch (ArrayIndexOutOfBoundsException expected) {
+			fail("ConfigurationException expected");
+		} catch (ConfigurationException expected) {
 		}
 		try {
 			env = new ServerEnvironment("org.iglu.BogusClass");

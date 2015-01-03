@@ -49,8 +49,8 @@ public class CommandLine {
 //		System.out.println("==x==> " + StringSupport.split(line, ",", ""));
 
 		List<String> result = new ArrayList<String>();
-		for(String s : StringSupport.split(line, ",", "")) {
-			result.add(s.trim());
+		for(String s : StringSupport.split(line, ", ", "\"")) {
+			result.add(s);
 		}
 
 

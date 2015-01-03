@@ -84,13 +84,10 @@ public class TelnetServerIntegrationTest extends BasicAssembly {
 
 	@Override
 	public Cluster getCoreCluster() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void initialize(String[] args) {
-		// TODO Auto-generated method stub
-
 	}
 }
