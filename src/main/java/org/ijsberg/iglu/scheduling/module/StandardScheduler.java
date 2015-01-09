@@ -137,6 +137,7 @@ public class StandardScheduler implements Runnable, Startable, Scheduler {
 	 * @param pageable
 	 */
 	public void register(Pageable pageable) {
+		System.out.println(pagedSystemObjectNames);
 		if (!pagedSystemObjectNames.contains(pageable.toString())) {
 			if (pageable.getPageIntervalInMinutes() <= 0) {
 				System.out.println(new LogEntry(Level.VERBOSE, "scheduler will not page " + StringSupport.trim(pageable.toString() + "'", 80, "...") + ": interval in minutes (" + pageable.getPageIntervalInMinutes() + ") is not valid"));
