@@ -45,18 +45,10 @@ public class CommandLine {
 
 	public static String[] splitArguments(String line) {
 
-//		System.out.println("==x==> " + line);
-//		System.out.println("==x==> " + StringSupport.split(line, ",", ""));
-
 		List<String> result = new ArrayList<String>();
-		for(String s : StringSupport.split(line, ", ", "\"")) {
-			result.add(s);
+		for(String s : StringSupport.split(line, ",", "")) {
+			result.add(s.trim());
 		}
-
-
-
-		//String[] result = StringSupport.split(line, ",", "").toArray(new String[0]);
-//		System.out.println(result);
 		return result.toArray(new String[0]);
 	}
 
