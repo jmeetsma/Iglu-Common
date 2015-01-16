@@ -71,6 +71,17 @@ public class PropertiesSupport {
 		return retval;
 	}
 
+	public static Set<String> getRootKeys(Properties properties) {
+		Set<String> retval = new HashSet<String>();
+		for (Object keyObj : properties.keySet()) {
+			String key = (String) keyObj;
+			if (key.indexOf(KEY_SEPARATOR) == -1) {
+				retval.add(key);
+			}
+		}
+		return retval;
+	}
+
 	/**
 	 * @param properties
 	 * @return
